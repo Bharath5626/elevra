@@ -1,0 +1,76 @@
+# ── Environment & secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+.venv/
+env/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log
+
+# ── Node / Frontend ──────────────────────────────────────────────────────────
+node_modules/
+dist/
+.cache/
+.parcel-cache/
+.vite/
+*.local
+
+# ── Frontend build output ────────────────────────────────────────────────────
+frontend/dist/
+frontend/.env
+frontend/.env.*
+
+# ── Browser extension ────────────────────────────────────────────────────────
+extension/*.zip
+extension/dist/
+
+# ── Docker ───────────────────────────────────────────────────────────────────
+.dockerignore
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+
+# ── Database ─────────────────────────────────────────────────────────────────
+*.sqlite3
+*.db
+
+# ── OS & editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── Misc ─────────────────────────────────────────────────────────────────────
+*.pem
+*.key
+*.cert
+uploads/
+media/

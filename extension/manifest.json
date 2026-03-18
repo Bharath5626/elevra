@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Elevra One-Click Apply",
+  "version": "1.0.0",
+  "description": "Auto-fill job application forms using your Elevra Career AI Studio profile.",
+  "permissions": ["tabs", "storage", "scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://localhost:5173/*",
+        "http://localhost:5174/*"
+      ],
+      "js": ["bridge.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Elevra One-Click Apply"
+  }
+}

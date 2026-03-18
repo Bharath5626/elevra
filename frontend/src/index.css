@@ -1,0 +1,354 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────
+   Elevra – Light Theme
+   ───────────────────────────────────────────────────── */
+
+@theme {
+  /* Primary – Coral / Salmon */
+  --color-primary-50:  #fff1f2;
+  --color-primary-100: #ffe4e6;
+  --color-primary-200: #ffcdd2;
+  --color-primary-300: #ff9aa5;
+  --color-primary-400: #ff6575;
+  --color-primary-500: #ff3d55;
+  --color-primary-600: #e72f41;
+  --color-primary-700: #c4202f;
+  --color-primary-800: #9c1d29;
+  --color-primary-900: #801d27;
+
+  /* Secondary – Deep Navy */
+  --color-secondary-50:  #e6eaf2;
+  --color-secondary-100: #b3bee0;
+  --color-secondary-200: #8093ce;
+  --color-secondary-300: #4d68bc;
+  --color-secondary-400: #1a3daa;
+  --color-secondary-500: #002058;
+  --color-secondary-600: #001a47;
+  --color-secondary-700: #001336;
+  --color-secondary-800: #000d25;
+  --color-secondary-900: #000614;
+
+  /* Accent – Purple / Lavender */
+  --color-accent-50:  #f5f3ff;
+  --color-accent-100: #ede9fe;
+  --color-accent-200: #ddd6fe;
+  --color-accent-300: #c4b5fd;
+  --color-accent-400: #b4a7f5;
+  --color-accent-500: #8b7bd4;
+  --color-accent-600: #6c5cb3;
+  --color-accent-700: #392c7d;
+  --color-accent-800: #2d2266;
+  --color-accent-900: #211950;
+
+  /* Surface (Light theme) */
+  --color-surface-50:  #fafafe;
+  --color-surface-100: #f7f7ff;
+  --color-surface-200: #f0f0f8;
+  --color-surface-300: #e9ecef;
+  --color-surface-400: #d1d5db;
+  --color-surface-500: #9ca3af;
+  --color-surface-600: #685f78;
+  --color-surface-700: #4b5563;
+  --color-surface-800: #374151;
+  --color-surface-900: #1f2937;
+  --color-surface-950: #0f172a;
+
+  /* Status */
+  --color-success-400: #22c55e;
+  --color-success-500: #16a34a;
+  --color-warning-400: #f59e0b;
+  --color-warning-500: #d97706;
+  --color-danger-400:  #ef4444;
+  --color-danger-500:  #dc2626;
+  --color-info-400:    #3b82f6;
+  --color-info-500:    #2563eb;
+}
+
+/* ─── Base ─────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-surface-100);
+  color: var(--color-surface-600);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  color: var(--color-secondary-500);
+  font-weight: 700;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ─── Layout ────────────────────────────── */
+.page-wrapper {
+  min-height: 100vh;
+  padding-top: 80px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ─── Gradient Text ───────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-accent-400) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Cards ─────────────────────────────── */
+.card {
+  background: var(--color-surface-50);
+  border: 1px solid var(--color-surface-300);
+  border-radius: 14px;
+  padding: 32px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-surface-400);
+}
+
+/* ─── Buttons ───────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 32px;
+  border-radius: 50px;
+  border: 2px solid transparent;
+  background: var(--color-primary-400);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-600);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 101, 117, 0.3);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border-radius: 50px;
+  border: 2px solid var(--color-accent-400);
+  background: transparent;
+  color: var(--color-accent-700);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--color-accent-400);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(180, 167, 245, 0.3);
+}
+
+/* ─── Inputs ────────────────────────────── */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--color-surface-300);
+  background: #fff;
+  color: var(--color-secondary-500);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--color-primary-400);
+  box-shadow: 0 0 0 3px rgba(255, 101, 117, 0.1);
+}
+
+.input::placeholder {
+  color: var(--color-surface-500);
+}
+
+/* ─── Badges ────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.badge-success {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.badge-danger {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.badge-info {
+  background: #eff6ff;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+/* ─── Glass (light version) ─────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-surface-300);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-surface-300);
+}
+
+/* ─── Hero Banner BG (inspired by reference) ── */
+.hero-bg {
+  background: linear-gradient(135deg, var(--color-accent-700) 0%, var(--color-secondary-500) 100%);
+}
+
+/* ─── Decorative Shapes (light theme) ──── */
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.12;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bg-orb-1 {
+  width: 500px;
+  height: 500px;
+  background: var(--color-primary-300);
+  top: -150px;
+  right: -100px;
+}
+
+.bg-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: var(--color-accent-400);
+  bottom: -100px;
+  left: -100px;
+}
+
+.bg-orb-3 {
+  width: 300px;
+  height: 300px;
+  background: var(--color-primary-200);
+  top: 40%;
+  left: 20%;
+}
+
+/* ─── Spin animation ──────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ─── Glass effect ────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(6px);
+  color: #fff;
+}
+
+/* ─── Score ring animation ──────────────── */
+@keyframes score-ring {
+  from { stroke-dashoffset: 283; }
+}
+
+/* ─── Pulse glow for recording ──────────── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 101, 117, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(255, 101, 117, 0); }
+}
+
+/* ─── Skeleton loader ──────────────────── */
+@keyframes skeleton-pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.5; }
+}
+
+.skeleton {
+  background: var(--color-surface-200);
+  border-radius: 8px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ─── Scrollbar ─────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface-200);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-400);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-500);
+}
+
+/* ─── Section styling ────────────────────── */
+.section-light {
+  background: #fff;
+}
+
+.section-subtle {
+  background: var(--color-surface-100);
+}
+
+/* ─── Breadcrumb gradient (from reference) ── */
+.breadcrumb-bg {
+  background: linear-gradient(90deg, #FEE0DE 0%, #E4F5FD 51.39%, #DDEDFF 100%);
+}
