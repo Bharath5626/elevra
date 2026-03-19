@@ -1,0 +1,164 @@
+import { useState, useEffect } from 'react';
+import { Outlet, useLocation, Navigate } from 'react-router-dom';
+import { Menu, X, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import Sidebar from './Sidebar';
+
+const routeTitles: Record<string, string> = {
+  '/dashboard':       'Dashboard',
+  '/resume':          'Resume Analysis',
+  '/interview/setup': 'Mock Interview',
+  '/roadmap':         'Learning Roadmap',
+  '/jobs':            'Find Jobs',
+  '/applications':    'Applications',
+  '/history':         'Interview History',
+};
+
+function getPageTitle(pathname: string): string {
+  if (routeTitles[pathname]) return routeTitles[pathname];
+  for (const [path, title] of Object.entries(routeTitles)) {
+    if (pathname.startsWith(path + '/')) return title;
+  }
+  if (pathname.includes('/session')) return 'Interview Session';
+  if (pathname.includes('/report'))  return 'Interview Report';
+  if (pathname.includes('/replay'))  return 'Session Replay';
+  return 'Career AI Studio';
+}
+
+export default function AppLayout() {
+  const { user, logout, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
+  // Close sidebar on route change on mobile
+  useEffect(() => {
+    if (isMobile) setSidebarOpen(false);
+  }, [location.pathname, isMobile]);
+
+  if (isLoading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7ff' }}>
+        <div style={{
+          width: 36, height: 36, borderRadius: '50%',
+          border: '3px solid #ffe4e6', borderTopColor: '#ff6575',
+          animation: 'spin 1s linear infinite',
+        }} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const pageTitle = getPageTitle(location.pathname);
+
+  return (
+    <div className="app-layout">
+      {/* ── Sidebar ── */}
+      <Sidebar
+        isOpen={isMobile ? sidebarOpen : true}
+        isMobile={isMobile}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      {/* ── Mobile backdrop ── */}
+      {isMobile && sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 30,
+            background: 'rgba(0,20,50,0.55)',
+            backdropFilter: 'blur(2px)',
+          }}
+        />
+      )}
+
+      {/* ── Right column (topbar + content) ── */}
+      <div className="app-main" style={{ marginLeft: isMobile ? 0 : 240 }}>
+
+        {/* Topbar */}
+        <header className="app-topbar">
+          {/* Hamburger – mobile only */}
+          {isMobile && (
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 36, height: 36, borderRadius: 8,
+                border: 'none', background: 'transparent',
+                cursor: 'pointer', color: '#002058',
+                flexShrink: 0,
+              }}
+            >
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          )}
+
+          {/* Page title */}
+          <h1 style={{
+            flex: 1,
+            fontSize: 17, fontWeight: 700,
+            color: '#002058', margin: 0,
+            fontFamily: 'Poppins, sans-serif',
+            letterSpacing: '-0.2px',
+          }}>
+            {pageTitle}
+          </h1>
+
+          {/* User chip */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 9,
+              padding: '5px 12px', borderRadius: 50,
+              background: '#f7f7ff',
+              border: '1px solid #E7E7E7',
+            }}>
+              <div style={{
+                width: 26, height: 26, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #ff6575, #b4a7f5)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#fff',
+              }}>
+                {(user?.full_name || user?.email || 'U')[0].toUpperCase()}
+              </div>
+              <span style={{
+                fontSize: 13, fontWeight: 600, color: '#002058',
+                maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {user?.full_name || user?.email}
+              </span>
+            </div>
+
+            {/* Logout */}
+            <button
+              onClick={logout}
+              title="Logout"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 34, height: 34, borderRadius: 8,
+                border: '1px solid #E7E7E7',
+                background: 'transparent', cursor: 'pointer',
+                color: '#685f78', transition: 'all 0.2s',
+              }}
+            >
+              <LogOut size={15} />
+            </button>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="app-content">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}

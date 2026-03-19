@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import AppLayout from './components/AppLayout';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -17,36 +17,28 @@ import HistoryPage from './pages/HistoryPage';
 import JobsPage from './pages/JobsPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 
-// Protected Route wrapper
-function ProtectedRoute() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-950">
-        <div className="w-8 h-8 border-2 border-primary-400/30 border-t-primary-400 rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <Outlet />;
+/** Wraps public pages with the top Navbar */
+function PublicLayout() {
+  return (
+    <>
+      <Navbar />
+      <Outlet />
+    </>
+  );
 }
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Navbar />
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        {/* Public routes – have the marketing Navbar */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
 
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
+        {/* Protected app routes – AppLayout handles auth guard + sidebar */}
+        <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/resume" element={<ResumePage />} />
           <Route path="/interview/setup" element={<InterviewSetupPage />} />

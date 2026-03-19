@@ -58,22 +58,21 @@ export default function ApplicationsPage() {
 
   /* ── Styles ─────────────────────────────────────── */
   const card: React.CSSProperties = {
-    background: '#fff', borderRadius: 20,
-    border: '1px solid var(--color-surface-300)',
-    boxShadow: '0 2px 12px rgba(0,0,0,.04)',
+    background: '#fff', borderRadius: 10,
+    border: '1px solid #E7E7E7',
+    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
   };
 
   if (loading) {
     return (
-      <div className="page-wrapper" style={{ background: 'var(--color-surface-100)', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
         <Loader2 size={32} className="animate-spin" style={{ color: 'var(--color-primary-400)' }} />
       </div>
     );
   }
 
   return (
-    <div className="page-wrapper" style={{ background: 'var(--color-surface-100)' }}>
-      <div className="container" style={{ maxWidth: 1100, paddingTop: 40, paddingBottom: 72 }}>
+    <div style={{ padding: '24px 28px 48px' }}>
 
         {/* ── Header ──────────────────────────────── */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
@@ -254,7 +253,6 @@ export default function ApplicationsPage() {
             </AnimatePresence>
           </div>
         )}
-      </div>
     </div>
   );
 }

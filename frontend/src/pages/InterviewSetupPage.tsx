@@ -75,8 +75,7 @@ export default function InterviewSetupPage() {
   };
 
   return (
-    <div className="page-wrapper" style={{ background: 'linear-gradient(135deg, #f7f7ff 0%, #f0f4ff 100%)', minHeight: '100vh' }}>
-      <div className="container" style={{ maxWidth: 760, paddingTop: 48, paddingBottom: 64 }}>
+    <div style={{ padding: '24px 28px 48px', maxWidth: 760, margin: '0 auto' }}>
 
         {/* Header */}
         <motion.div {...fadeUp(0)} style={{ marginBottom: 40 }}>
@@ -338,7 +337,6 @@ export default function InterviewSetupPage() {
           </motion.div>
 
         </div>
-      </div>
     </div>
   );
 }

@@ -34,36 +34,14 @@ export default function RoadmapHistoryPage() {
   /* ── Loading ─────────────────────────────────────────────────── */
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <Loader2 size={32} className="animate-spin" style={{ color: '#6366f1' }} />
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '40px 24px 80px', paddingTop: 100 }}>
-      <div style={{ maxWidth: 760, margin: '0 auto' }}>
-
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 36 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
-            <div style={{
-              width: 48, height: 48, borderRadius: 14,
-              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
-              <MapPin size={22} style={{ color: '#fff' }} />
-            </div>
-            <div>
-              <h1 style={{ fontSize: 26, fontWeight: 700, color: '#0f172a', margin: 0 }}>
-                Learning Roadmaps
-              </h1>
-              <p style={{ fontSize: 14, color: '#64748b', margin: 0, marginTop: 2 }}>
-                All AI-generated roadmaps from your past interview sessions
-              </p>
-            </div>
-          </div>
-        </motion.div>
+    <div style={{ padding: '24px 28px 48px', maxWidth: 760, margin: '0 auto' }}>
 
         {/* Error */}
         {error && (
@@ -80,8 +58,8 @@ export default function RoadmapHistoryPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
             style={{
-              background: '#fff', borderRadius: 20, border: '1px solid #e2e8f0',
-              boxShadow: '0 1px 4px rgba(0,0,0,.06)',
+              background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7',
+              boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
               padding: '60px 40px', textAlign: 'center',
             }}
           >
@@ -120,9 +98,9 @@ export default function RoadmapHistoryPage() {
               >
                 <div
                   style={{
-                    background: '#fff', borderRadius: 18,
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 1px 3px rgba(0,0,0,.05)',
+                    background: '#fff', borderRadius: 10,
+                    border: '1px solid #E7E7E7',
+                    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
                     padding: '24px 28px',
                     transition: 'box-shadow .2s, transform .2s',
                     cursor: 'pointer',
@@ -205,7 +183,6 @@ export default function RoadmapHistoryPage() {
           ))}
         </div>
 
-      </div>
     </div>
   );
 }

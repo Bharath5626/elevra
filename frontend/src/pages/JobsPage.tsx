@@ -158,9 +158,9 @@ export default function JobsPage() {
 
   /* ── style helpers ────────────────────────────────── */
   const card: React.CSSProperties = {
-    background: '#fff', borderRadius: 20,
-    border: '1px solid var(--color-surface-300)',
-    boxShadow: '0 2px 12px rgba(0,0,0,.04)',
+    background: '#fff', borderRadius: 10,
+    border: '1px solid #E7E7E7',
+    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
   };
   const inputStyle: React.CSSProperties = {
     flex: 1, minWidth: 0, padding: '12px 16px 12px 42px',
@@ -170,8 +170,7 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="page-wrapper" style={{ background: 'var(--color-surface-100)' }}>
-      <div className="container" style={{ maxWidth: 1100, paddingTop: 40, paddingBottom: 72 }}>
+    <div style={{ padding: '24px 28px 48px' }}>
 
         {/* ── Header ────────────────────────────────── */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
@@ -522,8 +521,6 @@ export default function JobsPage() {
             </Link>
           </div>
         )}
-
-      </div>
 
       {/* ── Cover Letter Modal ──────────────────────── */}
       {applyJob && (

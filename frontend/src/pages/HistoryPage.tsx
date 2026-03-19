@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { interviewAPI } from '../services/api';
 import type { InterviewSession } from '../types';
-import {
-  History, Mic, ChevronRight, TrendingUp, TrendingDown,
-  Calendar, Loader2, Sparkles, ArrowRight, Filter,
-} from 'lucide-react';
+import { History, Mic, ChevronRight, TrendingUp, TrendingDown, Calendar, Loader2, Sparkles, ArrowRight, Filter, Award, CheckCircle } from 'lucide-react';
+import StatCard from '../components/StatCard';
 
 export default function HistoryPage() {
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
@@ -44,7 +42,7 @@ export default function HistoryPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', paddingTop: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Loader2 size={36} className="animate-spin" style={{ color: 'var(--color-primary-400)' }} />
       </div>
     );
@@ -56,54 +54,24 @@ export default function HistoryPage() {
   const completed = sessions.filter((s) => s.status === 'completed').length;
 
   return (
-    <div style={{ minHeight: '100vh', paddingTop: 80, background: 'var(--color-surface-100)' }}>
-      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '40px 32px' }}>
-
-        {/* Page header */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-            <div style={{
-              width: 40, height: 40, borderRadius: 10,
-              background: 'linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400))',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <History size={20} color="#fff" />
-            </div>
-            <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 700, color: 'var(--color-secondary-500)', margin: 0 }}>
-              Session History
-            </h1>
-          </div>
-          <p style={{ fontSize: 15, color: 'var(--color-surface-600)', marginLeft: 52 }}>
-            Track your interview performance over time.
-          </p>
-        </motion.div>
+    <div style={{ padding: '24px 28px 48px' }}>
 
         {/* Stats row */}
         {sessions.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.05 }}
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 180px), 1fr))',
-              gap: 16, marginBottom: 28,
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 220px), 1fr))',
+              gap: 16, marginBottom: 24,
             }}
           >
-            {[
-              { value: sessions.length, label: 'Total Sessions', color: 'var(--color-primary-400)' },
-              { value: avgScore, label: 'Avg Score', color: '#22c55e' },
-              { value: bestScore, label: 'Best Score', color: '#3b82f6' },
-              { value: completed, label: 'Completed', color: '#a855f7' },
-            ].map(({ value, label, color }) => (
-              <div key={label} style={{
-                background: '#fff', borderRadius: 14, border: '1px solid var(--color-surface-300)',
-                boxShadow: '0 2px 10px rgba(0,0,0,.04)', padding: '20px 24px', textAlign: 'center',
-              }}>
-                <p style={{ fontSize: 28, fontWeight: 800, color, margin: 0 }}>{value}</p>
-                <p style={{ fontSize: 12, color: 'var(--color-surface-500)', marginTop: 4 }}>{label}</p>
-              </div>
-            ))}
+            <StatCard label="Total Sessions" value={sessions.length}    icon={History}   iconColor="#FF6575" />
+            <StatCard label="Average Score"  value={`${avgScore}%`}    icon={TrendingUp} iconColor="#22c55e" />
+            <StatCard label="Best Score"     value={`${bestScore}/100`} icon={Award}      iconColor="#3b82f6" />
+            <StatCard label="Completed"      value={completed}          icon={CheckCircle} iconColor="#a855f7" />
           </motion.div>
         )}
 
@@ -138,8 +106,8 @@ export default function HistoryPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             style={{
-              background: '#fff', borderRadius: 16, border: '1px solid var(--color-surface-300)',
-              boxShadow: '0 2px 12px rgba(0,0,0,.04)',
+              background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7',
+              boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
               padding: '64px 32px', textAlign: 'center',
             }}
           >
@@ -184,9 +152,9 @@ export default function HistoryPage() {
                     style={{ textDecoration: 'none', display: 'block' }}
                   >
                     <div style={{
-                      background: '#fff', borderRadius: 14,
-                      border: '1px solid var(--color-surface-300)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,.04)',
+                      background: '#fff', borderRadius: 10,
+                      border: '1px solid #E7E7E7',
+                      boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
                       padding: '18px 24px',
                       display: 'flex', alignItems: 'center', gap: 16,
                       transition: 'box-shadow .2s, border-color .2s',
@@ -256,7 +224,6 @@ export default function HistoryPage() {
             })}
           </div>
         )}
-      </div>
     </div>
   );
 }

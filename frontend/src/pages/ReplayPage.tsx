@@ -26,7 +26,7 @@ export default function ReplayPage() {
   /* ── Loading ─────────────────────────────────────────── */
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', paddingTop: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7f7ff' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <Loader2 size={32} className="animate-spin" style={{ color: '#ff6575' }} />
       </div>
     );
@@ -35,7 +35,7 @@ export default function ReplayPage() {
   /* ── Empty state ─────────────────────────────────────── */
   if (answers.length === 0) {
     return (
-      <div style={{ minHeight: '100vh', paddingTop: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7f7ff', padding: '80px 24px 24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '24px' }}>
         <div style={{ textAlign: 'center' }}>
           <Play size={48} style={{ color: '#d1d5db', margin: '0 auto 12px', display: 'block' }} />
           <p style={{ fontSize: 15, color: '#685f78', marginBottom: 20 }}>No recordings found for this session</p>
@@ -59,8 +59,7 @@ export default function ReplayPage() {
 
   /* ── Main ────────────────────────────────────────────── */
   return (
-    <div style={{ minHeight: '100vh', paddingTop: 80, backgroundColor: '#f7f7ff' }}>
-      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '40px 32px 64px' }}>
+    <div style={{ padding: '24px 28px 48px' }}>
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
@@ -117,6 +116,5 @@ export default function ReplayPage() {
           />
         </motion.div>
       </div>
-    </div>
   );
 }

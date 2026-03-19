@@ -19,9 +19,9 @@ import {
 /* ---------- inline style helpers ---------------------------------- */
 const s = {
   page: {
-    minHeight: '100vh',
-    backgroundColor: '#f8fafc',
-    padding: '32px 24px 80px',
+    padding: '24px 28px 48px',
+    maxWidth: 800,
+    margin: '0 auto',
   } as React.CSSProperties,
 
   inner: {
@@ -31,18 +31,18 @@ const s = {
 
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: 16,
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+    borderRadius: 10,
+    border: '1px solid #E7E7E7',
+    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
     padding: 24,
     marginBottom: 20,
   } as React.CSSProperties,
 
   cardFlush: {
     backgroundColor: '#ffffff',
-    borderRadius: 16,
-    border: '1px solid #e2e8f0',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+    borderRadius: 10,
+    border: '1px solid #E7E7E7',
+    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
     overflow: 'hidden',
     marginBottom: 16,
   } as React.CSSProperties,
@@ -133,12 +133,11 @@ const s = {
   } as React.CSSProperties,
 
   centered: {
-    minHeight: '100vh',
+    minHeight: '60vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '24px 16px',
-    backgroundColor: '#f8fafc',
   } as React.CSSProperties,
 
   centerCard: {

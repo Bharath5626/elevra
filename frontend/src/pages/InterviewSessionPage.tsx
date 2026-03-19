@@ -63,7 +63,7 @@ export default function InterviewSessionPage() {
   /* ── Loading ──────────────────────────────────────────── */
   if (loading) {
     return (
-      <div className="page-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <Loader2 size={36} className="animate-spin text-primary-400" />
       </div>
     );
@@ -71,7 +71,7 @@ export default function InterviewSessionPage() {
 
   if (!session) {
     return (
-      <div className="page-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <div className="text-center">
           <HelpCircle size={52} style={{ margin: '0 auto 12px', color: 'var(--color-surface-400)' }} />
           <p style={{ color: 'var(--color-surface-600)' }}>Session not found</p>
@@ -83,7 +83,7 @@ export default function InterviewSessionPage() {
   /* ── Analyzing overlay ────────────────────────────────── */
   if (analyzing) {
     return (
-      <div className="page-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '0 24px' }}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -116,11 +116,7 @@ export default function InterviewSessionPage() {
   const allSubmitted    = submitted.size >= totalQ;
 
   return (
-    <div
-      className="page-wrapper"
-      style={{ background: 'linear-gradient(135deg, #f7f7ff 0%, #f0f4ff 100%)', minHeight: '100vh' }}
-    >
-      <div className="container" style={{ maxWidth: 1100, paddingTop: 40, paddingBottom: 60 }}>
+    <div style={{ padding: '24px 28px 48px' }}>
 
         {/* ── Header ────────────────────────────────────────── */}
         <motion.div
@@ -346,7 +342,6 @@ export default function InterviewSessionPage() {
           )}
         </div>
 
-      </div>
     </div>
   );
 }

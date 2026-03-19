@@ -63,6 +63,33 @@
   --color-danger-500:  #dc2626;
   --color-info-400:    #3b82f6;
   --color-info-500:    #2563eb;
+
+  /* Theme Gray Scale (from reference) */
+  --color-gray-100: #E7E7E7;
+  --color-gray-200: #D1D1D1;
+  --color-gray-300: #B0B0B0;
+  --color-gray-400: #888888;
+  --color-gray-500: #6D6D6D;
+  --color-gray-600: #5D5D5D;
+  --color-gray-700: #4F4F4F;
+  --color-gray-800: #3D3D3D;
+  --color-gray-900: #191919;
+
+  /* Light Scale (surface backgrounds) */
+  --color-light-100: #FEFEFE;
+  --color-light-200: #FCFCFD;
+  --color-light-300: #FBFBFD;
+  --color-light-400: #F9FAFC;
+  --color-light-500: #F8FAFB;
+  --color-light-600: #F7F9FB;
+  --color-light-700: #F6F8FA;
+  --color-light-800: #F5F7FA;
+  --color-light-900: #F4F6F9;
+
+  /* Shadow tokens */
+  --shadow-sm: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0px 3px 8px 0px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0px 2px 5px rgba(0, 0, 0, 0.06);
 }
 
 /* ─── Base ─────────────────────────────── */
@@ -76,7 +103,8 @@ body {
   font-family: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif;
   background-color: var(--color-surface-100);
   color: var(--color-surface-600);
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -91,9 +119,66 @@ a { text-decoration: none; color: inherit; }
 /* ─── Layout ────────────────────────────── */
 .page-wrapper {
   min-height: 100vh;
-  padding-top: 80px;
   position: relative;
   overflow-x: hidden;
+}
+
+/* ─── App Shell (sidebar layout) ────────── */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;
+  background: #002058;
+  z-index: 40;
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-sidebar.sidebar-hidden {
+  transform: translateX(-100%);
+}
+
+.app-main {
+  flex: 1;
+  margin-left: 240px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid var(--color-gray-100);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+}
+
+.app-content {
+  flex: 1;
+  background: #f7f7ff;
+  overflow-y: auto;
+}
+
+@media (max-width: 767px) {
+  .app-main {
+    margin-left: 0 !important;
+  }
 }
 
 .container {

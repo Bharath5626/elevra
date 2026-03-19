@@ -17,12 +17,8 @@ ROOT     = os.path.dirname(os.path.abspath(__file__))
 BACKEND  = os.path.join(ROOT, "backend")
 FRONTEND = os.path.join(ROOT, "frontend")
 
-# Use the venv uvicorn on Windows; fall back to system uvicorn
-UVICORN = (
-    os.path.join(BACKEND, "venv", "Scripts", "uvicorn.exe")
-    if os.path.exists(os.path.join(BACKEND, "venv", "Scripts", "uvicorn.exe"))
-    else "uvicorn"
-)
+# Run uvicorn as a Python module to avoid Application Control blocks on .exe files
+UVICORN = [sys.executable, "-m", "uvicorn"]
 
 # ── ANSI colour helpers ───────────────────────────────────────────────────────
 # Enable VT processing on Windows 10+
@@ -89,7 +85,7 @@ def main() -> None:
 
     # Backend
     backend_proc = start_process(
-        [UVICORN, "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"],
+        UVICORN + ["app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"],
         cwd=BACKEND,
     )
     processes.append(backend_proc)

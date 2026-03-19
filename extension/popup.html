@@ -4,81 +4,274 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elevra Apply</title>
+  <link rel="stylesheet" href="popup.css" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ── Elevra design tokens (mirrors frontend/src/index.css @theme) ── */
+    :root {
+      --color-primary-400:  #ff6575;
+      --color-accent-400:   #b4a7f5;
+      --color-surface-950:  #0f172a;
+      --color-surface-900:  #1e293b;
+      --color-surface-800:  #334155;
+      --color-surface-700:  #475569;
+      --color-surface-600:  #64748b;
+      --color-surface-500:  #94a3b8;
+      --color-surface-200:  #e2e8f0;
+      --color-surface-100:  #f1f5f9;
+      --color-success-400:  #22c55e;
+    }
+
+    /* ── Reset & base ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      width: 260px;
-      padding: 20px 18px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0f172a;
-      color: #f1f5f9;
+      width: 360px;
+      padding: 20px;
+      background: var(--color-surface-950);
+      color: var(--color-surface-100);
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
-    .logo {
-      font-size: 17px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #FF6575, #B4A7F5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.3px;
-      margin-bottom: 4px;
-    }
-    .tagline {
-      font-size: 11px;
-      color: #64748b;
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
       margin-bottom: 16px;
     }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: 11px;
+      color: var(--color-surface-600);
+      margin-top: 3px;
+      letter-spacing: 0.2px;
+    }
+
+    .version-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-surface-600);
+      border: 1px solid var(--color-surface-800);
+      border-radius: 6px;
+      padding: 2px 7px;
+      margin-top: 2px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    /* ── Status card ── */
     .status-card {
-      background: #1e293b;
+      background: var(--color-surface-900);
+      border: 1px solid var(--color-surface-800);
       border-radius: 10px;
-      padding: 12px 14px;
+      padding: 11px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #22c55e;
+
+    .dot-wrap {
+      position: relative;
+      width: 10px;
+      height: 10px;
       flex-shrink: 0;
-      box-shadow: 0 0 6px rgba(34,197,94,.6);
     }
-    .status-text {
+
+    .dot-core {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--color-success-400);
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+    }
+
+    .dot-ring {
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.2);
+      animation: ring-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes ring-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50%       { transform: scale(1.8); opacity: 0; }
+    }
+
+    .status-label { font-size: 12px; font-weight: 600; color: var(--color-surface-100); }
+    .status-sub   { font-size: 10px; color: var(--color-surface-500); margin-top: 1px; }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-surface-600);
+      margin-bottom: 10px;
+    }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: var(--color-surface-900);
+      border: 1px solid var(--color-surface-800);
+      border-radius: 9px;
+      padding: 10px 12px;
+    }
+
+    .step-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 1px;
+    }
+
+    .step-num.accent {
+      background: rgba(180, 167, 245, 0.12);
+      border: 1px solid rgba(180, 167, 245, 0.3);
+      color: var(--color-accent-400);
+    }
+
+    .step-num.coral {
+      background: rgba(255, 101, 117, 0.12);
+      border: 1px solid rgba(255, 101, 117, 0.3);
+      color: var(--color-primary-400);
+    }
+
+    .step-title {
       font-size: 12px;
       font-weight: 600;
-      color: #e2e8f0;
+      color: var(--color-surface-100);
+      line-height: 1.3;
     }
-    .hint {
+
+    .step-desc {
       font-size: 11px;
-      color: #475569;
-      line-height: 1.5;
+      color: var(--color-surface-500);
+      margin-top: 2px;
+      line-height: 1.45;
     }
-    .divider {
-      height: 1px;
-      background: #1e293b;
-      margin: 12px 0;
+
+    .hi-accent { color: var(--color-accent-400); font-weight: 600; }
+    .hi-coral  { color: var(--color-primary-400); font-weight: 600; }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--color-surface-800); margin: 2px 0 16px; }
+
+    /* ── Dashboard button ── */
+    .btn-dashboard {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400));
+      border: none;
+      border-radius: 9px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1px;
+      cursor: pointer;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-dashboard:hover  { opacity: 0.88; transform: translateY(-1px); }
+    .btn-dashboard:active { opacity: 1;    transform: translateY(0); }
+
+    .btn-icon { font-size: 14px; line-height: 1; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--color-surface-700);
+      margin-top: 14px;
+      letter-spacing: 0.2px;
     }
   </style>
 </head>
 <body>
-  <p class="logo">Elevra Apply</p>
-  <p class="tagline">One-Click Job Application</p>
 
-  <div class="status-card">
-    <span class="dot"></span>
-    <span class="status-text">Extension Active</span>
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <div class="header">
+    <div>
+      <p class="logo">Elevra Apply</p>
+      <p class="tagline">One-Click Job Application</p>
+    </div>
+    <span class="version-badge">v1.0</span>
   </div>
 
-  <p class="hint">
-    Visit the <strong style="color:#B4A7F5">Elevra Jobs</strong> page and click
-    <strong style="color:#FF6575">One-Click Apply</strong> on any job listing.
-  </p>
+  <!-- ── Status card ─────────────────────────────────────── -->
+  <div class="status-card">
+    <div class="dot-wrap">
+      <span class="dot-ring"></span>
+      <span class="dot-core"></span>
+    </div>
+    <div>
+      <p class="status-label">Extension Active</p>
+      <p class="status-sub">Ready to auto-fill &amp; apply</p>
+    </div>
+  </div>
 
+  <!-- ── How it works ────────────────────────────────────── -->
+  <p class="section-label">How it works</p>
+  <div class="steps">
+    <div class="step">
+      <span class="step-num accent">1</span>
+      <div>
+        <p class="step-title">Visit <span class="hi-accent">Elevra Jobs</span></p>
+        <p class="step-desc">Browse job listings on the Elevra platform.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num coral">2</span>
+      <div>
+        <p class="step-title">Click <span class="hi-coral">One-Click Apply</span></p>
+        <p class="step-desc">Forms are auto-filled using your resume &amp; profile data.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Divider ─────────────────────────────────────────── -->
   <div class="divider"></div>
 
-  <p class="hint" style="color:#334155">
-    Forms are auto-filled using your resume &amp; profile data stored in Elevra.
-  </p>
+  <!-- ── Dashboard CTA ───────────────────────────────────── -->
+  <button id="open-dashboard" type="button" class="btn-dashboard">
+    <span class="btn-icon">↗</span> Open Dashboard
+  </button>
+
+  <!-- ── Footer ─────────────────────────────────────────── -->
+  <p class="footer">Powered by your Elevra profile</p>
+
+  <script src="popup.js"></script>
 </body>
 </html>

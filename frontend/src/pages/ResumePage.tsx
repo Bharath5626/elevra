@@ -47,27 +47,10 @@ export default function ResumePage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', paddingTop: 80, background: 'var(--color-surface-100)' }}>
-      <div style={{ maxWidth: 1320, margin: '0 auto', padding: '40px 32px' }}>
-
-        {/* Page header */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-            <div style={{
-              width: 40, height: 40, borderRadius: 10,
-              background: 'linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400))',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <FileText size={20} color="#fff" />
-            </div>
-            <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', fontWeight: 700, color: 'var(--color-secondary-500)', margin: 0 }}>
-              Resume Intelligence
-            </h1>
-          </div>
-          <p style={{ fontSize: 15, color: 'var(--color-surface-600)', marginLeft: 52 }}>
-            Upload your resume and get AI-powered ATS scoring, skill gap analysis, and bullet improvements.
-          </p>
-        </motion.div>
+    <div style={{ padding: '24px 28px 48px' }}>
+      <p style={{ fontSize: 13, color: '#685f78', margin: '0 0 24px' }}>
+        Upload your resume and get AI-powered ATS scoring, skill gap analysis, and bullet improvements.
+      </p>
 
         {/* Two-column grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 480px), 1fr))', gap: 24 }}>
@@ -79,10 +62,10 @@ export default function ResumePage() {
             transition={{ delay: 0.1 }}
             style={{
               background: '#fff',
-              borderRadius: 16,
-              border: '1px solid var(--color-surface-300)',
-              boxShadow: '0 2px 16px rgba(0,0,0,.05)',
-              padding: '32px',
+              borderRadius: 10,
+              border: '1px solid #E7E7E7',
+              boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+              padding: '28px',
               display: 'flex', flexDirection: 'column', gap: 24,
             }}
           >
@@ -195,10 +178,10 @@ export default function ResumePage() {
             transition={{ delay: 0.2 }}
             style={{
               background: '#fff',
-              borderRadius: 16,
-              border: '1px solid var(--color-surface-300)',
-              boxShadow: '0 2px 16px rgba(0,0,0,.05)',
-              padding: '32px',
+              borderRadius: 10,
+              border: '1px solid #E7E7E7',
+              boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+              padding: '28px',
               display: 'flex', flexDirection: 'column',
             }}
           >
@@ -305,7 +288,6 @@ export default function ResumePage() {
             )}
           </motion.div>
         </div>
-      </div>
     </div>
   );
 }

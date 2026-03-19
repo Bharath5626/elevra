@@ -71,8 +71,7 @@ export default function InterviewReportPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'var(--color-surface-100)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <Loader2 size={36} style={{ color: 'var(--color-primary-400)', animation: 'spin 1s linear infinite' }} />
       </div>
     );
@@ -80,8 +79,7 @@ export default function InterviewReportPage() {
 
   if (loadFailed || !session) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'var(--color-surface-100)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <div style={{ textAlign: 'center' }}>
           <BarChart3 size={48} style={{ color: 'var(--color-surface-400)', margin: '0 auto 12px' }} />
           <p style={{ fontSize: 14, color: 'var(--color-surface-600)' }}>Report not available yet</p>
@@ -92,8 +90,7 @@ export default function InterviewReportPage() {
 
   if (session.status !== 'completed' || answers.length === 0) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'var(--color-surface-100)', padding: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '24px' }}>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -132,14 +129,13 @@ export default function InterviewReportPage() {
   /* ─── shared inline style helpers ────────────────────── */
   const card: React.CSSProperties = {
     background: '#fff',
-    borderRadius: 20,
-    border: '1px solid var(--color-surface-300)',
-    boxShadow: '0 2px 12px rgba(0,0,0,.04)',
+    borderRadius: 10,
+    border: '1px solid #E7E7E7',
+    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
   };
 
   return (
-    <div className="page-wrapper" style={{ background: 'var(--color-surface-100)' }}>
-      <div className="container" style={{ maxWidth: 1100, paddingTop: 40, paddingBottom: 72 }}>
+    <div style={{ padding: '24px 28px 48px' }}>
 
         {/* ── Back + page header ───────────────────────────── */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 32 }}>
@@ -406,7 +402,6 @@ export default function InterviewReportPage() {
           )}
         </AnimatePresence>
 
-      </div>
     </div>
   );
 }
