@@ -61,6 +61,19 @@ async def create_roadmap(
     return record
 
 
+@router.get("/all", response_model=list[RoadmapOut])
+async def list_roadmaps(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    r = await db.execute(
+        select(LearningRoadmap)
+        .where(LearningRoadmap.user_id == current_user.id)
+        .order_by(LearningRoadmap.generated_at.desc())
+    )
+    return r.scalars().all()
+
+
 @router.get("/{session_id}", response_model=RoadmapOut)
 async def get_roadmap(
     session_id: str,
@@ -77,16 +90,3 @@ async def get_roadmap(
     if not record:
         raise HTTPException(status_code=404, detail="Roadmap not found. Generate one first.")
     return record
-
-
-@router.get("/all", response_model=list[RoadmapOut])
-async def list_roadmaps(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    r = await db.execute(
-        select(LearningRoadmap)
-        .where(LearningRoadmap.user_id == current_user.id)
-        .order_by(LearningRoadmap.generated_at.desc())
-    )
-    return r.scalars().all()

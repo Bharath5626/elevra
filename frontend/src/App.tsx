@@ -12,6 +12,7 @@ import InterviewSessionPage from './pages/InterviewSessionPage';
 import InterviewReportPage from './pages/InterviewReportPage';
 import ReplayPage from './pages/ReplayPage';
 import RoadmapPage from './pages/RoadmapPage';
+import RoadmapHistoryPage from './pages/RoadmapHistoryPage';
 import HistoryPage from './pages/HistoryPage';
 import JobsPage from './pages/JobsPage';
 import ApplicationsPage from './pages/ApplicationsPage';
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="/interview/:sessionId/session" element={<InterviewSessionPage />} />
           <Route path="/interview/:sessionId/report" element={<InterviewReportPage />} />
           <Route path="/interview/:sessionId/replay" element={<ReplayPage />} />
+          <Route path="/roadmap" element={<RoadmapHistoryPage />} />
           <Route path="/roadmap/:sessionId" element={<RoadmapPage />} />
           <Route path="/jobs" element={<JobsPage />} />
           <Route path="/applications" element={<ApplicationsPage />} />
