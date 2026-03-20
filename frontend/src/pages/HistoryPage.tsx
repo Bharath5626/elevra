@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { interviewAPI } from '../services/api';
@@ -43,7 +43,7 @@ export default function HistoryPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Loader2 size={36} className="animate-spin" style={{ color: 'var(--color-primary-400)' }} />
+        <Loader2 size={36} className="animate-spin" style={{ color: '#2563EB' }} />
       </div>
     );
   }
@@ -68,7 +68,7 @@ export default function HistoryPage() {
               gap: 16, marginBottom: 24,
             }}
           >
-            <StatCard label="Total Sessions" value={sessions.length}    icon={History}   iconColor="#FF6575" />
+            <StatCard label="Total Sessions" value={sessions.length}    icon={History}   iconColor="#2563EB" />
             <StatCard label="Average Score"  value={`${avgScore}%`}    icon={TrendingUp} iconColor="#22c55e" />
             <StatCard label="Best Score"     value={`${bestScore}/100`} icon={Award}      iconColor="#3b82f6" />
             <StatCard label="Completed"      value={completed}          icon={CheckCircle} iconColor="#a855f7" />
@@ -82,16 +82,16 @@ export default function HistoryPage() {
           transition={{ delay: 0.15 }}
           style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}
         >
-          <Filter size={14} style={{ color: 'var(--color-surface-500)', flexShrink: 0 }} />
+          <Filter size={14} style={{ color: '#6B7280', flexShrink: 0 }} />
           {(['all', 'completed', 'in_progress'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               style={{
-                padding: '8px 18px', borderRadius: 50, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                border: filter === f ? '1.5px solid var(--color-primary-400)' : '1.5px solid var(--color-surface-300)',
-                background: filter === f ? 'var(--color-primary-50)' : '#fff',
-                color: filter === f ? 'var(--color-primary-400)' : 'var(--color-surface-600)',
+                padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                border: filter === f ? '1.5px solid #2563EB' : '1.5px solid #E5E7EB',
+                background: filter === f ? '#EFF6FF' : '#fff',
+                color: filter === f ? '#2563EB' : '#6B7280',
                 transition: 'all .2s',
               }}
             >
@@ -112,23 +112,23 @@ export default function HistoryPage() {
             }}
           >
             <div style={{
-              width: 72, height: 72, borderRadius: 18, background: 'var(--color-surface-100)',
+              width: 72, height: 72, borderRadius: 18, background: '#F9FAFB',
               display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
             }}>
-              <History size={32} style={{ color: 'var(--color-surface-400)' }} />
+              <History size={32} style={{ color: '#9CA3AF' }} />
             </div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-surface-500)', margin: '0 0 8px' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#6B7280', margin: '0 0 8px' }}>
               No sessions yet
             </h3>
-            <p style={{ fontSize: 14, color: 'var(--color-surface-400)', margin: '0 0 24px' }}>
+            <p style={{ fontSize: 14, color: '#9CA3AF', margin: '0 0 24px' }}>
               Start your first mock interview to begin tracking your progress
             </p>
             <Link
               to="/interview/setup"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '12px 28px', borderRadius: 50,
-                background: 'var(--color-primary-400)', color: '#fff',
+                padding: '12px 28px', borderRadius: 8,
+                background: '#2563EB', color: '#fff',
                 fontSize: 14, fontWeight: 600, textDecoration: 'none',
               }}
             >
@@ -161,37 +161,37 @@ export default function HistoryPage() {
                     }}
                       onMouseEnter={e => {
                         (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,.08)';
-                        (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--color-primary-200)';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = '#BFDBFE';
                       }}
                       onMouseLeave={e => {
                         (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,.04)';
-                        (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--color-surface-300)';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = '#E5E7EB';
                       }}
                     >
                       {/* Icon */}
                       <div style={{
                         width: 48, height: 48, borderRadius: 12, flexShrink: 0,
-                        background: 'rgba(255,101,117,.1)',
+                        background: '#EFF6FF',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
-                        <Mic size={22} style={{ color: 'var(--color-primary-400)' }} />
+                        <Mic size={22} style={{ color: '#2563EB' }} />
                       </div>
 
                       {/* Main info */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-secondary-500)', margin: '0 0 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: '0 0 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {session.job_role}
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: 'var(--color-surface-500)' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, color: '#6B7280' }}>
                             <Calendar size={12} />
                             {new Date(session.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </span>
-                          <span style={{ fontSize: 13, color: 'var(--color-surface-400)' }}>Â·</span>
-                          <span style={{ fontSize: 13, color: 'var(--color-surface-500)' }}>{session.difficulty}</span>
-                          <span style={{ fontSize: 13, color: 'var(--color-surface-400)' }}>Â·</span>
+                          <span style={{ fontSize: 13, color: '#9CA3AF' }}>·</span>
+                          <span style={{ fontSize: 13, color: '#6B7280' }}>{session.difficulty}</span>
+                          <span style={{ fontSize: 13, color: '#9CA3AF' }}>·</span>
                           <span style={{
-                            padding: '2px 10px', borderRadius: 50, fontSize: 12, fontWeight: 600,
+                            padding: '2px 10px', borderRadius: 6, fontSize: 12, fontWeight: 600,
                             background: session.status === 'completed' ? 'rgba(34,197,94,.1)' : 'rgba(245,158,11,.1)',
                             color: session.status === 'completed' ? '#15803d' : '#92400e',
                           }}>
@@ -215,7 +215,7 @@ export default function HistoryPage() {
                           </span>
                         </div>
 
-                        <ChevronRight size={18} style={{ color: 'var(--color-surface-400)' }} />
+                        <ChevronRight size={18} style={{ color: '#9CA3AF' }} />
                       </div>
                     </div>
                   </Link>

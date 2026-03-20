@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ReplayPlayer from '../components/ReplayPlayer';
@@ -23,29 +23,29 @@ export default function ReplayPage() {
       .finally(() => setLoading(false));
   }, [sessionId]);
 
-  /* ── Loading ─────────────────────────────────────────── */
+  /* -- Loading ------------------------------------------- */
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <Loader2 size={32} className="animate-spin" style={{ color: '#ff6575' }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: '#2563EB' }} />
       </div>
     );
   }
 
-  /* ── Empty state ─────────────────────────────────────── */
+  /* -- Empty state --------------------------------------- */
   if (answers.length === 0) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '24px' }}>
         <div style={{ textAlign: 'center' }}>
           <Play size={48} style={{ color: '#d1d5db', margin: '0 auto 12px', display: 'block' }} />
-          <p style={{ fontSize: 15, color: '#685f78', marginBottom: 20 }}>No recordings found for this session</p>
+          <p style={{ fontSize: 15, color: '#6B7280', marginBottom: 20 }}>No recordings found for this session</p>
           <Link
             to={`/interview/${sessionId}/report`}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '8px 20px', borderRadius: 50,
-              border: '2px solid #b4a7f5', backgroundColor: 'transparent',
-              color: '#392c7d', fontSize: 13, fontWeight: 600, textDecoration: 'none',
+              padding: '8px 20px', borderRadius: 8,
+              border: '1.5px solid #BFDBFE', backgroundColor: 'transparent',
+              color: '#2563EB', fontSize: 13, fontWeight: 600, textDecoration: 'none',
             }}
           >
             <ChevronLeft size={14} /> Back to Report
@@ -57,7 +57,7 @@ export default function ReplayPage() {
 
   const current = answers[selectedIdx];
 
-  /* ── Main ────────────────────────────────────────────── */
+  /* -- Main ---------------------------------------------- */
   return (
     <div style={{ padding: '24px 28px 48px' }}>
 
@@ -65,17 +65,17 @@ export default function ReplayPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
           <Link
             to={`/interview/${sessionId}/report`}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#9ca3af', textDecoration: 'none', marginBottom: 14 }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 13, color: '#6B7280', textDecoration: 'none', marginBottom: 14 }}
           >
             <ChevronLeft size={14} /> Back to Report
           </Link>
-          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 28, fontWeight: 700, color: '#002058', margin: '0 0 8px' }}>
+          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>
             Interview{' '}
-            <span style={{ background: 'linear-gradient(135deg, #ff6575, #b4a7f5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ color: '#2563EB' }}>
               Replay
             </span>
           </h1>
-          <p style={{ fontSize: 14, color: '#685f78', margin: 0, lineHeight: 1.6 }}>{current?.question_text}</p>
+          <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>{current?.question_text}</p>
         </motion.div>
 
         {/* Question tabs */}
@@ -91,9 +91,9 @@ export default function ReplayPage() {
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',
-                border: i === selectedIdx ? '1.5px solid #ff6575' : '1.5px solid #e9ecef',
-                backgroundColor: i === selectedIdx ? '#fff1f2' : '#fff',
-                color: i === selectedIdx ? '#ff6575' : '#685f78',
+                border: i === selectedIdx ? '1.5px solid #2563EB' : '1.5px solid #E5E7EB',
+                backgroundColor: i === selectedIdx ? '#EFF6FF' : '#fff',
+                color: i === selectedIdx ? '#2563EB' : '#6B7280',
                 transition: 'all .15s',
               }}
             >

@@ -70,6 +70,11 @@ export const authAPI = {
     const { data } = await api.post('/auth/refresh');
     return data;
   },
+
+  googleAuth: async (accessToken: string): Promise<AuthTokens> => {
+    const { data } = await api.post('/auth/google', { access_token: accessToken });
+    return data;
+  },
 };
 
 // ═══════════════════════════════════════════════════════

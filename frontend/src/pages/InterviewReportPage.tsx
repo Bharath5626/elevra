@@ -72,7 +72,7 @@ export default function InterviewReportPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <Loader2 size={36} style={{ color: 'var(--color-primary-400)', animation: 'spin 1s linear infinite' }} />
+        <Loader2 size={36} style={{ color: '#2563EB', animation: 'spin 1s linear infinite' }} />
       </div>
     );
   }
@@ -81,8 +81,8 @@ export default function InterviewReportPage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <div style={{ textAlign: 'center' }}>
-          <BarChart3 size={48} style={{ color: 'var(--color-surface-400)', margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 14, color: 'var(--color-surface-600)' }}>Report not available yet</p>
+          <BarChart3 size={48} style={{ color: '#9CA3AF', margin: '0 auto 12px' }} />
+          <p style={{ fontSize: 14, color: '#6B7280' }}>Report not available yet</p>
         </div>
       </div>
     );
@@ -95,24 +95,24 @@ export default function InterviewReportPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           style={{
-            background: '#fff', borderRadius: 20, border: '1px solid var(--color-surface-300)',
-            boxShadow: '0 2px 12px rgba(0,0,0,.06)', padding: '40px 36px',
+            background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB',
+            boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '40px 36px',
             width: '100%', maxWidth: 520,
           }}
         >
           <div style={{
-            width: 56, height: 56, borderRadius: 16,
-            background: 'var(--color-primary-50)',
+            width: 56, height: 56, borderRadius: 10,
+            background: '#EFF6FF',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 24px',
           }}>
-            <Loader2 size={28} style={{ color: 'var(--color-primary-400)', animation: 'spin 1s linear infinite' }} />
+            <Loader2 size={28} style={{ color: '#2563EB', animation: 'spin 1s linear infinite' }} />
           </div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-secondary-500)',
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#111827',
                        textAlign: 'center', margin: '0 0 10px' }}>
             Preparing your interview report
           </h1>
-          <p style={{ fontSize: 14, color: 'var(--color-surface-500)', textAlign: 'center',
+          <p style={{ fontSize: 14, color: '#6B7280', textAlign: 'center',
                       lineHeight: 1.65, margin: '0 0 28px' }}>
             Your real interview metrics are still being processed. This page will update automatically when the report is ready.
           </p>
@@ -142,24 +142,24 @@ export default function InterviewReportPage() {
           <Link
             to="/history"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 13,
-                     color: 'var(--color-surface-500)', marginBottom: 18, textDecoration: 'none' }}
+                     color: '#6B7280', marginBottom: 18, textDecoration: 'none' }}
           >
             <ChevronLeft size={14} /> Back to History
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{
-              width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+              width: 44, height: 44, borderRadius: 10, flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400))',
+              background: '#EFF6FF', border: '1px solid #BFDBFE',
             }}>
-              <BarChart3 size={20} color="#fff" />
+              <BarChart3 size={20} color="#2563EB" />
             </div>
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-secondary-500)', margin: 0, lineHeight: 1.3 }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0, lineHeight: 1.3 }}>
                 Interview Report
               </h1>
-              <p style={{ fontSize: 13, color: 'var(--color-surface-500)', margin: '3px 0 0' }}>
+              <p style={{ fontSize: 13, color: '#6B7280', margin: '3px 0 0' }}>
                 {session.job_role} &bull; {session.difficulty} &bull; {answers.length} question{answers.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -176,7 +176,7 @@ export default function InterviewReportPage() {
             {/* Score ring */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <ScoreCard score={session.overall_score} label="Overall Score" size="lg" />
-              <span style={{ fontSize: 11, color: 'var(--color-surface-500)', textTransform: 'uppercase',
+              <span style={{ fontSize: 11, color: '#6B7280', textTransform: 'uppercase',
                              letterSpacing: '0.06em', fontWeight: 600, marginTop: 4 }}>
                 Session Average
               </span>
@@ -184,7 +184,7 @@ export default function InterviewReportPage() {
 
             {/* Breakdown bars */}
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-surface-500)',
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280',
                            textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 18 }}>
                 Score Breakdown (averages)
               </p>
@@ -201,14 +201,14 @@ export default function InterviewReportPage() {
 
           {/* Action buttons */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28,
-                        paddingTop: 24, borderTop: '1px solid var(--color-surface-200)' }}>
+                        paddingTop: 24, borderTop: '1px solid #E5E7EB' }}>
             <Link
               to={`/interview/${sessionId}/replay`}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '10px 22px', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                padding: '10px 22px', borderRadius: 8, fontSize: 13, fontWeight: 600,
                 color: '#fff', textDecoration: 'none',
-                background: 'linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400))',
+                background: '#2563EB',
                 transition: 'opacity .2s',
               }}
             >
@@ -218,9 +218,9 @@ export default function InterviewReportPage() {
               to={`/roadmap/${sessionId}`}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '10px 22px', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                border: '1.5px solid var(--color-primary-400)',
-                color: 'var(--color-primary-400)', textDecoration: 'none',
+                padding: '10px 22px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                border: '1.5px solid #2563EB',
+                color: '#2563EB', textDecoration: 'none',
                 transition: 'background .2s',
               }}
             >
@@ -239,18 +239,18 @@ export default function InterviewReportPage() {
                 flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '9px 18px', borderRadius: 12, fontSize: 13, fontWeight: 600,
                 border: i === selectedAnswer
-                  ? '1.5px solid var(--color-primary-300)'
-                  : '1.5px solid var(--color-surface-300)',
-                background: i === selectedAnswer ? 'var(--color-primary-50)' : '#fff',
-                color: i === selectedAnswer ? 'var(--color-primary-500)' : 'var(--color-surface-600)',
+                  ? '1.5px solid #BFDBFE'
+                  : '1.5px solid #E5E7EB',
+                background: i === selectedAnswer ? '#EFF6FF' : '#fff',
+                color: i === selectedAnswer ? '#2563EB' : '#6B7280',
                 cursor: 'pointer', transition: 'all .18s',
               }}
             >
               Q{i + 1}
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: '2px 7px', borderRadius: 6,
-                background: i === selectedAnswer ? 'var(--color-primary-400)' : 'var(--color-surface-200)',
-                color: i === selectedAnswer ? '#fff' : 'var(--color-surface-500)',
+                background: i === selectedAnswer ? '#2563EB' : '#E5E7EB',
+                color: i === selectedAnswer ? '#fff' : '#6B7280',
               }}>
                 {a.overall_score}
               </span>
@@ -275,7 +275,7 @@ export default function InterviewReportPage() {
 
                 {/* Question + 4 score rings */}
                 <div style={{ ...card, padding: 28 }}>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-secondary-500)',
+                  <p style={{ fontSize: 15, fontWeight: 600, color: '#111827',
                                lineHeight: 1.65, marginBottom: 24 }}>
                     {current.question_text}
                   </p>
@@ -291,8 +291,8 @@ export default function InterviewReportPage() {
                 {/* Performance metrics */}
                 <div style={{ ...card, padding: 28 }}>
                   <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13,
-                                fontWeight: 700, color: 'var(--color-secondary-500)', marginBottom: 18 }}>
-                    <Eye size={14} style={{ color: 'var(--color-accent-400)', flexShrink: 0 }} />
+                                fontWeight: 700, color: '#111827', marginBottom: 18 }}>
+                    <Eye size={14} style={{ color: '#2563EB', flexShrink: 0 }} />
                     Performance Metrics
                   </h4>
 
@@ -303,22 +303,22 @@ export default function InterviewReportPage() {
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12,
-                                 paddingTop: 18, borderTop: '1px solid var(--color-surface-200)' }}>
+                                 paddingTop: 18, borderTop: '1px solid #E5E7EB' }}>
                     {[
                       { icon: <Mic2 size={14} />,          label: 'WPM',     value: Math.round(current.wpm) },
                       { icon: <AlertTriangle size={14} />, label: 'Fillers', value: current.filler_count },
                       { icon: <Star size={14} />,          label: 'STAR',    value: current.star_format_used ? 'Yes' : 'No' },
                     ].map(({ icon, label, value }) => (
                       <div key={label} style={{ textAlign: 'center', padding: '12px 8px',
-                                                borderRadius: 12, background: 'var(--color-surface-100)' }}>
+                                                borderRadius: 8, background: '#F9FAFB' }}>
                         <div style={{ display: 'flex', justifyContent: 'center',
-                                      color: 'var(--color-surface-400)', marginBottom: 6 }}>{icon}</div>
-                        <div style={{ fontSize: 11, color: 'var(--color-surface-500)', marginBottom: 5 }}>{label}</div>
+                                      color: '#9CA3AF', marginBottom: 6 }}>{icon}</div>
+                        <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 5 }}>{label}</div>
                         <div style={{
                           fontSize: 15, fontWeight: 700,
                           color: label === 'STAR'
-                            ? value === 'Yes' ? 'var(--color-success-400)' : 'var(--color-danger-400)'
-                            : 'var(--color-secondary-500)',
+                            ? value === 'Yes' ? '#22c55e' : '#ef4444'
+                            : '#111827',
                         }}>{value}</div>
                       </div>
                     ))}
@@ -333,8 +333,8 @@ export default function InterviewReportPage() {
                 {/* Strengths */}
                 <div style={{ ...card, padding: 28 }}>
                   <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13,
-                                fontWeight: 700, color: 'var(--color-secondary-500)', marginBottom: 16 }}>
-                    <CheckCircle size={14} style={{ color: 'var(--color-success-400)', flexShrink: 0 }} />
+                                fontWeight: 700, color: '#111827', marginBottom: 16 }}>
+                    <CheckCircle size={14} style={{ color: '#22c55e', flexShrink: 0 }} />
                     Strengths
                   </h4>
                   {current.strengths.length > 0 ? (
@@ -343,15 +343,15 @@ export default function InterviewReportPage() {
                                   maxHeight: 220, overflowY: 'auto' }}>
                       {current.strengths.map((s, i) => (
                         <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10,
-                                             fontSize: 13, color: 'var(--color-surface-600)', lineHeight: 1.55 }}>
-                          <CheckCircle size={13} style={{ color: 'var(--color-success-400)',
+                                             fontSize: 13, color: '#4B5563', lineHeight: 1.55 }}>
+                          <CheckCircle size={13} style={{ color: '#22c55e',
                                                            marginTop: 2, flexShrink: 0 }} />
                           {s}
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p style={{ fontSize: 13, color: 'var(--color-surface-500)' }}>
+                    <p style={{ fontSize: 13, color: '#6B7280' }}>
                       No strengths were extracted for this answer.
                     </p>
                   )}
@@ -360,8 +360,8 @@ export default function InterviewReportPage() {
                 {/* Areas for improvement */}
                 <div style={{ ...card, padding: 28 }}>
                   <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13,
-                                fontWeight: 700, color: 'var(--color-secondary-500)', marginBottom: 16 }}>
-                    <AlertTriangle size={14} style={{ color: 'var(--color-warning-400)', flexShrink: 0 }} />
+                                fontWeight: 700, color: '#111827', marginBottom: 16 }}>
+                    <AlertTriangle size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />
                     Areas for Improvement
                   </h4>
                   {current.improvements.length > 0 ? (
@@ -370,15 +370,15 @@ export default function InterviewReportPage() {
                                   maxHeight: 220, overflowY: 'auto' }}>
                       {current.improvements.map((imp, i) => (
                         <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10,
-                                             fontSize: 13, color: 'var(--color-surface-600)', lineHeight: 1.55 }}>
-                          <ArrowRight size={13} style={{ color: 'var(--color-warning-400)',
+                                             fontSize: 13, color: '#4B5563', lineHeight: 1.55 }}>
+                          <ArrowRight size={13} style={{ color: '#f59e0b',
                                                           marginTop: 2, flexShrink: 0 }} />
                           {imp}
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p style={{ fontSize: 13, color: 'var(--color-surface-500)' }}>
+                    <p style={{ fontSize: 13, color: '#6B7280' }}>
                       No improvement notes were generated for this answer.
                     </p>
                   )}
@@ -387,11 +387,11 @@ export default function InterviewReportPage() {
                 {/* Transcript */}
                 <div style={{ ...card, padding: 28 }}>
                   <h4 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13,
-                                fontWeight: 700, color: 'var(--color-secondary-500)', marginBottom: 16 }}>
-                    <Brain size={14} style={{ color: 'var(--color-primary-400)', flexShrink: 0 }} />
+                                fontWeight: 700, color: '#111827', marginBottom: 16 }}>
+                    <Brain size={14} style={{ color: '#2563EB', flexShrink: 0 }} />
                     Transcript
                   </h4>
-                  <p style={{ fontSize: 13, color: 'var(--color-surface-600)', lineHeight: 1.7,
+                  <p style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.7,
                                maxHeight: 200, overflowY: 'auto', margin: 0 }}>
                     {current.transcript || 'Transcript not available'}
                   </p>

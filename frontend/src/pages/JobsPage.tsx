@@ -164,8 +164,8 @@ export default function JobsPage() {
   };
   const inputStyle: React.CSSProperties = {
     flex: 1, minWidth: 0, padding: '12px 16px 12px 42px',
-    borderRadius: 12, fontSize: 14, border: '1.5px solid var(--color-surface-300)',
-    background: '#fff', color: 'var(--color-secondary-500)',
+    borderRadius: 12, fontSize: 14, border: '1.5px solid #E5E7EB',
+    background: '#fff', color: '#111827',
     outline: 'none', transition: 'border-color .15s',
   };
 
@@ -178,15 +178,15 @@ export default function JobsPage() {
             <div style={{
               width: 44, height: 44, borderRadius: 12, flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400))',
+              background: '#EFF6FF', border: '1px solid #BFDBFE',
             }}>
-              <Briefcase size={20} color="#fff" />
+              <Briefcase size={20} color="#2563EB" />
             </div>
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-secondary-500)', margin: 0, lineHeight: 1.3 }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0, lineHeight: 1.3 }}>
                 Job Discovery
               </h1>
-              <p style={{ fontSize: 13, color: 'var(--color-surface-500)', margin: '3px 0 0' }}>
+              <p style={{ fontSize: 13, color: '#6B7280', margin: '3px 0 0' }}>
                 Search real jobs from LinkedIn, Indeed, Glassdoor &amp; more
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function JobsPage() {
           >
             {/* Query input */}
             <div style={{ flex: '2 1 240px', position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-surface-400)', pointerEvents: 'none' }} />
+              <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -217,7 +217,7 @@ export default function JobsPage() {
 
             {/* Location input */}
             <div style={{ flex: '1 1 180px', position: 'relative' }}>
-              <MapPin size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-surface-400)', pointerEvents: 'none' }} />
+              <MapPin size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
@@ -230,9 +230,9 @@ export default function JobsPage() {
             <label style={{
               display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
               padding: '10px 16px', borderRadius: 12,
-              border: `1.5px solid ${remoteOnly ? 'var(--color-primary-400)' : 'var(--color-surface-300)'}`,
-              background: remoteOnly ? 'var(--color-primary-50)' : '#fff',
-              color: remoteOnly ? 'var(--color-primary-500)' : 'var(--color-surface-600)',
+              border: `1.5px solid ${remoteOnly ? '#2563EB' : '#E5E7EB'}`,
+              background: remoteOnly ? '#EFF6FF' : '#fff',
+              color: remoteOnly ? '#2563EB' : '#6B7280',
               fontSize: 13, fontWeight: 500, transition: 'all .15s', flexShrink: 0,
             }}>
               <Wifi size={14} />
@@ -254,7 +254,7 @@ export default function JobsPage() {
                 padding: '12px 28px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                 border: 'none', cursor: loading || !query.trim() ? 'not-allowed' : 'pointer',
                 color: '#fff',
-                background: 'linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400))',
+              background: '#2563EB',
                 opacity: loading || !query.trim() ? 0.6 : 1,
                 transition: 'opacity .15s', flexShrink: 0,
               }}
@@ -267,15 +267,15 @@ export default function JobsPage() {
           {/* Resume selector */}
           {resumes.length > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--color-surface-200)' }}>
-              <SlidersHorizontal size={14} style={{ color: 'var(--color-surface-400)', flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: 'var(--color-surface-500)', fontWeight: 500, flexShrink: 0 }}>Match against:</span>
+              <SlidersHorizontal size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+              <span style={{ fontSize: 12, color: '#6B7280', fontWeight: 500, flexShrink: 0 }}>Match against:</span>
               <select
                 value={selectedResume}
                 onChange={(e) => { setSelectedResume(e.target.value); setMatchScores({}); }}
                 style={{
                   padding: '6px 12px', borderRadius: 8, fontSize: 12,
-                  border: '1px solid var(--color-surface-300)', background: '#fff',
-                  color: 'var(--color-secondary-500)', outline: 'none', maxWidth: 300,
+                  border: '1px solid #E5E7EB', background: '#fff',
+                  color: '#111827', outline: 'none', maxWidth: 300,
                 }}
               >
                 {resumes.map((r) => (
@@ -291,12 +291,12 @@ export default function JobsPage() {
         {/* ── Results ───────────────────────────────── */}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
-            <Loader2 size={32} className="animate-spin" style={{ color: 'var(--color-primary-400)' }} />
+            <Loader2 size={32} className="animate-spin" style={{ color: '#2563EB' }} />
           </div>
         ) : searched && jobs.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <Briefcase size={40} style={{ color: 'var(--color-surface-400)', margin: '0 auto 12px' }} />
-            <p style={{ fontSize: 14, color: 'var(--color-surface-500)' }}>No jobs found. Try different keywords or location.</p>
+            <Briefcase size={40} style={{ color: '#9CA3AF', margin: '0 auto 12px' }} />
+            <p style={{ fontSize: 14, color: '#6B7280' }}>No jobs found. Try different keywords or location.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -316,14 +316,14 @@ export default function JobsPage() {
                       <img
                         src={job.employer_logo}
                         alt={job.company}
-                        style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'contain', background: '#f8fafc', flexShrink: 0 }}
+                        style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'contain', background: '#F9FAFB', flexShrink: 0 }}
                       />
                     ) : (
                       <div style={{
                         width: 48, height: 48, borderRadius: 12, flexShrink: 0,
-                        background: 'linear-gradient(135deg, #FF6575, #B4A7F5)',
+                        background: '#EFF6FF',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 700, fontSize: 18,
+                        color: '#2563EB', fontWeight: 700, fontSize: 18,
                       }}>
                         {job.company.charAt(0)}
                       </div>
@@ -332,7 +332,7 @@ export default function JobsPage() {
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
-                        <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--color-secondary-500)', margin: 0 }}>
+                        <h3 style={{ fontSize: 16, fontWeight: 600, color: '#111827', margin: 0 }}>
                           {job.job_title}
                         </h3>
                         {job.is_remote && (
@@ -354,7 +354,7 @@ export default function JobsPage() {
                         )}
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', fontSize: 13, color: 'var(--color-surface-500)', marginBottom: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', fontSize: 13, color: '#6B7280', marginBottom: 10 }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <Building2 size={13} /> {job.company}
                         </span>
@@ -374,7 +374,7 @@ export default function JobsPage() {
                       </div>
 
                       <p style={{
-                        fontSize: 13, color: 'var(--color-surface-600)', lineHeight: 1.6,
+                        fontSize: 13, color: '#4B5563', lineHeight: 1.6,
                         margin: 0, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                       }}>
                         {job.description}
@@ -414,7 +414,7 @@ export default function JobsPage() {
                           padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600,
                           border: 'none', cursor: selectedResume ? 'pointer' : 'not-allowed',
                           color: '#fff',
-                          background: 'linear-gradient(135deg, #FF6575, #B4A7F5)',
+                          background: '#2563EB',
                           opacity: selectedResume ? 1 : 0.5,
                           transition: 'opacity .15s', whiteSpace: 'nowrap',
                         }}
@@ -428,9 +428,9 @@ export default function JobsPage() {
                         style={{
                           display: 'flex', alignItems: 'center', gap: 6,
                           padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                          border: '1.5px solid var(--color-surface-300)',
+                          border: '1.5px solid #E5E7EB',
                           cursor: selectedResume ? 'pointer' : 'not-allowed',
-                          color: 'var(--color-surface-600)', background: '#fff',
+                          color: '#374151', background: '#fff',
                           opacity: selectedResume ? 1 : 0.5,
                           transition: 'opacity .15s', whiteSpace: 'nowrap',
                         }}
@@ -444,8 +444,8 @@ export default function JobsPage() {
                         style={{
                           display: 'flex', alignItems: 'center', gap: 6,
                           padding: '8px 16px', borderRadius: 10, fontSize: 12, fontWeight: 500,
-                          border: '1.5px solid var(--color-surface-300)',
-                          color: 'var(--color-surface-600)', textDecoration: 'none',
+                          border: '1.5px solid #E5E7EB',
+                          color: '#374151', textDecoration: 'none',
                           transition: 'border-color .15s', whiteSpace: 'nowrap',
                         }}
                       >
@@ -466,8 +466,8 @@ export default function JobsPage() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 4,
                     padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 500,
-                    border: '1.5px solid var(--color-surface-300)', background: '#fff',
-                    color: page <= 1 ? 'var(--color-surface-400)' : 'var(--color-secondary-500)',
+                    border: '1.5px solid #E5E7EB', background: '#fff',
+                    color: page <= 1 ? '#9CA3AF' : '#111827',
                     cursor: page <= 1 ? 'not-allowed' : 'pointer', opacity: page <= 1 ? 0.5 : 1,
                   }}
                 >
@@ -475,7 +475,7 @@ export default function JobsPage() {
                 </button>
                 <span style={{
                   display: 'flex', alignItems: 'center',
-                  fontSize: 13, fontWeight: 600, color: 'var(--color-secondary-500)',
+                  fontSize: 13, fontWeight: 600, color: '#111827',
                 }}>
                   Page {page}
                 </span>
@@ -485,8 +485,8 @@ export default function JobsPage() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 4,
                     padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 500,
-                    border: '1.5px solid var(--color-surface-300)', background: '#fff',
-                    color: jobs.length < 10 ? 'var(--color-surface-400)' : 'var(--color-secondary-500)',
+                    border: '1.5px solid #E5E7EB', background: '#fff',
+                    color: jobs.length < 10 ? '#9CA3AF' : '#111827',
                     cursor: jobs.length < 10 ? 'not-allowed' : 'pointer', opacity: jobs.length < 10 ? 0.5 : 1,
                   }}
                 >
@@ -500,11 +500,11 @@ export default function JobsPage() {
         {/* ── No search yet placeholder ─────────────── */}
         {!searched && !loading && (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <Search size={44} style={{ color: 'var(--color-surface-300)', margin: '0 auto 16px' }} />
-            <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--color-secondary-500)', margin: '0 0 6px' }}>
+            <Search size={44} style={{ color: '#E5E7EB', margin: '0 auto 16px' }} />
+            <p style={{ fontSize: 16, fontWeight: 600, color: '#111827', margin: '0 0 6px' }}>
               Search for your next opportunity
             </p>
-            <p style={{ fontSize: 13, color: 'var(--color-surface-500)', maxWidth: 400, margin: '0 auto' }}>
+            <p style={{ fontSize: 13, color: '#6B7280', maxWidth: 400, margin: '0 auto' }}>
               Enter a job title or keywords above. We'll search LinkedIn, Indeed, Glassdoor, and 500+ job boards.
             </p>
             <Link
@@ -513,8 +513,8 @@ export default function JobsPage() {
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 marginTop: 20, padding: '10px 22px', borderRadius: 12,
                 fontSize: 13, fontWeight: 600, textDecoration: 'none',
-                border: '1.5px solid var(--color-primary-400)',
-                color: 'var(--color-primary-400)',
+                border: '1.5px solid #2563EB',
+                color: '#2563EB',
               }}
             >
               <Briefcase size={14} /> View My Applications
@@ -547,13 +547,13 @@ export default function JobsPage() {
             <button onClick={closeOneClick} style={{
               position: 'absolute', top: 14, right: 14,
               background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--color-surface-400)', padding: 4,
+              color: '#9CA3AF', padding: 4,
             }}><X size={18} /></button>
 
             {/* Header */}
             <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--color-surface-400)', textTransform: 'uppercase', letterSpacing: 1.2, margin: '0 0 6px' }}>One-Click Apply</p>
-            <h2 style={{ fontSize: 17, fontWeight: 700, color: 'var(--color-secondary-500)', margin: '0 0 3px', paddingRight: 28 }}>{oneClickJob.job_title}</h2>
-            <p style={{ fontSize: 13, color: 'var(--color-surface-500)', margin: '0 0 20px' }}>{oneClickJob.company} · {oneClickJob.location}</p>
+            <h2 style={{ fontSize: 17, fontWeight: 700, color: '#111827', margin: '0 0 3px', paddingRight: 28 }}>{oneClickJob.job_title}</h2>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>{oneClickJob.company} · {oneClickJob.location}</p>
 
             {/* ATS Score pill */}
             {(() => {
@@ -578,16 +578,16 @@ export default function JobsPage() {
             {/* ─ Status states ─ */}
             {oneClickStatus === 'fetching' && (
               <div style={{ textAlign: 'center', padding: '18px 0' }}>
-                <Loader2 size={28} className="animate-spin" style={{ color: 'var(--color-primary-400)', margin: '0 auto 10px' }} />
-                <p style={{ fontSize: 13, color: 'var(--color-surface-500)', margin: 0 }}>Loading your profile…</p>
+                <Loader2 size={28} className="animate-spin" style={{ color: '#2563EB', margin: '0 auto 10px' }} />
+                <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>Loading your profile…</p>
               </div>
             )}
 
             {oneClickStatus === 'waiting' && (
               <div style={{ textAlign: 'center', padding: '18px 0' }}>
-                <Loader2 size={28} className="animate-spin" style={{ color: 'var(--color-primary-400)', margin: '0 auto 10px' }} />
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-secondary-500)', margin: '0 0 10px' }}>Waiting for Application Form…</p>
-                <div style={{ textAlign: 'left', background: 'var(--color-surface-50)', borderRadius: 10, padding: '12px 16px', fontSize: 12, color: 'var(--color-surface-600)', lineHeight: 1.8 }}>
+                <Loader2 size={28} className="animate-spin" style={{ color: '#2563EB', margin: '0 auto 10px' }} />
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: '0 0 10px' }}>Waiting for Application Form…</p>
+                <div style={{ textAlign: 'left', background: '#F9FAFB', borderRadius: 10, padding: '12px 16px', fontSize: 12, color: '#4B5563', lineHeight: 1.8 }}>
                   <p style={{ margin: '0 0 4px', fontWeight: 600 }}>Follow these steps in the new tab:</p>
                   <p style={{ margin: 0 }}>1. If you see a job listing → click <strong>Apply</strong></p>
                   <p style={{ margin: 0 }}>2. If asked to login/register → complete that step</p>
@@ -612,7 +612,7 @@ export default function JobsPage() {
                   <button onClick={handleConfirmSubmit} style={{
                     flex: 2, padding: '11px 0', borderRadius: 12, fontSize: 13, fontWeight: 700,
                     border: 'none', cursor: 'pointer', color: '#fff',
-                    background: 'linear-gradient(135deg, #FF6575, #B4A7F5)',
+                  background: '#2563EB',
                   }}>✓ Confirm &amp; Submit</button>
                 </div>
               </>
@@ -620,20 +620,20 @@ export default function JobsPage() {
 
             {oneClickStatus === 'submitting' && (
               <div style={{ textAlign: 'center', padding: '18px 0' }}>
-                <Loader2 size={28} className="animate-spin" style={{ color: 'var(--color-primary-400)', margin: '0 auto 10px' }} />
-                <p style={{ fontSize: 13, color: 'var(--color-surface-500)', margin: 0 }}>Submitting application…</p>
+                <Loader2 size={28} className="animate-spin" style={{ color: '#2563EB', margin: '0 auto 10px' }} />
+                <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>Submitting application…</p>
               </div>
             )}
 
             {oneClickStatus === 'done' && (
               <div style={{ textAlign: 'center', padding: '18px 0' }}>
                 <CheckCircle size={40} style={{ color: '#22c55e', margin: '0 auto 12px' }} />
-                <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-secondary-500)', margin: '0 0 6px' }}>Applied Successfully!</p>
-                <p style={{ fontSize: 13, color: 'var(--color-surface-500)', margin: '0 0 20px' }}>Your application to {oneClickJob.company} has been submitted and saved to history.</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>Applied Successfully!</p>
+                <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>Your application to {oneClickJob.company} has been submitted and saved to history.</p>
                 <button onClick={closeOneClick} style={{
                   padding: '10px 32px', borderRadius: 12, fontSize: 13, fontWeight: 600,
                   border: 'none', cursor: 'pointer', color: '#fff',
-                  background: 'linear-gradient(135deg, #FF6575, #B4A7F5)',
+                  background: '#2563EB',
                 }}>Done</button>
               </div>
             )}
@@ -641,22 +641,22 @@ export default function JobsPage() {
             {oneClickStatus === 'error' && (
               <div style={{ textAlign: 'center', padding: '18px 0' }}>
                 <AlertCircle size={36} style={{ color: '#ef4444', margin: '0 auto 12px' }} />
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-secondary-500)', margin: '0 0 6px' }}>Something went wrong</p>
-                <p style={{ fontSize: 12, color: 'var(--color-surface-500)', margin: '0 0 16px' }}>{oneClickError}</p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: '0 0 6px' }}>Something went wrong</p>
+                <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 16px' }}>{oneClickError}</p>
                 <a href={oneClickJob.apply_url} target="_blank" rel="noopener noreferrer" onClick={closeOneClick} style={{
                   display: 'inline-block', padding: '10px 26px', borderRadius: 12,
-                  fontSize: 13, fontWeight: 600, color: '#fff', background: '#1e293b', textDecoration: 'none',
+                  fontSize: 13, fontWeight: 600, color: '#fff', background: '#111827', textDecoration: 'none',
                 }}>Open Direct Link</a>
               </div>
             )}
 
             {!extensionAvailable && oneClickStatus === 'idle' && (
               <div style={{ textAlign: 'center', padding: '10px 0' }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-secondary-500)', margin: '0 0 8px' }}>Install Elevra Extension</p>
-                <p style={{ fontSize: 12, color: 'var(--color-surface-500)', margin: '0 0 16px' }}>Install the Chrome extension to auto-fill job forms with your profile data.</p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#111827', margin: '0 0 8px' }}>Install Elevra Extension</p>
+                <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 16px' }}>Install the Chrome extension to auto-fill job forms with your profile data.</p>
                 <a href={oneClickJob.apply_url} target="_blank" rel="noopener noreferrer" onClick={closeOneClick} style={{
                   display: 'inline-block', padding: '10px 26px', borderRadius: 12,
-                  fontSize: 13, fontWeight: 600, color: '#fff', background: '#1e293b', textDecoration: 'none',
+                  fontSize: 13, fontWeight: 600, color: '#fff', background: '#111827', textDecoration: 'none',
                 }}>Apply Manually</a>
               </div>
             )}

@@ -73,8 +73,8 @@ export default function InterviewSessionPage() {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
         <div className="text-center">
-          <HelpCircle size={52} style={{ margin: '0 auto 12px', color: 'var(--color-surface-400)' }} />
-          <p style={{ color: 'var(--color-surface-600)' }}>Session not found</p>
+          <HelpCircle size={52} style={{ margin: '0 auto 12px', color: '#9CA3AF' }} />
+          <p style={{ color: '#4B5563' }}>Session not found</p>
         </div>
       </div>
     );
@@ -88,23 +88,23 @@ export default function InterviewSessionPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           style={{
-            background: '#fff', borderRadius: 24,
-            border: '1px solid var(--color-surface-300)',
-            boxShadow: '0 8px 40px rgba(0,0,0,.1)',
+            background: '#fff', borderRadius: 12,
+            border: '1px solid #E5E7EB',
+            boxShadow: '0 4px 20px rgba(0,0,0,.08)',
             padding: '48px 40px', textAlign: 'center', width: '100%', maxWidth: 440,
           }}
         >
-          <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--color-primary-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-            <Loader2 size={36} style={{ color: 'var(--color-primary-400)' }} className="animate-spin" />
+          <div style={{ width: 72, height: 72, borderRadius: 12, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <Loader2 size={36} style={{ color: '#2563EB' }} className="animate-spin" />
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-secondary-500)', marginBottom: 10 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#111827', marginBottom: 10 }}>
             Analyzing Your Interview
           </h2>
-          <p style={{ fontSize: 14, color: 'var(--color-surface-500)', marginBottom: 32, lineHeight: 1.7 }}>
+          <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 32, lineHeight: 1.7 }}>
             AI is evaluating your answers, body language, eye contact, and speech patterns…
           </p>
           <ProgressBar value={analysisProgress} label="Analysis Progress" height={10} />
-          <p style={{ fontSize: 12, color: 'var(--color-surface-400)', marginTop: 16 }}>This may take a few minutes</p>
+          <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 16 }}>This may take a few minutes</p>
         </motion.div>
       </div>
     );
@@ -125,22 +125,22 @@ export default function InterviewSessionPage() {
           style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 28 }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--color-primary-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Briefcase size={18} style={{ color: 'var(--color-primary-400)' }} />
+            <div style={{ width: 42, height: 42, borderRadius: 8, background: '#EFF6FF', border: '1px solid #BFDBFE', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Briefcase size={18} style={{ color: '#2563EB' }} />
             </div>
             <div>
-              <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-secondary-500)', lineHeight: 1.3, fontFamily: 'Poppins, sans-serif' }}>
+              <h1 style={{ fontSize: 20, fontWeight: 700, color: '#111827', lineHeight: 1.3, fontFamily: 'Poppins, sans-serif' }}>
                 {session.job_role}
               </h1>
-              <p style={{ fontSize: 13, color: 'var(--color-surface-500)', marginTop: 2 }}>
-                Difficulty: <strong style={{ color: 'var(--color-secondary-500)' }}>{session.difficulty}</strong>
+              <p style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>
+                Difficulty: <strong style={{ color: '#111827' }}>{session.difficulty}</strong>
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 18px', borderRadius: 50, background: '#fff', border: '1px solid var(--color-surface-300)', fontSize: 14, color: 'var(--color-surface-600)', flexShrink: 0 }}>
-            <Clock size={14} style={{ color: 'var(--color-primary-400)' }} />
-            Question&nbsp;<strong style={{ color: 'var(--color-secondary-500)' }}>{currentQ + 1}</strong>&nbsp;of&nbsp;{totalQ}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 18px', borderRadius: 8, background: '#fff', border: '1px solid #E5E7EB', fontSize: 14, color: '#4B5563', flexShrink: 0 }}>
+            <Clock size={14} style={{ color: '#2563EB' }} />
+            Question&nbsp;<strong style={{ color: '#111827' }}>{currentQ + 1}</strong>&nbsp;of&nbsp;{totalQ}
           </div>
         </motion.div>
 
@@ -159,10 +159,10 @@ export default function InterviewSessionPage() {
                 cursor: 'pointer',
                 transition: 'all .3s',
                 background: submitted.has(i)
-                  ? 'var(--color-success-400)'
+                  ? '#22c55e'
                   : i === currentQ
-                  ? 'var(--color-primary-400)'
-                  : 'var(--color-surface-300)',
+                  ? '#2563EB'
+                  : '#E5E7EB',
               }}
             />
           ))}
@@ -188,31 +188,31 @@ export default function InterviewSessionPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
                 {/* Question card */}
-                <div style={{ background: '#fff', borderRadius: 20, border: '1px solid var(--color-surface-300)', boxShadow: '0 2px 12px rgba(0,0,0,.05)', padding: '28px 28px 24px' }}>
+                <div style={{ background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '28px 28px 24px' }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                     <span className={`badge badge-${currentQuestion.type === 'technical' ? 'info' : 'warning'}`}>
                       {currentQuestion.type}
                     </span>
                     {currentQuestion.focus_area && (
-                      <span style={{ fontSize: 12, color: 'var(--color-surface-500)', fontWeight: 500 }}>
+                      <span style={{ fontSize: 12, color: '#6B7280', fontWeight: 500 }}>
                         {currentQuestion.focus_area}
                       </span>
                     )}
                   </div>
-                  <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--color-secondary-500)', lineHeight: 1.65 }}>
+                  <p style={{ fontSize: 16, fontWeight: 600, color: '#111827', lineHeight: 1.65 }}>
                     {currentQuestion.text}
                   </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--color-surface-200)', fontSize: 12, color: 'var(--color-surface-500)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 20, paddingTop: 16, borderTop: '1px solid #E5E7EB', fontSize: 12, color: '#6B7280' }}>
                     <Clock size={12} />
                     Suggested duration: ~{currentQuestion.expected_duration_seconds}s
                   </div>
                 </div>
 
                 {/* Tips card */}
-                <div style={{ background: 'linear-gradient(135deg, #fff8f8 0%, #fff1f9 100%)', borderRadius: 16, border: '1px solid var(--color-primary-100)', padding: '20px 24px' }}>
+                <div style={{ background: '#F9FAFB', borderRadius: 10, border: '1px solid #E5E7EB', padding: '20px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                    <Lightbulb size={15} style={{ color: 'var(--color-primary-400)' }} />
-                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary-500)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Interview Tips</span>
+                    <Lightbulb size={15} style={{ color: '#2563EB' }} />
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#2563EB', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Interview Tips</span>
                   </div>
                   <ul style={{ display: 'flex', flexDirection: 'column', gap: 10, listStyle: 'none', padding: 0, margin: 0 }}>
                     {[
@@ -221,8 +221,8 @@ export default function InterviewSessionPage() {
                       'Speak clearly and at a steady, confident pace',
                       'Stay within the suggested duration for best results',
                     ].map((tip, i) => (
-                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13, color: 'var(--color-surface-600)', lineHeight: 1.5 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-primary-400)', marginTop: 5, flexShrink: 0 }} />
+                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13, color: '#4B5563', lineHeight: 1.5 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#2563EB', marginTop: 5, flexShrink: 0 }} />
                         {tip}
                       </li>
                     ))}
@@ -242,17 +242,17 @@ export default function InterviewSessionPage() {
                         cursor: 'pointer',
                         transition: 'all .2s',
                         background: i === currentQ
-                          ? 'var(--color-primary-400)'
+                          ? '#2563EB'
                           : submitted.has(i)
                           ? 'rgba(34,197,94,.12)'
                           : '#fff',
                         color: i === currentQ
                           ? '#fff'
                           : submitted.has(i)
-                          ? 'var(--color-success-400)'
-                          : 'var(--color-surface-500)',
-                        boxShadow: i === currentQ ? '0 2px 8px rgba(255,101,117,.3)' : 'none',
-                        outline: submitted.has(i) ? '1.5px solid rgba(34,197,94,.4)' : i === currentQ ? 'none' : '1px solid var(--color-surface-300)',
+                          ? '#22c55e'
+                          : '#6B7280',
+                        boxShadow: i === currentQ ? '0 2px 8px rgba(37,99,235,.3)' : 'none',
+                        outline: submitted.has(i) ? '1.5px solid rgba(34,197,94,.4)' : i === currentQ ? 'none' : '1px solid #E5E7EB',
                       }}
                     >
                       {submitted.has(i) ? '✓' : i + 1}
@@ -266,7 +266,7 @@ export default function InterviewSessionPage() {
                 {submitted.has(currentQ) ? (
                   <div
                     style={{
-                      background: '#fff', borderRadius: 20,
+                      background: '#fff', borderRadius: 12,
                       border: '1.5px solid rgba(34,197,94,.3)',
                       padding: '64px 32px',
                       display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -274,10 +274,10 @@ export default function InterviewSessionPage() {
                     }}
                   >
                     <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(34,197,94,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <CheckCircle size={36} style={{ color: 'var(--color-success-400)' }} />
+                      <CheckCircle size={36} style={{ color: '#22c55e' }} />
                     </div>
-                    <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-success-500)' }}>Answer Submitted!</p>
-                    <p style={{ fontSize: 14, color: 'var(--color-surface-500)', lineHeight: 1.6, maxWidth: 260 }}>
+                    <p style={{ fontSize: 18, fontWeight: 700, color: '#16a34a' }}>Answer Submitted!</p>
+                    <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, maxWidth: 260 }}>
                       Navigate to the next question or finish when all are done.
                     </p>
                   </div>
@@ -297,7 +297,7 @@ export default function InterviewSessionPage() {
         <div
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            marginTop: 36, paddingTop: 24, borderTop: '1px solid var(--color-surface-200)',
+            marginTop: 36, paddingTop: 24, borderTop: '1px solid #E5E7EB',
           }}
         >
           <button
@@ -310,8 +310,8 @@ export default function InterviewSessionPage() {
             Previous
           </button>
 
-          <span style={{ fontSize: 14, color: 'var(--color-surface-500)' }}>
-            <strong style={{ color: 'var(--color-secondary-500)' }}>{submitted.size}</strong>
+          <span style={{ fontSize: 14, color: '#6B7280' }}>
+            <strong style={{ color: '#111827' }}>{submitted.size}</strong>
             &nbsp;/ {totalQ} answered
           </span>
 
@@ -331,7 +331,7 @@ export default function InterviewSessionPage() {
               className="btn-primary"
               style={{
                 padding: '10px 22px',
-                background: allSubmitted ? 'var(--color-success-400)' : undefined,
+                background: allSubmitted ? '#22c55e' : undefined,
                 opacity: allSubmitted ? 1 : 0.4,
                 cursor: allSubmitted ? 'pointer' : 'not-allowed',
               }}

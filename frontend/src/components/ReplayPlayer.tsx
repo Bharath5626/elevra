@@ -1,4 +1,4 @@
-﻿import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Maximize, Eye, MessageSquare } from 'lucide-react';
 import type { FeedbackTimestamp } from '../types';
@@ -78,18 +78,18 @@ export default function ReplayPlayer({
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  /* ─── styles ─────────────────────────────────────────── */
+  /* --- styles ------------------------------------------- */
   const ctrl: React.CSSProperties = {
     padding: '8px 10px', borderRadius: 8, background: 'none',
-    border: 'none', cursor: 'pointer', color: '#e2e8f0',
+    border: 'none', cursor: 'pointer', color: '#E5E7EB',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* ── Video card ─────────────────────────────────── */}
-      <div style={{ backgroundColor: '#1e293b', borderRadius: 16, overflow: 'hidden', border: '1px solid #334155' }}>
+      {/* -- Video card ----------------------------------- */}
+      <div style={{ backgroundColor: '#111827', borderRadius: 16, overflow: 'hidden', border: '1px solid #374151' }}>
 
         {/* Video element */}
         <div
@@ -167,7 +167,7 @@ export default function ReplayPlayer({
             <div style={{
               position: 'absolute', top: 0, left: 0, height: '100%',
               borderRadius: 99, pointerEvents: 'none',
-              background: 'linear-gradient(90deg, #ff6575, #b4a7f5)',
+              background: '#2563EB',
               width: `${progress}%`,
               transition: 'width .1s linear',
             }} />
@@ -196,7 +196,7 @@ export default function ReplayPlayer({
             {transcript && (
               <button
                 onClick={() => setShowTranscript(!showTranscript)}
-                style={{ ...ctrl, backgroundColor: showTranscript ? 'rgba(255,101,117,.15)' : 'transparent', color: showTranscript ? '#ff6575' : '#e2e8f0' }}
+                style={{ ...ctrl, backgroundColor: showTranscript ? 'rgba(37,99,235,.15)' : 'transparent', color: showTranscript ? '#2563EB' : '#E5E7EB' }}
               >
                 <MessageSquare size={16} />
               </button>
@@ -222,11 +222,11 @@ export default function ReplayPlayer({
         </AnimatePresence>
       </div>
 
-      {/* ── Feedback sidebar ─────────────────────────────── */}
+      {/* -- Feedback sidebar ------------------------------- */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <Eye size={14} style={{ color: '#ff6575' }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#475569' }}>Live Feedback</span>
+          <Eye size={14} style={{ color: '#2563EB' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#4B5563' }}>Live Feedback</span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 300, overflowY: 'auto' }}>

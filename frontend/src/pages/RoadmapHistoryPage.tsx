@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { roadmapAPI } from '../services/api';
-import type { LearningRoadmap } from '../types';
-import { BookOpen, ArrowRight, Calendar, Loader2, MapPin } from 'lucide-react';
+import { roadmapAPI, interviewAPI } from '../services/api';
+import type { LearningRoadmap, InterviewSession } from '../types';
+import { BookOpen, ArrowRight, Calendar, Loader2, Briefcase } from 'lucide-react';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -21,12 +21,18 @@ function formatDate(iso: string) {
 
 export default function RoadmapHistoryPage() {
   const [roadmaps, setRoadmaps] = useState<LearningRoadmap[]>([]);
+  const [sessionMap, setSessionMap] = useState<Record<string, InterviewSession>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    roadmapAPI.getAll()
-      .then(setRoadmaps)
+    Promise.all([roadmapAPI.getAll(), interviewAPI.getSessions()])
+      .then(([rms, sessions]) => {
+        setRoadmaps(rms);
+        const map: Record<string, InterviewSession> = {};
+        sessions.forEach(s => { map[s.id] = s; });
+        setSessionMap(map);
+      })
       .catch(() => setError('Failed to load roadmaps.'))
       .finally(() => setLoading(false));
   }, []);
@@ -35,7 +41,7 @@ export default function RoadmapHistoryPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <Loader2 size={32} className="animate-spin" style={{ color: '#6366f1' }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: '#2563EB' }} />
       </div>
     );
   }
@@ -63,19 +69,19 @@ export default function RoadmapHistoryPage() {
               padding: '60px 40px', textAlign: 'center',
             }}
           >
-            <BookOpen size={52} style={{ color: '#cbd5e1', margin: '0 auto 20px', display: 'block' }} />
-            <h3 style={{ fontSize: 20, fontWeight: 600, color: '#0f172a', margin: '0 0 10px' }}>
+            <BookOpen size={52} style={{ color: '#D1D5DB', margin: '0 auto 20px', display: 'block' }} />
+            <h3 style={{ fontSize: 20, fontWeight: 600, color: '#111827', margin: '0 0 10px' }}>
               No roadmaps yet
             </h3>
-            <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.7, maxWidth: 380, margin: '0 auto 28px' }}>
+            <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, maxWidth: 380, margin: '0 auto 28px' }}>
               Complete a mock interview to get a personalised AI-generated 30-day learning roadmap.
             </p>
             <Link
               to="/interview/setup"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '11px 28px', borderRadius: 50,
-                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                padding: '11px 28px', borderRadius: 8,
+                background: '#2563EB',
                 color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none',
               }}
             >
@@ -106,7 +112,7 @@ export default function RoadmapHistoryPage() {
                     cursor: 'pointer',
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 24px rgba(99,102,241,.12)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 24px rgba(37,99,235,.12)';
                     (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
                   }}
                   onMouseLeave={e => {
@@ -117,20 +123,31 @@ export default function RoadmapHistoryPage() {
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
                     {/* Left */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      {/* Week count badge */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                      {/* Job role + meta badges */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+                        {sessionMap[rm.session_id] && (
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 5,
+                            padding: '3px 12px', borderRadius: 999,
+                            background: '#F0F9FF', border: '1px solid #BAE6FD',
+                            color: '#0369A1', fontSize: 12, fontWeight: 700,
+                          }}>
+                            <Briefcase size={11} />
+                            {sessionMap[rm.session_id].job_role}
+                          </span>
+                        )}
                         <span style={{
                           display: 'inline-flex', alignItems: 'center', gap: 5,
                           padding: '3px 12px', borderRadius: 999,
-                          background: 'linear-gradient(135deg, #ede9fe, #ddd6fe)',
-                          color: '#5b21b6', fontSize: 12, fontWeight: 600,
+                          background: '#EFF6FF', border: '1px solid #BFDBFE',
+                          color: '#2563EB', fontSize: 12, fontWeight: 600,
                         }}>
                           <BookOpen size={11} />
                           {rm.plan.weeks?.length ?? 0}-Week Plan
                         </span>
                         <span style={{
                           display: 'inline-flex', alignItems: 'center', gap: 5,
-                          color: '#94a3b8', fontSize: 12,
+                          color: '#9CA3AF', fontSize: 12,
                         }}>
                           <Calendar size={12} />
                           {formatDate(rm.generated_at)}
@@ -138,13 +155,13 @@ export default function RoadmapHistoryPage() {
                       </div>
 
                       {/* Summary */}
+                      {/* Short description */}
                       <p style={{
-                        fontSize: 14, color: '#475569', lineHeight: 1.65,
-                        margin: 0,
-                        overflow: 'hidden',
+                        fontSize: 13, color: '#6B7280', margin: 0, lineHeight: 1.6,
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical' as React.CSSProperties['WebkitBoxOrient'],
+                        overflow: 'hidden',
                       }}>
                         {rm.plan.summary}
                       </p>
@@ -171,10 +188,10 @@ export default function RoadmapHistoryPage() {
                     {/* Arrow */}
                     <div style={{
                       width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-                      background: 'linear-gradient(135deg, #ede9fe, #ddd6fe)',
+                      background: '#EFF6FF', border: '1px solid #BFDBFE',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <ArrowRight size={18} style={{ color: '#7c3aed' }} />
+                      <ArrowRight size={18} style={{ color: '#2563EB' }} />
                     </div>
                   </div>
                 </div>

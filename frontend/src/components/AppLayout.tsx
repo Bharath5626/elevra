@@ -30,6 +30,17 @@ export default function AppLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () => localStorage.getItem('sidebarCollapsed') === 'true'
+  );
+
+  const handleToggleCollapse = () => {
+    setSidebarCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem('sidebarCollapsed', String(next));
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handler = () => setIsMobile(window.innerWidth < 768);
@@ -44,10 +55,10 @@ export default function AppLayout() {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f7f7ff' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F9FAFB' }}>
         <div style={{
           width: 36, height: 36, borderRadius: '50%',
-          border: '3px solid #ffe4e6', borderTopColor: '#ff6575',
+          border: '3px solid #E5E7EB', borderTopColor: '#2563EB',
           animation: 'spin 1s linear infinite',
         }} />
       </div>
@@ -67,6 +78,8 @@ export default function AppLayout() {
         isOpen={isMobile ? sidebarOpen : true}
         isMobile={isMobile}
         onClose={() => setSidebarOpen(false)}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={handleToggleCollapse}
       />
 
       {/* ── Mobile backdrop ── */}
@@ -82,7 +95,7 @@ export default function AppLayout() {
       )}
 
       {/* ── Right column (topbar + content) ── */}
-      <div className="app-main" style={{ marginLeft: isMobile ? 0 : 240 }}>
+      <div className="app-main" style={{ marginLeft: isMobile ? 0 : (sidebarCollapsed ? 56 : 240), transition: 'margin-left 0.2s ease' }}>
 
         {/* Topbar */}
         <header className="app-topbar">
@@ -94,7 +107,7 @@ export default function AppLayout() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 width: 36, height: 36, borderRadius: 8,
                 border: 'none', background: 'transparent',
-                cursor: 'pointer', color: '#002058',
+              cursor: 'pointer', color: '#111827',
                 flexShrink: 0,
               }}
             >
@@ -105,8 +118,8 @@ export default function AppLayout() {
           {/* Page title */}
           <h1 style={{
             flex: 1,
-            fontSize: 17, fontWeight: 700,
-            color: '#002058', margin: 0,
+            fontSize: 15, fontWeight: 700,
+            color: '#111827', margin: 0,
             fontFamily: 'Poppins, sans-serif',
             letterSpacing: '-0.2px',
           }}>
@@ -117,20 +130,20 @@ export default function AppLayout() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 9,
-              padding: '5px 12px', borderRadius: 50,
-              background: '#f7f7ff',
-              border: '1px solid #E7E7E7',
+              padding: '5px 12px 5px 6px', borderRadius: 6,
+              background: '#F9FAFB',
+              border: '1px solid #E5E7EB',
             }}>
               <div style={{
-                width: 26, height: 26, borderRadius: '50%',
-                background: 'linear-gradient(135deg, #ff6575, #b4a7f5)',
+                width: 26, height: 26, borderRadius: 4,
+                background: '#2563EB',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#fff',
               }}>
                 {(user?.full_name || user?.email || 'U')[0].toUpperCase()}
               </div>
               <span style={{
-                fontSize: 13, fontWeight: 600, color: '#002058',
+                fontSize: 13, fontWeight: 600, color: '#111827',
                 maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
                 {user?.full_name || user?.email}
@@ -143,10 +156,10 @@ export default function AppLayout() {
               title="Logout"
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: 34, height: 34, borderRadius: 8,
-                border: '1px solid #E7E7E7',
-                background: 'transparent', cursor: 'pointer',
-                color: '#685f78', transition: 'all 0.2s',
+              width: 34, height: 34, borderRadius: 6,
+              border: '1px solid #E5E7EB',
+              background: 'transparent', cursor: 'pointer',
+              color: '#6B7280', transition: 'all 0.15s',
               }}
             >
               <LogOut size={15} />

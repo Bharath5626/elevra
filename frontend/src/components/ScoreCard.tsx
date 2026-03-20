@@ -67,6 +67,7 @@ export default function ScoreCard({ score, label, size = 120, strokeWidth = 10 }
               fontSize: scoreFontSize,
               fontWeight: 800,
               lineHeight: 1,
+              color: gradientStart,
               background: `linear-gradient(135deg, ${gradientStart}, ${gradientEnd})`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -83,7 +84,7 @@ export default function ScoreCard({ score, label, size = 120, strokeWidth = 10 }
       <span style={{
         fontSize: labelFontSize,
         fontWeight: 600,
-        color: '#685f78',
+        color: '#6B7280',
         textAlign: 'center',
         lineHeight: 1.3,
         letterSpacing: '.01em',

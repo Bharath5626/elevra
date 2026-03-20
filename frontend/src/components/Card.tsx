@@ -31,10 +31,10 @@ export default function Card({
         <div style={{
           padding: '14px 20px',
           borderBottom: '1px solid #E7E7E7',
-          background: '#F8FAFB',
+          background: '#F9FAFB',
           fontWeight: 600,
           fontSize: 14,
-          color: '#002058',
+          color: '#111827',
           fontFamily: 'Poppins, sans-serif',
         }}>
           {header}
@@ -49,7 +49,7 @@ export default function Card({
         <div style={{
           padding: '12px 20px',
           borderTop: '1px solid #E7E7E7',
-          background: '#F8FAFB',
+          background: '#F9FAFB',
         }}>
           {footer}
         </div>

@@ -153,13 +153,13 @@ export default function VideoRecorder({
   return (
     <div className="card" style={{ overflow: 'hidden' }}>
       {questionText && (
-        <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,.05)', background: 'rgba(99,102,241,.04)' }}>
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,.05)', background: 'rgba(37,99,235,.04)' }}>
           <p style={{ fontSize: 13, color: 'rgba(226,232,240,.75)', margin: 0 }}>{questionText}</p>
         </div>
       )}
 
       {/* Video Container */}
-      <div style={{ position: 'relative', aspectRatio: '16/9', background: '#0f172a', borderRadius: 8, overflow: 'hidden', margin: 16 }}>
+      <div style={{ position: 'relative', aspectRatio: '16/9', background: '#111827', borderRadius: 8, overflow: 'hidden', margin: 16 }}>
         <video
           ref={videoRef}
           autoPlay={status === 'idle' || status === 'recording' || status === 'paused'}

@@ -1,19 +1,58 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, Loader2, AlertCircle, CheckCircle, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { Upload, FileText, Loader2, AlertCircle, CheckCircle, ChevronDown, ChevronUp, Sparkles, History, X, Calendar, Target } from 'lucide-react';
 import ProgressBar from '../components/ProgressBar';
-import ScoreCard from '../components/ScoreCard';
 import { resumeAPI } from '../services/api';
 import type { ResumeAnalysis } from '../types';
+
+const P = '#2563EB';
+const P_BG = '#EFF6FF';
+const P_BD = '#BFDBFE';
+const TEXT = '#111827';
+const MUTED = '#6B7280';
+const BORDER = '#E5E7EB';
 
 const sectionTitle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 700,
-  color: 'var(--color-surface-500)',
+  color: MUTED,
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
   marginBottom: 10,
 };
+
+/* ── Parse suggestion text into structured parts ── */
+interface SuggestionPart {
+  type: 'intro' | 'item';
+  title?: string;
+  body: string;
+}
+
+function parseSuggestion(text: string): SuggestionPart[] {
+  const parts: SuggestionPart[] = [];
+  // Split on numbered list items: "1. " or "1) "
+  const chunks = text.split(/(?=\d+\.\s)/);
+  chunks.forEach(chunk => {
+    const numbered = chunk.match(/^(\d+)\.\s+\*\*([^*]+)\*\*[:\s]*([\s\S]*)/);
+    if (numbered) {
+      parts.push({ type: 'item', title: numbered[2].replace(/:$/, ''), body: numbered[3].trim() });
+    } else {
+      const clean = chunk.replace(/\*\*([^*]+)\*\*/g, '$1').trim();
+      if (clean) parts.push({ type: 'intro', body: clean });
+    }
+  });
+  return parts;
+}
+
+/* Render inline **bold** spans */
+function renderBold(text: string) {
+  const segments = text.split(/\*\*([^*]+)\*\*/g);
+  return segments.map((seg, i) =>
+    i % 2 === 1
+      ? <strong key={i} style={{ fontWeight: 700, color: '#1e3a8a' }}>{seg}</strong>
+      : seg
+  );
+}
 
 export default function ResumePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -24,13 +63,48 @@ export default function ResumePage() {
   const [showBullets, setShowBullets] = useState(false);
   const [dragOver, setDragOver] = useState(false);
 
+  /* history popup */
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [history, setHistory] = useState<ResumeAnalysis[]>([]);
+  const [histLoading, setHistLoading] = useState(false);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  const loadResult = (data: ResumeAnalysis) => {
+    setResult(data);
+  };
+
+  const openHistory = async () => {
+    setHistoryOpen(true);
+    if (history.length > 0) return;
+    setHistLoading(true);
+    try {
+      const data = await resumeAPI.getHistory();
+      setHistory(data);
+    } catch { /* silent */ } finally {
+      setHistLoading(false);
+    }
+  };
+
+  /* close on outside click */
+  useEffect(() => {
+    if (!historyOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
+        setHistoryOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [historyOpen]);
+
   const handleSubmit = async () => {
     if (!file) return;
     setLoading(true);
     setError('');
     try {
       const res = await resumeAPI.analyze(file, jd);
-      setResult(res);
+      loadResult(res);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Analysis failed';
       setError(msg);
@@ -48,9 +122,166 @@ export default function ResumePage() {
 
   return (
     <div style={{ padding: '24px 28px 48px' }}>
-      <p style={{ fontSize: 13, color: '#685f78', margin: '0 0 24px' }}>
-        Upload your resume and get AI-powered ATS scoring, skill gap analysis, and bullet improvements.
-      </p>
+
+      {/* ── Page header row ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+        <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>
+          Upload your resume to receive an ATS compatibility score, skill gap analysis, and targeted bullet point improvements.
+        </p>
+        <button
+          onClick={openHistory}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '7px 14px', borderRadius: 8, border: '1px solid #E5E7EB',
+            background: '#fff', color: '#374151', fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', flexShrink: 0, marginLeft: 16,
+            transition: 'all .15s',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = '#EFF6FF';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = '#BFDBFE';
+            (e.currentTarget as HTMLButtonElement).style.color = P;
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = '#fff';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = '#E5E7EB';
+            (e.currentTarget as HTMLButtonElement).style.color = '#374151';
+          }}
+        >
+          <History size={14} /> History
+        </button>
+      </div>
+
+      {/* ── History popup ── */}
+      <AnimatePresence>
+        {historyOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              style={{
+                position: 'fixed', inset: 0, zIndex: 100,
+                background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(2px)',
+              }}
+            />
+            {/* Drawer */}
+            <motion.div
+              ref={popupRef}
+              initial={{ opacity: 0, x: 320 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 320 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+              style={{
+                position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 101,
+                width: 420, background: '#fff',
+                boxShadow: '-4px 0 32px rgba(0,0,0,0.12)',
+                display: 'flex', flexDirection: 'column',
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '20px 24px', borderBottom: '1px solid #E5E7EB',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <History size={16} style={{ color: P }} />
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#111827', fontFamily: 'Poppins, sans-serif' }}>
+                    Analysis History
+                  </span>
+                </div>
+                <button
+                  onClick={() => setHistoryOpen(false)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 4, display: 'flex' }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px' }}>
+                {histLoading ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 0' }}>
+                    <Loader2 size={28} className="animate-spin" style={{ color: P }} />
+                  </div>
+                ) : history.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <FileText size={40} style={{ color: '#D1D5DB', margin: '0 auto 12px', display: 'block' }} />
+                    <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>No previous analyses found.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {history.map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => { loadResult(item); setHistoryOpen(false); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 14,
+                          padding: '14px 16px', borderRadius: 10,
+                          border: '1px solid #E5E7EB', background: '#fff',
+                          cursor: 'pointer', textAlign: 'left', width: '100%',
+                          transition: 'all .15s',
+                        }}
+                        onMouseEnter={e => {
+                          (e.currentTarget as HTMLButtonElement).style.background = '#EFF6FF';
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = '#BFDBFE';
+                        }}
+                        onMouseLeave={e => {
+                          (e.currentTarget as HTMLButtonElement).style.background = '#fff';
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = '#E5E7EB';
+                        }}
+                      >
+                        {/* Icon */}
+                        <div style={{
+                          width: 40, height: 40, borderRadius: 8, flexShrink: 0,
+                          background: '#EFF6FF', border: '1px solid #BFDBFE',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <FileText size={18} style={{ color: P }} />
+                        </div>
+
+                        {/* Details */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{
+                            fontSize: 13, fontWeight: 700, color: '#111827',
+                            margin: '0 0 4px',
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          }}>
+                            {item.filename || 'Resume'}
+                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#6B7280' }}>
+                              <Calendar size={10} />
+                              {new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#6B7280' }}>
+                              <Target size={10} />
+                              v{item.version_number}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* ATS score */}
+                        <div style={{
+                          display: 'flex', flexDirection: 'column', alignItems: 'center',
+                          background: item.ats_score >= 70 ? 'rgba(22,163,74,.1)' : item.ats_score >= 50 ? 'rgba(217,119,6,.1)' : 'rgba(220,38,38,.1)',
+                          borderRadius: 8, padding: '6px 12px', flexShrink: 0,
+                        }}>
+                          <span style={{
+                            fontSize: 18, fontWeight: 800, lineHeight: 1,
+                            color: item.ats_score >= 70 ? '#16a34a' : item.ats_score >= 50 ? '#d97706' : '#dc2626',
+                            fontFamily: 'Poppins, sans-serif',
+                          }}>
+                            {item.ats_score}
+                          </span>
+                          <span style={{ fontSize: 9, fontWeight: 700, color: '#6B7280', letterSpacing: '.05em', textTransform: 'uppercase' }}>ATS</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
         {/* Two-column grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 480px), 1fr))', gap: 24 }}>
@@ -69,7 +300,7 @@ export default function ResumePage() {
               display: 'flex', flexDirection: 'column', gap: 24,
             }}
           >
-            <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 17, fontWeight: 700, color: 'var(--color-secondary-500)', margin: 0 }}>
+            <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 17, fontWeight: 700, color: TEXT, margin: 0 }}>
               Upload Resume
             </h3>
 
@@ -81,28 +312,28 @@ export default function ResumePage() {
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
                 padding: '36px 24px',
-                border: `2px dashed ${dragOver ? 'var(--color-primary-400)' : file ? '#22c55e' : 'var(--color-surface-300)'}`,
-                borderRadius: 14,
-                background: dragOver ? 'rgba(255,101,117,.04)' : file ? 'rgba(34,197,94,.04)' : 'var(--color-surface-50)',
+                border: `2px dashed ${dragOver ? P : file ? '#22c55e' : BORDER}`,
+                borderRadius: 10,
+                background: dragOver ? 'rgba(37,99,235,.04)' : file ? 'rgba(34,197,94,.04)' : '#F9FAFB',
                 cursor: 'pointer',
                 transition: 'all .2s ease',
               }}
             >
               <div style={{
                 width: 56, height: 56, borderRadius: 14,
-                background: file ? 'rgba(34,197,94,.12)' : 'rgba(255,101,117,.1)',
+                background: file ? 'rgba(34,197,94,.12)' : P_BG,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {file
                   ? <CheckCircle size={26} color="#22c55e" />
-                  : <Upload size={26} color="var(--color-primary-400)" />
+                  : <Upload size={26} color={P} />
                 }
               </div>
               <div style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-secondary-500)', margin: '0 0 4px' }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: TEXT, margin: '0 0 4px' }}>
                   {file ? file.name : 'Click or drag PDF here'}
                 </p>
-                <p style={{ fontSize: 12, color: 'var(--color-surface-500)', margin: 0 }}>
+                <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>
                   {file ? `${(file.size / 1024).toFixed(0)} KB` : 'PDF format · max 5 MB'}
                 </p>
               </div>
@@ -110,7 +341,7 @@ export default function ResumePage() {
                 <button
                   type="button"
                   onClick={(e) => { e.preventDefault(); setFile(null); }}
-                  style={{ fontSize: 12, color: 'var(--color-primary-400)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                  style={{ fontSize: 12, color: P, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
                 >
                   Remove
                 </button>
@@ -120,8 +351,8 @@ export default function ResumePage() {
 
             {/* JD textarea */}
             <div>
-              <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--color-secondary-500)', marginBottom: 8 }}>
-                Job Description <span style={{ fontWeight: 400, color: 'var(--color-surface-500)' }}>(optional)</span>
+              <label style={{ display: 'block', fontSize: 14, fontWeight: 600, color: TEXT, marginBottom: 8 }}>
+                Job Description <span style={{ fontWeight: 400, color: MUTED }}>(optional)</span>
               </label>
               <textarea
                 value={jd}
@@ -156,9 +387,9 @@ export default function ResumePage() {
               disabled={!file || loading}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                width: '100%', padding: '15px 0', borderRadius: 50, border: 'none',
-                background: !file ? 'var(--color-surface-300)' : loading ? 'var(--color-primary-200)' : 'var(--color-primary-400)',
-                color: !file ? 'var(--color-surface-500)' : '#fff',
+                width: '100%', padding: '15px 0', borderRadius: 8, border: 'none',
+                background: !file ? '#9CA3AF' : loading ? '#93b7fe' : P,
+                color: !file ? '#6B7280' : '#fff',
                 fontSize: 15, fontWeight: 600,
                 cursor: !file || loading ? 'not-allowed' : 'pointer',
                 transition: 'background .2s',
@@ -171,123 +402,393 @@ export default function ResumePage() {
             </button>
           </motion.div>
 
-          {/* ── Results card ── */}
+          {/* ── Score snapshot card (right col) ── */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             style={{
-              background: '#fff',
-              borderRadius: 10,
+              background: '#fff', borderRadius: 10,
               border: '1px solid #E7E7E7',
               boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
-              padding: '28px',
-              display: 'flex', flexDirection: 'column',
+              padding: '28px', display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
             }}
           >
-            <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 17, fontWeight: 700, color: 'var(--color-secondary-500)', margin: '0 0 24px' }}>
-              Analysis Results
-            </h3>
-
             {!result ? (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 0', color: 'var(--color-surface-400)' }}>
-                <div style={{ width: 64, height: 64, borderRadius: 16, background: 'var(--color-surface-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                  <FileText size={28} style={{ opacity: 0.4 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0' }}>
+                <div style={{ width: 64, height: 64, borderRadius: 10, background: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                  <FileText size={28} style={{ opacity: 0.3 }} />
                 </div>
-                <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-surface-500)', margin: '0 0 4px' }}>No analysis yet</p>
-                <p style={{ fontSize: 13, color: 'var(--color-surface-400)', margin: 0 }}>Upload a PDF and click Analyse</p>
+                <p style={{ fontSize: 15, fontWeight: 600, color: MUTED, margin: '0 0 6px' }}>Your score will appear here</p>
+                <p style={{ fontSize: 13, color: '#9CA3AF', margin: 0, textAlign: 'center', maxWidth: 220 }}>Upload your resume and click Analyse Resume to get your results.</p>
               </div>
-            ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            ) : (() => {
+              const score = result.ats_score || 0;
+              const grade = score >= 80 ? { label: 'Excellent',  color: '#16a34a', track: '#dcfce7', arc: '#22c55e' }
+                          : score >= 65 ? { label: 'Good',       color: '#2563EB', track: '#DBEAFE', arc: '#3b82f6' }
+                          : score >= 50 ? { label: 'Fair',        color: '#d97706', track: '#fef3c7', arc: '#f59e0b' }
+                          :               { label: 'Needs Work',  color: '#dc2626', track: '#fee2e2', arc: '#ef4444' };
 
-                {/* ATS Score centred */}
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
-                  <ScoreCard score={result.ats_score || 0} label="ATS Score" size={140} />
-                </div>
+              /* inline ring — no SVG gradient IDs, no webkit clip */
+              const RING = 160, SW = 12;
+              const R = (RING - SW) / 2;
+              const CIRC = 2 * Math.PI * R;
+              const arcOffset = CIRC - (score / 100) * CIRC;
 
-                {/* Keyword gaps */}
+              return (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+
+                  {/* Ring */}
+                  <div style={{ position: 'relative', width: RING, height: RING }}>
+                    <svg width={RING} height={RING} style={{ transform: 'rotate(-90deg)', display: 'block' }}>
+                      {/* track */}
+                      <circle cx={RING/2} cy={RING/2} r={R} fill="none" stroke={grade.track} strokeWidth={SW} />
+                      {/* arc */}
+                      <motion.circle
+                        cx={RING/2} cy={RING/2} r={R}
+                        fill="none" stroke={grade.arc} strokeWidth={SW} strokeLinecap="round"
+                        strokeDasharray={CIRC}
+                        initial={{ strokeDashoffset: CIRC }}
+                        animate={{ strokeDashoffset: arcOffset }}
+                        transition={{ duration: 1.4, ease: 'easeOut' }}
+                      />
+                    </svg>
+                    {/* center label */}
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.7 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+                        style={{ fontFamily: 'Poppins, sans-serif', fontSize: 36, fontWeight: 800, lineHeight: 1, color: grade.color }}
+                      >
+                        {score}
+                      </motion.span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: MUTED, letterSpacing: '.04em' }}>/100</span>
+                    </div>
+                  </div>
+
+                  {/* Grade + blurb */}
+                  <div style={{ textAlign: 'center' }}>
+                    <span style={{ display: 'inline-block', padding: '4px 18px', borderRadius: 999, fontSize: 13, fontWeight: 700, color: grade.color, background: grade.track, marginBottom: 8 }}>
+                      {grade.label}
+                    </span>
+                    <p style={{ fontSize: 13, color: MUTED, margin: 0, lineHeight: 1.6 }}>
+                      {score >= 80 ? 'Your resume is well-optimised for ATS systems.' :
+                       score >= 65 ? 'Good start — a few tweaks will push you higher.' :
+                       score >= 50 ? 'Your resume needs some keyword and format improvements.' :
+                                     'Significant improvements needed to pass ATS filters.'}
+                    </p>
+                  </div>
+
+                  {/* Quick stats */}
+                  {(() => {
+                    const skipped = result.keyword_gaps?.length ?? 0;
+                    const found   = result.skills_found?.length ?? 0;
+                    const bullets = result.weak_bullets?.length ?? 0;
+                    const stats = [
+                      { value: found,   label: 'Skills matched', color: '#16a34a', bg: 'rgba(22,163,74,.08)',   bd: 'rgba(22,163,74,.25)'   },
+                      { value: skipped, label: 'Keywords missing', color: '#d97706', bg: 'rgba(217,119,6,.08)', bd: 'rgba(217,119,6,.3)'   },
+                      { value: bullets, label: 'Bullets to fix',  color: P,         bg: P_BG,                  bd: P_BD                    },
+                    ];
+                    return (
+                      <div style={{ width: '100%', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                        {stats.map(s => (
+                          <div key={s.label} style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center',
+                            padding: '10px 6px', borderRadius: 8,
+                            background: s.bg, border: `1px solid ${s.bd}`,
+                          }}>
+                            <span style={{ fontSize: 22, fontWeight: 800, color: s.color, lineHeight: 1, fontFamily: 'Poppins, sans-serif' }}>{s.value}</span>
+                            <span style={{ fontSize: 10, fontWeight: 600, color: s.color, marginTop: 3, textAlign: 'center', lineHeight: 1.3 }}>{s.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Scroll CTA */}
+                  <button
+                    onClick={() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    style={{
+                      width: '100%', padding: '11px 0', borderRadius: 8,
+                      border: `1px solid ${P_BD}`, background: P_BG,
+                      color: P, fontSize: 13, fontWeight: 700,
+                      cursor: 'pointer', display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', gap: 6, transition: 'background .15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#DBEAFE')}
+                    onMouseLeave={e => (e.currentTarget.style.background = P_BG)}
+                  >
+                    View Full Analysis <ChevronDown size={15} />
+                  </button>
+                </motion.div>
+              );
+            })()}
+          </motion.div>
+        </div>
+
+        {/* ══ Full-width detailed results ══ */}
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              ref={resultsRef}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.1 }}
+              style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}
+            >
+
+              {/* ── Empty state when PDF had no extractable content ── */}
+              {(() => {
+                const hasAny = result.overall_suggestion ||
+                  (result.keyword_gaps?.length ?? 0) > 0 ||
+                  (result.skills_found?.length ?? 0) > 0 ||
+                  (result.weak_bullets?.length ?? 0) > 0 ||
+                  (result.bias_flags?.length ?? 0) > 0;
+                if (hasAny) return null;
+                return (
+                  <div style={{
+                    background: '#fff', borderRadius: 10,
+                    border: '1px solid #FDE68A',
+                    padding: '28px 28px',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    textAlign: 'center', gap: 10,
+                  }}>
+                    <div style={{ fontSize: 32 }}>📄</div>
+                    <p style={{ fontSize: 15, fontWeight: 700, color: TEXT, margin: 0 }}>Limited content detected</p>
+                    <p style={{ fontSize: 13, color: MUTED, margin: 0, maxWidth: 440, lineHeight: 1.7 }}>
+                      We could extract your ATS score, but couldn't find enough structured content
+                      (skills, bullet points, or keywords) to analyse. This usually happens with
+                      image-based PDFs, scanned documents, or heavily formatted resumes.
+                      Try uploading a plain-text PDF export for the best results.
+                    </p>
+                  </div>
+                );
+              })()}
+
+              {/* ── Section navigator ── */}
+              <div style={{
+                background: '#fff', borderRadius: 10,
+                border: '1px solid #E7E7E7',
+                padding: '12px 20px',
+                display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8,
+              }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: MUTED, marginRight: 4, whiteSpace: 'nowrap' }}>
+                  Jump to:
+                </span>
+                {([
+                  result.overall_suggestion
+                    ? { id: 'sec-rec', label: '💡 Recommendations', color: P, bg: P_BG, bd: P_BD }
+                    : null,
+                  (result.keyword_gaps?.length ?? 0) > 0
+                    ? { id: 'sec-kw', label: `🔑 ${result.keyword_gaps!.length} Missing Keyword${result.keyword_gaps!.length !== 1 ? 's' : ''}`, color: '#d97706', bg: 'rgba(217,119,6,.08)', bd: 'rgba(217,119,6,.3)' }
+                    : null,
+                  (result.skills_found?.length ?? 0) > 0
+                    ? { id: 'sec-sk', label: `✓ ${result.skills_found!.length} Skills Found`, color: '#16a34a', bg: 'rgba(22,163,74,.08)', bd: 'rgba(22,163,74,.25)' }
+                    : null,
+                  (result.weak_bullets?.length ?? 0) > 0
+                    ? { id: 'sec-bu', label: `✏️ ${result.weak_bullets!.length} Bullet Upgrade${result.weak_bullets!.length !== 1 ? 's' : ''}`, color: P, bg: P_BG, bd: P_BD }
+                    : null,
+                  (result.bias_flags?.length ?? 0) > 0
+                    ? { id: 'sec-bi', label: '⚠️ Inclusion Check', color: '#ca8a04', bg: '#fef9c3', bd: '#FDE68A' }
+                    : null,
+                ] as Array<{ id: string; label: string; color: string; bg: string; bd: string } | null>)
+                  .filter((s): s is { id: string; label: string; color: string; bg: string; bd: string } => s !== null)
+                  .map(s => (
+                    <button
+                      key={s.id}
+                      onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                      style={{
+                        padding: '5px 14px', borderRadius: 999,
+                        fontSize: 12, fontWeight: 600,
+                        color: s.color, background: s.bg,
+                        border: `1px solid ${s.bd}`,
+                        cursor: 'pointer', transition: 'opacity .15s',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.opacity = '0.75')}
+                      onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+              </div>
+
+              {/* Overall suggestion banner */}
+              {result.overall_suggestion && (() => {
+                const parts = parseSuggestion(result.overall_suggestion);
+                return (
+                  <div id="sec-rec" style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 10, padding: '20px 24px' }}>
+                    {/* Header */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: P, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Sparkles size={16} color="#fff" />
+                      </div>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: P, margin: 0 }}>How to Improve Your Resume</p>
+                    </div>
+
+                    {/* Intro paragraph */}
+                    {parts.filter(p => p.type === 'intro').map((p, i) => (
+                      <p key={i} style={{ fontSize: 13, color: '#1e40af', lineHeight: 1.7, margin: '0 0 16px' }}>
+                        {renderBold(p.body)}
+                      </p>
+                    ))}
+
+                    {/* Numbered action items */}
+                    {parts.filter(p => p.type === 'item').length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {parts.filter(p => p.type === 'item').map((p, i) => (
+                          <div key={i} style={{
+                            display: 'flex', gap: 14, alignItems: 'flex-start',
+                            background: '#fff', borderRadius: 8,
+                            border: '1px solid #BFDBFE', padding: '14px 16px',
+                          }}>
+                            <div style={{
+                              width: 26, height: 26, borderRadius: 6, flexShrink: 0,
+                              background: P, color: '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 12, fontWeight: 800, fontFamily: 'Poppins, sans-serif',
+                            }}>
+                              {i + 1}
+                            </div>
+                            <div>
+                              <p style={{ fontSize: 13, fontWeight: 700, color: '#1e3a8a', margin: '0 0 4px' }}>{p.title}</p>
+                              <p style={{ fontSize: 13, color: '#374151', margin: 0, lineHeight: 1.65 }}>
+                                {renderBold(p.body)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 460px), 1fr))', gap: 16 }}>
+
+                {/* Missing keywords */}
                 {result.keyword_gaps && result.keyword_gaps.length > 0 && (
-                  <div>
-                    <p style={sectionTitle}>Keyword Gaps</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {result.keyword_gaps.map((kw: string, i: number) => (
-                        <span key={i} className="badge badge-warning">{kw}</span>
+                  <div id="sec-kw" style={{ background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(217,119,6,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <AlertCircle size={15} color="#d97706" />
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: TEXT, margin: 0 }}>Keywords to Add</p>
+                        <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>These words from the job description are missing in your resume</p>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
+                      {result.keyword_gaps.map((kw, i) => (
+                        <span key={i} style={{ padding: '4px 12px', borderRadius: 999, fontSize: 12, fontWeight: 600, background: 'rgba(217,119,6,.08)', color: '#92400e', border: '1px solid rgba(217,119,6,.25)' }}>
+                          + {kw}
+                        </span>
                       ))}
                     </div>
                   </div>
                 )}
 
                 {/* Skills found */}
-                {result.skills_found && (result.skills_found as string[]).length > 0 && (
-                  <div>
-                    <p style={sectionTitle}>Skills Found</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {(result.skills_found as string[]).map((sk: string, i: number) => (
-                        <span key={i} className="badge badge-success">{sk}</span>
+                {result.skills_found && result.skills_found.length > 0 && (
+                  <div id="sec-sk" style={{ background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(22,163,74,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <CheckCircle size={15} color="#16a34a" />
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: TEXT, margin: 0 }}>Skills You Already Have</p>
+                        <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>These are already visible in your resume — great work!</p>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
+                      {result.skills_found.map((sk, i) => (
+                        <span key={i} style={{ padding: '4px 12px', borderRadius: 999, fontSize: 12, fontWeight: 600, background: 'rgba(22,163,74,.08)', color: '#15803d', border: '1px solid rgba(22,163,74,.2)' }}>
+                          ✓ {sk}
+                        </span>
                       ))}
                     </div>
                   </div>
                 )}
+              </div>
 
-                {/* Improved bullets collapsible */}
-                {result.improved_bullets && (result.improved_bullets as string[]).length > 0 && (
-                  <div style={{ borderTop: '1px solid var(--color-surface-200)', paddingTop: 16 }}>
-                    <button
-                      onClick={() => setShowBullets(!showBullets)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 14, fontWeight: 600, color: 'var(--color-primary-400)', padding: 0,
-                      }}
-                    >
-                      <CheckCircle size={15} />
-                      Improved Bullet Points
-                      {showBullets ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                    </button>
-                    <AnimatePresence>
-                      {showBullets && (
-                        <motion.ul
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          style={{ margin: '12px 0 0', padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}
-                        >
-                          {(result.improved_bullets as string[]).map((b: string, i: number) => (
-                            <li key={i} style={{
-                              fontSize: 13, color: 'var(--color-surface-600)',
-                              paddingLeft: 16, borderLeft: '3px solid var(--color-primary-200)',
-                              lineHeight: 1.55,
-                            }}>
-                              {b}
-                            </li>
+              {/* Bullet improvements — before/after */}
+              {result.weak_bullets && result.weak_bullets.length > 0 && (
+                <div id="sec-bu" style={{ background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7', boxShadow: '0 1px 4px rgba(0,0,0,.05)', overflow: 'hidden' }}>
+                  <button
+                    onClick={() => setShowBullets(!showBullets)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '20px 24px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 30, height: 30, borderRadius: 7, background: P_BG, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <FileText size={15} color={P} />
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: TEXT, margin: 0 }}>Rewrite These Bullet Points</p>
+                        <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>{result.weak_bullets.length} weak bullets found — see stronger versions below</p>
+                      </div>
+                    </div>
+                    {showBullets ? <ChevronUp size={16} color={MUTED} /> : <ChevronDown size={16} color={MUTED} />}
+                  </button>
+                  <AnimatePresence>
+                    {showBullets && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        style={{ borderTop: '1px solid #E7E7E7', padding: '8px 24px 24px' }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
+                          {result.weak_bullets.map((wb, i) => (
+                            <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                              <div style={{ padding: '12px 14px', borderRadius: 8, background: 'rgba(220,38,38,.04)', border: '1px solid rgba(220,38,38,.15)' }}>
+                                <p style={{ fontSize: 11, fontWeight: 700, color: '#dc2626', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '.06em' }}>Before</p>
+                                <p style={{ fontSize: 13, color: '#7f1d1d', margin: 0, lineHeight: 1.6 }}>{wb.original}</p>
+                              </div>
+                              <div style={{ padding: '12px 14px', borderRadius: 8, background: 'rgba(22,163,74,.04)', border: '1px solid rgba(22,163,74,.2)' }}>
+                                <p style={{ fontSize: 11, fontWeight: 700, color: '#16a34a', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '.06em' }}>After ✓</p>
+                                <p style={{ fontSize: 13, color: '#14532d', margin: 0, lineHeight: 1.6 }}>{wb.improved}</p>
+                              </div>
+                            </div>
                           ))}
-                        </motion.ul>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
 
-                {/* Bias flags */}
-                {result.bias_flags && (result.bias_flags as string[]).length > 0 && (
-                  <div>
-                    <p style={sectionTitle}>Bias Flags</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {(result.bias_flags as string[]).map((bf: string, i: number) => (
-                        <span key={i} className="badge badge-danger">{bf}</span>
-                      ))}
+              {/* Bias / inclusion warnings */}
+              {result.bias_flags && result.bias_flags.length > 0 && (
+                <div id="sec-bi" style={{ background: '#fff', borderRadius: 10, border: '1px solid #FDE68A', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                    <div style={{ width: 30, height: 30, borderRadius: 7, background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <AlertCircle size={15} color="#ca8a04" />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: TEXT, margin: 0 }}>Inclusion Check</p>
+                      <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>These phrases could unintentionally signal bias to recruiters — consider rewording</p>
                     </div>
                   </div>
-                )}
-
-                {/* Readability bar */}
-                {typeof result.overall_readability === 'number' && (
-                  <div style={{ borderTop: '1px solid var(--color-surface-200)', paddingTop: 16 }}>
-                    <ProgressBar value={result.overall_readability} label="Readability Score" height={12} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {result.bias_flags.map((bf, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', borderRadius: 8, background: '#fefce8', border: '1px solid #FDE68A' }}>
+                        <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
+                        <p style={{ fontSize: 13, color: '#78350f', margin: 0, lineHeight: 1.55 }}>{bf}</p>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </motion.div>
-            )}
-          </motion.div>
-        </div>
+                </div>
+              )}
+
+            </motion.div>
+          )}
+        </AnimatePresence>
+
     </div>
   );
 }

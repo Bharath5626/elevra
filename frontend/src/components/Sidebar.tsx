@@ -1,8 +1,12 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, Video, BookOpen,
-  Briefcase, Clock, Target, X, ChevronRight,
+  Briefcase, Clock, Target, X, Menu, LogOut,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+const P = '#2563EB';
 
 const navItems = [
   { path: '/dashboard',       label: 'Dashboard',       icon: LayoutDashboard },
@@ -18,106 +22,246 @@ interface SidebarProps {
   isOpen: boolean;
   isMobile: boolean;
   onClose: () => void;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
-export default function Sidebar({ isOpen, isMobile, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onToggleCollapse }: SidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const [tooltip, setTooltip] = useState<{ label: string; y: number } | null>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  const slim = isCollapsed && !isMobile;
+  const W = slim ? 56 : 240;
 
   return (
     <aside
+      ref={sidebarRef}
       className="app-sidebar"
-      style={{ transform: isOpen ? 'translateX(0)' : 'translateX(-100%)' }}
+      style={{
+        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+        width: W,
+      }}
     >
       {/* ── Logo ── */}
       <div style={{
         height: 64,
         display: 'flex', alignItems: 'center',
-        padding: '0 20px',
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        padding: '0 12px',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
         flexShrink: 0,
         gap: 10,
       }}>
-        <div style={{
-          width: 34, height: 34, borderRadius: 10,
-          background: 'linear-gradient(135deg, #ff6575, #b4a7f5)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0,
-        }}>
-          <span style={{ color: '#fff', fontSize: 14, fontWeight: 900 }}>E</span>
-        </div>
-        <span style={{ fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: '-0.3px' }}>
-          Elev<span style={{ color: '#ff6575' }}>ra</span>
-        </span>
+        {/* Hamburger toggle */}
+        {!isMobile && (
+          <button
+            onClick={onToggleCollapse}
+            title={slim ? 'Expand sidebar' : 'Collapse sidebar'}
+            style={{
+              background: 'transparent', border: 'none',
+              color: 'rgba(255,255,255,0.55)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 32, height: 32, borderRadius: 6,
+              flexShrink: 0, transition: 'color 0.13s ease, background 0.13s ease',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.color = '#fff';
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.1)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.55)';
+              (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+            }}
+          >
+            <Menu size={18} />
+          </button>
+        )}
 
-        {/* Close button – mobile only */}
+        {!slim && (
+          <>
+            <div style={{
+              width: 28, height: 28,
+              background: P,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0, borderRadius: 6,
+            }}>
+              <span style={{ color: '#fff', fontSize: 13, fontWeight: 900, letterSpacing: '-0.5px' }}>E</span>
+            </div>
+            <span style={{
+              flex: 1,
+              fontSize: 16, fontWeight: 700, color: '#fff',
+              letterSpacing: '-0.4px', fontFamily: 'Poppins, sans-serif',
+            }}>
+              elevra
+            </span>
+          </>
+        )}
+
         {isMobile && (
           <button
             onClick={onClose}
             style={{
-              marginLeft: 'auto',
-              background: 'transparent', border: 'none',
-              color: 'rgba(255,255,255,0.6)', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 4, borderRadius: 6,
+              marginLeft: 'auto', background: 'transparent', border: 'none',
+              color: 'rgba(255,255,255,0.45)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', padding: 4,
             }}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         )}
       </div>
 
       {/* ── Nav items ── */}
-      <nav style={{ flex: 1, padding: '20px 12px' }}>
-        <p style={{
-          fontSize: 10, fontWeight: 700,
-          color: 'rgba(255,255,255,0.38)',
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          padding: '0 10px',
-          marginBottom: 10,
-          margin: '0 0 10px',
-        }}>
-          Main Menu
-        </p>
+      <nav style={{
+        flex: 1,
+        padding: slim ? '16px 0' : '20px 10px',
+        overflowY: 'auto',
+      }}>
+        {!slim && (
+          <p style={{
+            fontSize: 10, fontWeight: 700,
+            color: 'rgba(255,255,255,0.35)',
+            letterSpacing: '0.12em', textTransform: 'uppercase' as const,
+            padding: '0 12px', margin: '0 0 10px', fontFamily: 'monospace',
+          }}>
+            Main
+          </p>
+        )}
+
         {navItems.map(({ path, label, icon: Icon }) => {
           const isActive =
             location.pathname === path ||
             (path !== '/dashboard' && location.pathname.startsWith(path));
+          const isHov = tooltip?.label === label;
+
           return (
-            <Link
+            <div
               key={path}
-              to={path}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 11,
-                padding: '10px 10px 10px 11px',
-                borderRadius: 8,
-                marginBottom: 3,
-                textDecoration: 'none',
-                fontSize: 14,
-                fontWeight: isActive ? 600 : 500,
-                color: isActive ? '#ff6575' : 'rgba(255,255,255,0.72)',
-                background: isActive ? 'rgba(255,101,117,0.14)' : 'transparent',
-                borderLeft: isActive ? '3px solid #ff6575' : '3px solid transparent',
-                transition: 'all 0.2s',
+              style={{ position: 'relative' }}
+              onMouseEnter={e => {
+                if (slim) {
+                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                  setTooltip({ label, y: rect.top + rect.height / 2 });
+                }
               }}
+              onMouseLeave={() => setTooltip(null)}
             >
-              <Icon size={17} style={{ flexShrink: 0 }} />
-              <span style={{ flex: 1 }}>{label}</span>
-              {isActive && <ChevronRight size={13} style={{ flexShrink: 0, opacity: 0.7 }} />}
-            </Link>
+              <Link
+                to={path}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: slim ? 'center' : 'flex-start',
+                  gap: slim ? 0 : 10,
+                  padding: slim ? '10px 0' : '9px 12px',
+                  marginBottom: 1,
+                  textDecoration: 'none',
+                  fontSize: 13.5,
+                  fontWeight: isActive ? 600 : 400,
+                  color: isActive
+                    ? '#fff'
+                    : isHov
+                    ? 'rgba(255,255,255,0.85)'
+                    : 'rgba(255,255,255,0.5)',
+                  background: isActive
+                    ? 'rgba(255,255,255,0.12)'
+                    : isHov
+                    ? 'rgba(255,255,255,0.07)'
+                    : 'transparent',
+                  borderLeft: slim ? 'none' : `2px solid ${isActive ? P : 'transparent'}`,
+                  borderRadius: 6,
+                  transition: 'all 0.13s ease',
+                }}
+              >
+                <Icon size={16} style={{ flexShrink: 0 }} />
+                {!slim && <span>{label}</span>}
+              </Link>
+
+              {/* Tooltip rendered inline — replaced by fixed portal below */}
+            </div>
           );
         })}
       </nav>
 
-      {/* ── Footer branding ── */}
+      {/* Fixed-position tooltip — escapes overflow clipping */}
+      {slim && tooltip && (
+        <div style={{
+          position: 'fixed',
+          left: W + 10,
+          top: tooltip.y,
+          transform: 'translateY(-50%)',
+          background: '#1F2937',
+          color: '#fff',
+          fontSize: 12,
+          fontWeight: 500,
+          padding: '5px 10px',
+          borderRadius: 6,
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+          zIndex: 9999,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
+        }}>
+          <div style={{
+            position: 'absolute',
+            left: -4, top: '50%',
+            transform: 'translateY(-50%)',
+            width: 0, height: 0,
+            borderTop: '4px solid transparent',
+            borderBottom: '4px solid transparent',
+            borderRight: '4px solid #1F2937',
+          }} />
+          {tooltip.label}
+        </div>
+      )}
+
+      {/* ── Footer ── */}
       <div style={{
-        padding: '14px 20px',
+        padding: slim ? '10px 0' : '10px 10px',
         borderTop: '1px solid rgba(255,255,255,0.08)',
         flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
       }}>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: 0, textAlign: 'center' }}>
-          Career AI Studio &copy; {new Date().getFullYear()}
-        </p>
+        {/* Logout button */}
+        <button
+          onClick={() => { logout(); navigate('/login'); }}
+          title="Logout"
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.color = '#FCA5A5';
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.4)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+          }}
+          style={{
+            display: 'flex', alignItems: 'center',
+            justifyContent: slim ? 'center' : 'flex-start',
+            gap: 10,
+            width: '100%',
+            padding: slim ? '9px 0' : '9px 12px',
+            background: 'transparent', border: 'none',
+            color: 'rgba(255,255,255,0.4)',
+            fontSize: 13.5, fontWeight: 400,
+            cursor: 'pointer', borderRadius: 6,
+            transition: 'all 0.13s ease',
+          }}
+        >
+          <LogOut size={16} style={{ flexShrink: 0 }} />
+          {!slim && <span>Logout</span>}
+        </button>
+
+        {!slim && (
+          <p style={{
+            fontSize: 11, color: 'rgba(255,255,255,0.18)',
+            margin: '4px 0 0', letterSpacing: '0.02em', padding: '0 12px',
+          }}>
+            Career AI Studio &copy; {new Date().getFullYear()}
+          </p>
+        )}
       </div>
     </aside>
   );

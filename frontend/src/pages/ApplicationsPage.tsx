@@ -66,7 +66,7 @@ export default function ApplicationsPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <Loader2 size={32} className="animate-spin" style={{ color: 'var(--color-primary-400)' }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: '#2563EB' }} />
       </div>
     );
   }
@@ -80,15 +80,15 @@ export default function ApplicationsPage() {
             <div style={{
               width: 44, height: 44, borderRadius: 12, flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400))',
+              background: '#EFF6FF', border: '1px solid #BFDBFE',
             }}>
-              <Briefcase size={20} color="#fff" />
+              <Briefcase size={20} color="#2563EB" />
             </div>
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-secondary-500)', margin: 0, lineHeight: 1.3 }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0, lineHeight: 1.3 }}>
                 My Applications
               </h1>
-              <p style={{ fontSize: 13, color: 'var(--color-surface-500)', margin: '3px 0 0' }}>
+              <p style={{ fontSize: 13, color: '#6B7280', margin: '3px 0 0' }}>
                 Track every job you've applied to
               </p>
             </div>
@@ -100,7 +100,7 @@ export default function ApplicationsPage() {
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '10px 22px', borderRadius: 12, fontSize: 13, fontWeight: 600,
               textDecoration: 'none', color: '#fff',
-              background: 'linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400))',
+              background: '#2563EB',
             }}
           >
             <Search size={14} /> Find More Jobs
@@ -124,10 +124,10 @@ export default function ApplicationsPage() {
                 <s.icon size={18} style={{ color: s.color }} />
               </div>
               <div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-secondary-500)', lineHeight: 1 }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#111827', lineHeight: 1 }}>
                   {s.count}
                 </div>
-                <div style={{ fontSize: 12, color: 'var(--color-surface-500)', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
                   {s.label}
                 </div>
               </div>
@@ -138,11 +138,11 @@ export default function ApplicationsPage() {
         {/* ── Empty state ─────────────────────────── */}
         {apps.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <Briefcase size={44} style={{ color: 'var(--color-surface-300)', margin: '0 auto 16px' }} />
-            <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--color-secondary-500)', margin: '0 0 6px' }}>
+            <Briefcase size={44} style={{ color: '#9CA3AF', margin: '0 auto 16px' }} />
+            <p style={{ fontSize: 16, fontWeight: 600, color: '#111827', margin: '0 0 6px' }}>
               No applications yet
             </p>
-            <p style={{ fontSize: 13, color: 'var(--color-surface-500)' }}>
+            <p style={{ fontSize: 13, color: '#6B7280' }}>
               Search for jobs and apply with one click to start tracking.
             </p>
           </div>
@@ -165,13 +165,13 @@ export default function ApplicationsPage() {
                     <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
                       {/* Logo */}
                       {app.employer_logo ? (
-                        <img src={app.employer_logo} alt={app.company} style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'contain', background: '#f8fafc', flexShrink: 0 }} />
+                        <img src={app.employer_logo} alt={app.company} style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'contain', background: '#F9FAFB', flexShrink: 0 }} />
                       ) : (
                         <div style={{
                           width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-                          background: 'linear-gradient(135deg, #FF6575, #B4A7F5)',
+                          background: '#EFF6FF',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: '#fff', fontWeight: 700, fontSize: 16,
+                          color: '#2563EB', fontWeight: 700, fontSize: 16,
                         }}>
                           {app.company.charAt(0)}
                         </div>
@@ -179,10 +179,10 @@ export default function ApplicationsPage() {
 
                       {/* Info */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-secondary-500)', margin: 0 }}>
+                        <h3 style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: 0 }}>
                           {app.job_title}
                         </h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: 'var(--color-surface-500)', marginTop: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: '#6B7280', marginTop: 4 }}>
                           <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Building2 size={12} /> {app.company}</span>
                           <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><MapPin size={12} /> {app.location}</span>
                           {app.match_score != null && (
@@ -213,7 +213,7 @@ export default function ApplicationsPage() {
                         ))}
                       </select>
 
-                      <span style={{ fontSize: 11, color: 'var(--color-surface-400)', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap' }}>
                         {new Date(app.applied_at).toLocaleDateString()}
                       </span>
 
@@ -225,8 +225,8 @@ export default function ApplicationsPage() {
                         style={{
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           width: 34, height: 34, borderRadius: 8,
-                          border: '1px solid var(--color-surface-300)',
-                          color: 'var(--color-surface-500)', flexShrink: 0,
+                          border: '1px solid #E5E7EB',
+                          color: '#6B7280', flexShrink: 0,
                         }}
                         title="Open job posting"
                       >

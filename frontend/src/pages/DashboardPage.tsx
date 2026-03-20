@@ -1,40 +1,46 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   FileSearch, Video, Play, BookOpen, Clock,
   TrendingUp, ArrowRight, Briefcase, Award, Target,
-  Sparkles, ChevronRight, Zap, BarChart2, Star,
+  Sparkles, ChevronRight, Zap, BarChart2,
 } from 'lucide-react';
 import ScoreCard from '../components/ScoreCard';
 import { useAuth } from '../context/AuthContext';
 import type { CRIScore, InterviewSession } from '../types';
 import { criAPI, interviewAPI } from '../services/api';
 
+/* ── design tokens ── */
+const P      = '#2563EB';
+const P_D    = '#1D4ED8';
+const P_BG   = '#EFF6FF';
+const P_BD   = '#BFDBFE';
+const BG     = '#FFFFFF';
+const BG_ALT = '#F9FAFB';
+const TEXT   = '#111827';
+const TEXT2  = '#374151';
+const MUTED  = '#6B7280';
+const BORDER = '#E5E7EB';
+
 const quickActions = [
-  { icon: FileSearch, label: 'Resume Analysis', path: '/resume',          gradient: 'linear-gradient(135deg,#ff6575,#ff9a9e)', glow: '#ff657544' },
-  { icon: Video,      label: 'Mock Interview',   path: '/interview/setup', gradient: 'linear-gradient(135deg,#b4a7f5,#7c6fec)', glow: '#b4a7f544' },
-  { icon: Play,       label: 'Replay Sessions',  path: '/history',         gradient: 'linear-gradient(135deg,#22c55e,#16a34a)', glow: '#22c55e44' },
-  { icon: BookOpen,   label: 'Learning Roadmap', path: '/roadmap',         gradient: 'linear-gradient(135deg,#3b82f6,#6366f1)', glow: '#3b82f644' },
-  { icon: Briefcase,  label: 'Find Jobs',        path: '/jobs',            gradient: 'linear-gradient(135deg,#f59e0b,#f97316)', glow: '#f59e0b44' },
+  { icon: FileSearch, label: 'Resume Analysis', path: '/resume' },
+  { icon: Video,      label: 'Mock Interview',   path: '/interview/setup' },
+  { icon: Play,       label: 'Replay Sessions',  path: '/history' },
+  { icon: BookOpen,   label: 'Learning Roadmap', path: '/roadmap' },
+  { icon: Briefcase,  label: 'Find Jobs',        path: '/jobs' },
 ];
 
 const mockCRI: CRIScore = {
-  id: '1', user_id: '1', cri_total: 72,
-  resume_score: 78, interview_score: 65, jd_fit_score: 74,
-  improvement_delta: 5, percentile: 68,
+  id: '1', user_id: '1', cri_total: 0,
+  resume_score: 0, interview_score: 0, jd_fit_score: 0,
+  improvement_delta: 0, percentile: 0,
   recorded_at: new Date().toISOString(),
 };
 
-const mockSessions: InterviewSession[] = [
-  { id: '1', user_id: '1', job_role: 'Frontend Developer',  difficulty: 'Intermediate', status: 'completed', overall_score: 78, questions: [], created_at: new Date(Date.now() - 86400000).toISOString(),  resume_analysis_id: null },
-  { id: '2', user_id: '1', job_role: 'Full Stack Engineer', difficulty: 'Advanced',     status: 'completed', overall_score: 65, questions: [], created_at: new Date(Date.now() - 172800000).toISOString(), resume_analysis_id: null },
-  { id: '3', user_id: '1', job_role: 'Product Manager',    difficulty: 'Intermediate', status: 'completed', overall_score: 82, questions: [], created_at: new Date(Date.now() - 259200000).toISOString(), resume_analysis_id: null },
-];
-
-const scoreColor  = (s: number) => s >= 70 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444';
-const scoreBg     = (s: number) => s >= 70 ? 'rgba(34,197,94,.12)' : s >= 50 ? 'rgba(245,158,11,.12)' : 'rgba(239,68,68,.12)';
-const difficultyColor = (d: string) => d === 'Advanced' ? '#b4a7f5' : d === 'Intermediate' ? '#3b82f6' : '#22c55e';
+const scoreColor = (s: number) => s >= 70 ? '#16a34a' : s >= 50 ? '#d97706' : '#dc2626';
+const scoreBg    = (s: number) => s >= 70 ? 'rgba(22,163,74,.1)' : s >= 50 ? 'rgba(217,119,6,.1)' : 'rgba(220,38,38,.1)';
+const difficultyColor = (d: string) => d === 'Advanced' ? P : d === 'Intermediate' ? TEXT2 : MUTED;
 
 /* ── mini sparkline data ── */
 const sparkPoints = [52, 58, 61, 55, 65, 68, 72];
@@ -47,15 +53,12 @@ const sparkPath = (() => {
   }).join(' ');
 })();
 
-/* ── stat cards data ── */
 const getStatCards = (cri: CRIScore) => [
   {
     label: 'Career Readiness',
     value: `${cri.cri_total ?? 0}`,
     unit: '%',
     icon: Award,
-    gradient: 'linear-gradient(135deg, #ff6575 0%, #ff9a9e 100%)',
-    glow: '#ff657530',
     trend: cri.improvement_delta,
     sub: `Top ${100 - (cri.percentile ?? 0)}% of candidates`,
     sparkline: true,
@@ -65,8 +68,6 @@ const getStatCards = (cri: CRIScore) => [
     value: `${cri.resume_score ?? 0}`,
     unit: '%',
     icon: FileSearch,
-    gradient: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
-    glow: '#3b82f630',
     sub: 'ATS optimised',
   },
   {
@@ -74,8 +75,6 @@ const getStatCards = (cri: CRIScore) => [
     value: `${cri.interview_score ?? 0}`,
     unit: '%',
     icon: Video,
-    gradient: 'linear-gradient(135deg, #b4a7f5 0%, #7c6fec 100%)',
-    glow: '#b4a7f530',
     sub: 'Based on last session',
   },
   {
@@ -83,8 +82,6 @@ const getStatCards = (cri: CRIScore) => [
     value: `${cri.jd_fit_score ?? 0}`,
     unit: '%',
     icon: Target,
-    gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-    glow: '#22c55e30',
     sub: 'Role compatibility',
   },
 ];
@@ -92,20 +89,21 @@ const getStatCards = (cri: CRIScore) => [
 /* ─────────────────────────────────────────────── */
 export default function DashboardPage() {
   const { user } = useAuth();
-  const [cri, setCri]         = useState<CRIScore>(mockCRI);
-  const [sessions, setSessions] = useState<InterviewSession[]>(mockSessions);
+  const [cri, setCri]           = useState<CRIScore>(mockCRI);
+  const [sessions, setSessions] = useState<InterviewSession[]>([]);
   const [hoveredAction, setHoveredAction]   = useState<string | null>(null);
   const [hoveredSession, setHoveredSession] = useState<string | null>(null);
+  const [hoveredCTA, setHoveredCTA]         = useState(false);
 
   useEffect(() => {
     criAPI.getCurrent().then(r => setCri(r)).catch(() => {});
-    interviewAPI.getSessions().then(r => setSessions(r.length ? r.slice(0, 5) : mockSessions)).catch(() => {});
+    interviewAPI.getSessions().then(r => setSessions(r.slice(0, 5))).catch(() => {});
   }, []);
 
   const statCards = getStatCards(cri);
 
   return (
-    <div style={{ padding: '28px 28px 48px', maxWidth: 1320, margin: '0 auto' }}>
+    <div style={{ padding: '32px 32px 64px', maxWidth: 1320, margin: '0 auto', background: BG_ALT, minHeight: '100vh' }}>
 
       {/* ══ Hero banner ══════════════════════════════════════ */}
       <motion.div
@@ -113,56 +111,48 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         style={{
           position: 'relative',
-          borderRadius: 20,
-          overflow: 'hidden',
-          marginBottom: 28,
+          marginBottom: 36,
           padding: '32px 36px',
-          background: 'linear-gradient(135deg, #002058 0%, #1a0a4e 55%, #2d1066 100%)',
-          boxShadow: '0 20px 60px rgba(0,32,88,.35), 0 4px 16px rgba(0,0,0,.2)',
+          background: '#111827',
+          border: 'none',
+          borderRadius: 12,
+          boxShadow: '0 4px 16px rgba(27,43,30,.25)',
         }}
       >
-        {/* ambient orbs */}
-        <div style={{ position: 'absolute', top: -60, right: -40, width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(180,167,245,.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -80, left: '30%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,101,117,.18) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: -20, left: '55%', width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
-
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
           <div>
-            {/* greeting pill */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
-              background: 'rgba(255,255,255,.1)',
-              border: '1px solid rgba(255,255,255,.18)',
-              borderRadius: 99, padding: '5px 14px',
-              fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,.85)',
-              marginBottom: 14, backdropFilter: 'blur(10px)',
+              background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
+              padding: '4px 12px', marginBottom: 14, borderRadius: 20,
+              fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
+              letterSpacing: '.08em', textTransform: 'uppercase' as const, fontFamily: 'monospace',
             }}>
-              <Sparkles size={12} style={{ color: '#f59e0b' }} />
-              AI-Powered Career Studio
+              <Sparkles size={11} />
+              Intelligent Career Studio
             </div>
-
             <h2 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 26, fontWeight: 800, color: '#fff', margin: '0 0 8px', lineHeight: 1.25 }}>
               Welcome back,{' '}
-              <span style={{ background: 'linear-gradient(90deg,#ff6575,#b4a7f5)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                {user?.full_name || 'User'}
-              </span>{' '}👋
+              <span style={{ color: '#93C5FD' }}>{user?.full_name || 'User'}</span>
             </h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.6)', margin: 0, maxWidth: 460 }}>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', margin: 0, maxWidth: 460 }}>
               Your career readiness score is <strong style={{ color: '#fff' }}>{cri.cri_total}%</strong> — keep pushing. Here's today's overview.
             </p>
           </div>
 
-          {/* CTA button */}
           <Link
             to="/interview/setup"
+            onMouseEnter={() => setHoveredCTA(true)}
+            onMouseLeave={() => setHoveredCTA(false)}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '12px 24px', borderRadius: 12,
-              background: 'linear-gradient(135deg,#ff6575,#e63950)',
-              color: '#fff', fontWeight: 700, fontSize: 14,
+              padding: '11px 22px',
+              background: '#fff',
+              color: '#111827', fontWeight: 700, fontSize: 14,
               textDecoration: 'none',
-              boxShadow: '0 4px 20px rgba(255,101,117,.5)',
-              transition: 'transform .2s, box-shadow .2s',
+              border: 'none',
+              borderRadius: 8,
+              transition: 'opacity .18s',
               flexShrink: 0,
             }}
           >
@@ -176,8 +166,8 @@ export default function DashboardPage() {
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))',
-        gap: 16,
-        marginBottom: 28,
+        gap: 20,
+        marginBottom: 32,
       }}>
         {statCards.map((card, i) => (
           <motion.div
@@ -186,34 +176,26 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 + i * 0.06 }}
             style={{
-              position: 'relative',
-              background: '#fff',
-              border: '1px solid rgba(0,0,0,.07)',
-              borderRadius: 16,
-              padding: '22px 22px 18px',
-              boxShadow: `0 2px 12px rgba(0,0,0,.06), 0 0 0 0 ${card.glow}`,
-              overflow: 'hidden',
-              transition: 'box-shadow .25s, transform .25s',
+              background: BG,
+              border: `1px solid ${BORDER}`,
+              borderRadius: 12,
+              padding: '24px 24px 22px',
+              boxShadow: '0 1px 4px rgba(0,0,0,.05)',
             }}
-            whileHover={{ y: -3, boxShadow: `0 8px 32px rgba(0,0,0,.1), 0 0 0 6px ${card.glow}` }}
           >
-            {/* top-right gradient blob */}
-            <div style={{ position: 'absolute', top: -20, right: -20, width: 90, height: 90, borderRadius: '50%', background: card.glow, pointerEvents: 'none' }} />
-
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
               <div style={{
-                width: 42, height: 42, borderRadius: 11,
-                background: card.gradient,
+                width: 40, height: 40, borderRadius: 10,
+                background: P_BG, border: `1px solid ${P_BD}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: `0 4px 12px ${card.glow}`,
               }}>
-                <card.icon size={20} style={{ color: '#fff' }} />
+                <card.icon size={18} style={{ color: P }} />
               </div>
               {card.trend !== undefined && (
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 4,
-                  background: 'rgba(34,197,94,.1)', borderRadius: 99,
-                  padding: '3px 8px', fontSize: 11, fontWeight: 700, color: '#15803d',
+                  background: 'rgba(22,163,74,.1)', borderRadius: 6,
+                  padding: '3px 8px', fontSize: 11, fontWeight: 700, color: '#16a34a',
                 }}>
                   <TrendingUp size={11} />
                   +{card.trend}%
@@ -222,34 +204,28 @@ export default function DashboardPage() {
             </div>
 
             <div style={{ marginBottom: 6 }}>
-              <p style={{ fontSize: 12, color: '#685f78', fontWeight: 500, margin: '0 0 4px', letterSpacing: '.01em' }}>{card.label}</p>
+              <p style={{ fontSize: 12, color: MUTED, fontWeight: 500, margin: '0 0 4px', letterSpacing: '.01em' }}>{card.label}</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-                <span style={{ fontSize: 32, fontWeight: 800, color: '#002058', fontFamily: 'Poppins, sans-serif', lineHeight: 1 }}>
+                <span style={{ fontSize: 32, fontWeight: 800, color: TEXT, fontFamily: 'Poppins, sans-serif', lineHeight: 1 }}>
                   {card.value}
                 </span>
-                <span style={{ fontSize: 16, fontWeight: 700, color: '#9ca3af' }}>{card.unit}</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: MUTED }}>{card.unit}</span>
               </div>
             </div>
 
             {card.sparkline && (
               <svg width={80} height={32} style={{ marginBottom: 6, display: 'block' }}>
-                <defs>
-                  <linearGradient id="spark-grad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#ff6575" />
-                    <stop offset="100%" stopColor="#b4a7f5" />
-                  </linearGradient>
-                </defs>
-                <path d={sparkPath} fill="none" stroke="url(#spark-grad)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+                <path d={sparkPath} fill="none" stroke={P} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             )}
 
-            <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>{card.sub}</p>
+            <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>{card.sub}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* ══ Main 3-column grid ══════════════════════════════ */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 20 }}>
+      {/* ══ Main grid ══════════════════════════════════════ */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 24 }}>
 
         {/* ── CRI Breakdown — col span 4 ── */}
         <motion.div
@@ -259,36 +235,34 @@ export default function DashboardPage() {
           style={{ gridColumn: 'span 4' }}
         >
           <div style={{
-            background: '#fff',
-            border: '1px solid rgba(0,0,0,.07)',
-            borderRadius: 18,
-            boxShadow: '0 2px 12px rgba(0,0,0,.06)',
+            background: BG,
+            border: `1px solid ${BORDER}`,
+            borderRadius: 10,
+            boxShadow: '0 1px 3px rgba(0,0,0,.04)',
             overflow: 'hidden',
           }}>
-            {/* header */}
             <div style={{
-              padding: '18px 22px 14px',
-              borderBottom: '1px solid #f0f0f8',
+              padding: '20px 24px 16px',
+              borderBottom: `1px solid ${BORDER}`,
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div>
-                <p style={{ fontSize: 12, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.06em', margin: '0 0 3px' }}>Readiness Index</p>
-                <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: '#002058', margin: 0 }}>CRI Breakdown</h3>
+                <p style={{ fontSize: 11, fontWeight: 700, color: P_D, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 3px', fontFamily: 'monospace' }}>Readiness Index</p>
+                <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0 }}>CRI Breakdown</h3>
               </div>
               <div style={{
-                width: 32, height: 32, borderRadius: 9,
-                background: 'linear-gradient(135deg,#ff6575,#b4a7f5)',
+                width: 32, height: 32, borderRadius: 8,
+                background: P_BG, border: `1px solid ${P_BD}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <BarChart2 size={15} style={{ color: '#fff' }} />
+                <BarChart2 size={15} style={{ color: P }} />
               </div>
             </div>
 
-            <div style={{ padding: '24px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22 }}>
-              {/* donut */}
+            <div style={{ padding: '28px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
               <div style={{ position: 'relative' }}>
                 <ScoreCard
-                  score={cri.cri_total ?? (cri as never as { overall_score?: number }).overall_score ?? 0}
+                  score={cri.cri_total ?? 0}
                   label="Overall CRI"
                   size={140}
                   strokeWidth={10}
@@ -297,9 +271,9 @@ export default function DashboardPage() {
                   <div style={{
                     position: 'absolute', bottom: -6, left: '50%', transform: 'translateX(-50%)',
                     display: 'flex', alignItems: 'center', gap: 4,
-                    background: 'rgba(34,197,94,.12)', borderRadius: 99,
-                    padding: '2px 10px', fontSize: 11, fontWeight: 700, color: '#15803d',
-                    whiteSpace: 'nowrap',
+                    background: 'rgba(22,163,74,.1)',
+                    padding: '2px 10px', fontSize: 11, fontWeight: 700, color: '#16a34a',
+                    whiteSpace: 'nowrap' as const,
                   }}>
                     <TrendingUp size={10} />
                     +{cri.improvement_delta}% this week
@@ -307,53 +281,48 @@ export default function DashboardPage() {
                 )}
               </div>
 
-              {/* progress bars */}
               <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {[
-                  { label: 'Resume',    value: cri.resume_score,    color: '#3b82f6' },
-                  { label: 'Interview', value: cri.interview_score,  color: '#b4a7f5' },
-                  { label: 'JD Match',  value: cri.jd_fit_score ?? 0, color: '#22c55e' },
+                  { label: 'Resume',    value: cri.resume_score },
+                  { label: 'Interview', value: cri.interview_score },
+                  { label: 'JD Match',  value: cri.jd_fit_score ?? 0 },
                 ].map(bar => (
                   <div key={bar.label}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#685f78' }}>{bar.label}</span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: '#002058' }}>{bar.value}%</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: TEXT2 }}>{bar.label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: TEXT }}>{bar.value}%</span>
                     </div>
-                    <div style={{ height: 7, borderRadius: 99, background: '#f0f0f8', overflow: 'hidden' }}>
+                    <div style={{ height: 6, background: BG_ALT, border: `1px solid ${BORDER}` }}>
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${bar.value}%` }}
                         transition={{ duration: 1.1, ease: 'easeOut', delay: 0.4 }}
-                        style={{
-                          height: '100%',
-                          borderRadius: 99,
-                          background: `linear-gradient(90deg, ${bar.color}cc, ${bar.color})`,
-                          boxShadow: `0 0 8px ${bar.color}55`,
-                        }}
+                        style={{ height: '100%', background: P }}
                       />
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* percentile chip */}
               <div style={{
-                width: '100%', padding: '12px 16px', borderRadius: 12,
-                background: 'linear-gradient(135deg,rgba(0,32,88,.04),rgba(180,167,245,.08))',
-                border: '1px solid rgba(180,167,245,.25)',
+                width: '100%', padding: '12px 16px',
+                background: P_BG, border: `1px solid ${P_BD}`,
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
-                <Star size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />
-                <p style={{ fontSize: 12, color: '#685f78', margin: 0, lineHeight: 1.4 }}>
-                  You're in the <strong style={{ color: '#002058' }}>top {100 - (cri.percentile ?? 0)}%</strong> of all candidates on the platform.
+                <TrendingUp size={14} style={{ color: P, flexShrink: 0 }} />
+                <p style={{ fontSize: 12, color: TEXT2, margin: 0, lineHeight: 1.4 }}>
+                  {cri.cri_total > 0
+                    ? <>Your composite score is <strong style={{ color: TEXT }}>{cri.cri_total}%</strong>. Complete more sessions to improve it.</>
+                    : <>Complete a resume analysis and mock interview to get your first CRI score.</>
+                  }
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* ── Right two columns (Quick Actions + Recent Sessions) ── */}
-        <div style={{ gridColumn: 'span 8', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* ── Right two columns ── */}
+        <div style={{ gridColumn: 'span 8', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
           {/* Quick Actions */}
           <motion.div
@@ -362,25 +331,25 @@ export default function DashboardPage() {
             transition={{ delay: 0.34 }}
           >
             <div style={{
-              background: '#fff',
-              border: '1px solid rgba(0,0,0,.07)',
-              borderRadius: 18,
-              boxShadow: '0 2px 12px rgba(0,0,0,.06)',
+              background: BG,
+              border: `1px solid ${BORDER}`,
+              borderRadius: 10,
+              boxShadow: '0 1px 3px rgba(0,0,0,.04)',
               overflow: 'hidden',
             }}>
               <div style={{
-                padding: '18px 22px 14px',
-                borderBottom: '1px solid #f0f0f8',
+                padding: '20px 24px 16px',
+                borderBottom: `1px solid ${BORDER}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <div>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.06em', margin: '0 0 3px' }}>Jump Right In</p>
-                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: '#002058', margin: 0 }}>Quick Actions</h3>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: P_D, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 3px', fontFamily: 'monospace' }}>Jump Right In</p>
+                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0 }}>Quick Actions</h3>
                 </div>
-                <Zap size={16} style={{ color: '#f59e0b' }} />
+                <Zap size={16} style={{ color: '#F59E0B' }} />
               </div>
 
-              <div style={{ padding: '20px 22px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+              <div style={{ padding: '24px 24px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
                 {quickActions.map((a) => (
                   <Link
                     key={a.label}
@@ -388,27 +357,24 @@ export default function DashboardPage() {
                     onMouseEnter={() => setHoveredAction(a.label)}
                     onMouseLeave={() => setHoveredAction(null)}
                     style={{
-                      borderRadius: 14,
-                      padding: '18px 10px 14px',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
-                      textDecoration: 'none',
-                      background: hoveredAction === a.label ? '#fafafe' : '#fff',
-                      border: `1px solid ${hoveredAction === a.label ? 'rgba(180,167,245,.4)' : 'rgba(0,0,0,.07)'}`,
-                      boxShadow: hoveredAction === a.label ? `0 4px 20px ${a.glow}` : 'none',
-                      transition: 'all .2s',
-                      transform: hoveredAction === a.label ? 'translateY(-3px)' : 'none',
+                      padding: '20px 12px 16px',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+                      textDecoration: 'none', borderRadius: 10,
+                      background: hoveredAction === a.label ? P_BG : BG_ALT,
+                      border: `1px solid ${hoveredAction === a.label ? P_BD : BORDER}`,
+                      transition: 'all .18s',
                     }}
                   >
                     <div style={{
-                      width: 46, height: 46, borderRadius: 13,
-                      background: hoveredAction === a.label ? a.gradient : 'linear-gradient(135deg, #f7f7ff, #f0f0f8)',
+                      width: 44, height: 44, borderRadius: 10,
+                      background: hoveredAction === a.label ? P : P_BG,
+                      border: `1px solid ${P_BD}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      boxShadow: hoveredAction === a.label ? `0 4px 14px ${a.glow}` : 'none',
-                      transition: 'all .2s',
+                      transition: 'background .18s',
                     }}>
-                      <a.icon size={20} style={{ color: hoveredAction === a.label ? '#fff' : '#685f78', transition: 'color .2s' }} />
+                      <a.icon size={20} style={{ color: hoveredAction === a.label ? '#fff' : P, transition: 'color .18s' }} />
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#002058', textAlign: 'center', lineHeight: 1.4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: TEXT, textAlign: 'center' as const, lineHeight: 1.4 }}>
                       {a.label}
                     </span>
                   </Link>
@@ -424,41 +390,56 @@ export default function DashboardPage() {
             transition={{ delay: 0.42 }}
           >
             <div style={{
-              background: '#fff',
-              border: '1px solid rgba(0,0,0,.07)',
-              borderRadius: 18,
-              boxShadow: '0 2px 12px rgba(0,0,0,.06)',
+              background: BG,
+              border: `1px solid ${BORDER}`,
+              borderRadius: 10,
+              boxShadow: '0 1px 3px rgba(0,0,0,.04)',
               overflow: 'hidden',
             }}>
-              {/* header */}
               <div style={{
-                padding: '18px 22px 14px',
-                borderBottom: '1px solid #f0f0f8',
+                padding: '20px 24px 16px',
+                borderBottom: `1px solid ${BORDER}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <div>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.06em', margin: '0 0 3px' }}>Interview History</p>
-                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: '#002058', margin: 0 }}>Recent Sessions</h3>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: P_D, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 3px', fontFamily: 'monospace' }}>Interview History</p>
+                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0 }}>Recent Sessions</h3>
                 </div>
                 <Link
                   to="/history"
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 5,
-                    padding: '6px 14px', borderRadius: 8,
-                    background: 'rgba(255,101,117,.08)',
-                    color: '#ff6575', fontWeight: 600, fontSize: 12,
+                    padding: '6px 14px', borderRadius: 6,
+                    background: P_BG, color: P,
+                    fontWeight: 600, fontSize: 12,
                     textDecoration: 'none',
-                    border: '1px solid rgba(255,101,117,.2)',
-                    transition: 'background .2s',
+                    border: `1px solid ${P_BD}`,
                   }}
                 >
                   View All <ArrowRight size={12} />
                 </Link>
               </div>
 
-              {/* session rows */}
-              <div style={{ padding: '8px 0' }}>
-                {sessions.map((s, idx) => (
+              <div style={{ padding: '4px 0' }}>
+                {sessions.length === 0 ? (
+                  <div style={{ padding: '36px 22px', textAlign: 'center' as const }}>
+                    <Video size={28} style={{ color: BORDER, marginBottom: 12 }} />
+                    <p style={{ fontSize: 14, fontWeight: 600, color: MUTED, margin: '0 0 6px' }}>No sessions yet</p>
+                    <p style={{ fontSize: 13, color: MUTED, margin: '0 0 16px' }}>Complete your first mock interview to see results here.</p>
+                    <Link
+                      to="/interview/setup"
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        padding: '9px 20px', fontSize: 13, fontWeight: 600, borderRadius: 8,
+                        background: P, color: '#fff', textDecoration: 'none',
+                        border: `1px solid ${P}`,
+                      }}
+                    >
+                      Start Interview <ArrowRight size={13} />
+                    </Link>
+                  </div>
+                ) : (
+                  sessions.map((s, idx) => (
                   <Link
                     key={s.id}
                     to={`/interview/${s.id}/report`}
@@ -466,40 +447,39 @@ export default function DashboardPage() {
                     onMouseLeave={() => setHoveredSession(null)}
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      padding: '14px 22px', gap: 14,
+                      padding: '16px 24px', gap: 16,
                       textDecoration: 'none',
-                      background: hoveredSession === s.id ? '#fafafe' : 'transparent',
-                      borderBottom: idx < sessions.length - 1 ? '1px solid #f7f7ff' : 'none',
-                      transition: 'background .15s',
+                      background: hoveredSession === s.id ? P_BG : 'transparent',
+                      borderBottom: idx < sessions.length - 1 ? `1px solid ${BORDER}` : 'none',
+                      borderLeft: `3px solid ${hoveredSession === s.id ? P : 'transparent'}`,
+                      transition: 'all .15s',
                     }}
                   >
-                    {/* left: avatar + meta */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0, flex: 1 }}>
                       <div style={{
-                        width: 42, height: 42, borderRadius: 12,
-                        background: 'linear-gradient(135deg, rgba(180,167,245,.2), rgba(57,44,125,.1))',
+                          width: 40, height: 40, borderRadius: 10,
+                        background: P_BG, border: `1px solid ${P_BD}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                        border: '1px solid rgba(180,167,245,.25)',
                       }}>
-                        <Video size={18} style={{ color: '#392c7d' }} />
+                        <Video size={17} style={{ color: P }} />
                       </div>
                       <div style={{ minWidth: 0 }}>
                         <p style={{
-                          fontSize: 14, fontWeight: 700, color: '#002058',
-                          margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          fontSize: 14, fontWeight: 700, color: TEXT,
+                          margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                         }}>
                           {s.job_role}
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#9ca3af' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: MUTED }}>
                             <Clock size={10} />
                             {new Date(s.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </span>
                           <span style={{
-                            padding: '2px 9px', borderRadius: 99, fontSize: 11, fontWeight: 600,
-                            background: `${difficultyColor(s.difficulty)}18`,
+                            padding: '2px 8px', fontSize: 11, fontWeight: 600, borderRadius: 4,
+                            background: BG_ALT,
                             color: difficultyColor(s.difficulty),
-                            border: `1px solid ${difficultyColor(s.difficulty)}30`,
+                            border: `1px solid ${BORDER}`,
                           }}>
                             {s.difficulty}
                           </span>
@@ -507,26 +487,23 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    {/* right: score + arrow */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
                       <div style={{
-                        display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
+                        display: 'inline-flex', alignItems: 'baseline', gap: 2,
+                        background: scoreBg(s.overall_score || 0), borderRadius: 6,
+                        padding: '4px 10px',
+                        border: `1px solid ${scoreColor(s.overall_score || 0)}50`,
                       }}>
-                        <div style={{
-                          display: 'inline-flex', alignItems: 'baseline', gap: 2,
-                          background: scoreBg(s.overall_score || 0),
-                          borderRadius: 8, padding: '4px 10px',
-                        }}>
-                          <span style={{ fontSize: 20, fontWeight: 800, color: scoreColor(s.overall_score || 0), lineHeight: 1, fontFamily: 'Poppins, sans-serif' }}>
-                            {s.overall_score || '--'}
-                          </span>
-                          <span style={{ fontSize: 11, color: scoreColor(s.overall_score || 0), fontWeight: 600 }}>/100</span>
-                        </div>
+                        <span style={{ fontSize: 20, fontWeight: 800, color: scoreColor(s.overall_score || 0), lineHeight: 1, fontFamily: 'Poppins, sans-serif' }}>
+                          {s.overall_score || '--'}
+                        </span>
+                        <span style={{ fontSize: 11, color: scoreColor(s.overall_score || 0), fontWeight: 600 }}>/100</span>
                       </div>
-                      <ChevronRight size={15} style={{ color: '#d1d5db', transition: 'transform .2s', transform: hoveredSession === s.id ? 'translateX(3px)' : 'none' }} />
+                      <ChevronRight size={15} style={{ color: MUTED, transition: 'transform .15s', transform: hoveredSession === s.id ? 'translateX(3px)' : 'none' }} />
                     </div>
                   </Link>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </motion.div>
@@ -534,7 +511,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ══ Bottom row: Activity + Tips ══════════════════════ */}
+      {/* ══ Bottom row ══════════════════════════════════════ */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))', gap: 20, marginTop: 20 }}>
 
         {/* Activity streak */}
@@ -544,36 +521,33 @@ export default function DashboardPage() {
           transition={{ delay: 0.5 }}
         >
           <div style={{
-            background: 'linear-gradient(135deg, #002058 0%, #1a0a4e 100%)',
-            borderRadius: 18,
-            padding: '24px 24px 20px',
-            boxShadow: '0 8px 32px rgba(0,32,88,.25)',
-            position: 'relative',
-            overflow: 'hidden',
+            background: '#111827',
+            border: 'none',
+            borderRadius: 12,
+            padding: '28px 28px 24px',
+            boxShadow: '0 4px 16px rgba(27,43,30,.2)',
           }}>
-            <div style={{ position: 'absolute', bottom: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'radial-gradient(circle, rgba(180,167,245,.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#f59e0b,#f97316)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Zap size={16} style={{ color: '#fff' }} />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,.5)', textTransform: 'uppercase', letterSpacing: '.06em', margin: 0 }}>This Week</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.45)', textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: 0, fontFamily: 'monospace' }}>This Week</p>
                 <h4 style={{ fontFamily: 'Poppins, sans-serif', color: '#fff', fontSize: 15, fontWeight: 700, margin: 0 }}>Practice Streak</h4>
               </div>
             </div>
-            {/* day chips */}
             <div style={{ display: 'flex', gap: 6 }}>
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
                 const done = i < 4;
                 return (
                   <div key={day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
                     <div style={{
-                      width: '100%', aspectRatio: '1', borderRadius: 8, minWidth: 0,
-                      background: done ? 'linear-gradient(135deg,#ff6575,#b4a7f5)' : 'rgba(255,255,255,.08)',
-                      border: done ? 'none' : '1px solid rgba(255,255,255,.12)',
+                      width: '100%', aspectRatio: '1', minWidth: 0,
+                      background: done ? P : 'rgba(255,255,255,.08)',
+                      border: done ? `1px solid ${P_D}` : '1px solid rgba(255,255,255,.12)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      {done && <span style={{ fontSize: 11 }}>✓</span>}
+                      {done && <span style={{ fontSize: 11, color: '#fff' }}>✓</span>}
                     </div>
                     <span style={{ fontSize: 9, fontWeight: 600, color: done ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.35)', letterSpacing: '.02em' }}>{day}</span>
                   </div>
@@ -581,31 +555,31 @@ export default function DashboardPage() {
               })}
             </div>
             <p style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,.5)', margin: '14px 0 0' }}>
-              🔥 4-day streak — keep it going!
+              4-day streak — keep it going!
             </p>
           </div>
         </motion.div>
 
-        {/* AI Tips card */}
+        {/* Career Tips card */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.56 }}
         >
           <div style={{
-            background: '#fff',
-            border: '1px solid rgba(0,0,0,.07)',
-            borderRadius: 18,
-            padding: '24px 24px 20px',
-            boxShadow: '0 2px 12px rgba(0,0,0,.06)',
+            background: BG,
+            border: `1px solid ${BORDER}`,
+            borderRadius: 12,
+            padding: '28px 28px 24px',
+            boxShadow: '0 1px 4px rgba(0,0,0,.05)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#b4a7f5,#7c6fec)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Sparkles size={16} style={{ color: '#fff' }} />
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: P_BG, border: `1px solid ${P_BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Sparkles size={16} style={{ color: P }} />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '.06em', margin: 0 }}>AI Insight</p>
-                <h4 style={{ fontFamily: 'Poppins, sans-serif', color: '#002058', fontSize: 15, fontWeight: 700, margin: 0 }}>Today's Tip</h4>
+                <p style={{ fontSize: 11, fontWeight: 700, color: P_D, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: 0, fontFamily: 'monospace' }}>Smart Insight</p>
+                <h4 style={{ fontFamily: 'Poppins, sans-serif', color: TEXT, fontSize: 15, fontWeight: 700, margin: 0 }}>Today's Tip</h4>
               </div>
             </div>
 
@@ -614,13 +588,13 @@ export default function DashboardPage() {
               { icon: '🎯', text: 'Practice the STAR method for behavioural questions to structure answers clearly.' },
             ].map((tip, i) => (
               <div key={i} style={{
-                display: 'flex', gap: 10, padding: '10px 12px',
-                background: i === 0 ? 'rgba(180,167,245,.08)' : 'transparent',
-                borderRadius: 10, marginBottom: i === 0 ? 8 : 0,
-                border: i === 0 ? '1px solid rgba(180,167,245,.2)' : 'none',
+                display: 'flex', gap: 10, padding: '10px 12px', borderRadius: 8,
+                background: i === 0 ? P_BG : 'transparent',
+                marginBottom: i === 0 ? 8 : 0,
+                border: i === 0 ? `1px solid ${P_BD}` : 'none',
               }}>
                 <span style={{ fontSize: 16, flexShrink: 0, lineHeight: 1.5 }}>{tip.icon}</span>
-                <p style={{ fontSize: 12, color: '#685f78', margin: 0, lineHeight: 1.6 }}>{tip.text}</p>
+                <p style={{ fontSize: 12, color: TEXT2, margin: 0, lineHeight: 1.6 }}>{tip.text}</p>
               </div>
             ))}
 
@@ -628,7 +602,7 @@ export default function DashboardPage() {
               to="/roadmap"
               style={{
                 marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 5,
-                fontSize: 12, fontWeight: 600, color: '#7c6fec', textDecoration: 'none',
+                fontSize: 12, fontWeight: 700, color: P, textDecoration: 'none',
               }}
             >
               View full roadmap <ChevronRight size={13} />
