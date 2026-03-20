@@ -16,6 +16,8 @@ import RoadmapHistoryPage from './pages/RoadmapHistoryPage';
 import HistoryPage from './pages/HistoryPage';
 import JobsPage from './pages/JobsPage';
 import ApplicationsPage from './pages/ApplicationsPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 /** Wraps public pages with the top Navbar */
 function PublicLayout() {
@@ -51,6 +53,11 @@ export default function App() {
           <Route path="/applications" element={<ApplicationsPage />} />
           <Route path="/history" element={<HistoryPage />} />
         </Route>
+
+        {/* Admin routes – standalone layout (no sidebar, no user navbar) */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
 
         {/* Catch-all → landing */}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import settings
-from .database import init_db
+from .database import init_db, engine
 from .auth import router as auth_router
 from .resume import router as resume_router
 from .jd import router as jd_router
@@ -16,6 +16,7 @@ from .roadmap import router as roadmap_router
 from .cri import router as cri_router
 from .jobs import router as jobs_router
 from .profile import router as profile_router
+from .admin import router as admin_router
 
 # ── Logging setup ─────────────────────────────────────────────────────────────
 _LOG_DIR = Path(__file__).resolve().parents[2] / "logs"
@@ -52,6 +53,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("DB init skipped — could not connect: %s. Start PostgreSQL and restart.", e)
     yield
+    await engine.dispose()
 
 
 app = FastAPI(
@@ -80,6 +82,7 @@ app.include_router(roadmap_router)
 app.include_router(cri_router)
 app.include_router(jobs_router)
 app.include_router(profile_router)
+app.include_router(admin_router)
 
 
 # ── Global exception handler ──────────────────────────────────────────────────

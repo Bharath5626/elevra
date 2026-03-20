@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     # ── JSearch (RapidAPI) ────────────────────────────────────
     RAPIDAPI_KEY: str = ""
 
+    # ── Admin ─────────────────────────────────────────────────
+    ADMIN_SECRET: str = "elevra-admin-secret-change-in-production"
+
     model_config = {"env_file": ".env", "extra": "ignore"}
 
 

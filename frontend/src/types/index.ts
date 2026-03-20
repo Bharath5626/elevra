@@ -283,3 +283,73 @@ export interface ApplyKit {
   latestAtsScore: number | null;
   skills: string[];
 }
+
+// ─── Admin ───────────────────────────────────────────────
+export interface AdminStats {
+  generated_at: string;
+  users: {
+    total: number;
+    last_24h: number;
+    last_7d: number;
+    last_30d: number;
+  };
+  resume: {
+    total: number;
+    last_24h: number;
+    last_7d: number;
+    avg_ats_score: number;
+  };
+  interview: {
+    total: number;
+    completed: number;
+    last_24h: number;
+    last_7d: number;
+  };
+  jd_analysis: {
+    total: number;
+    last_24h: number;
+  };
+  roadmap: {
+    total: number;
+    last_7d: number;
+  };
+  job_applications: {
+    total: number;
+    last_7d: number;
+  };
+  cri: {
+    total: number;
+    avg_score: number;
+  };
+  profiles: {
+    total: number;
+  };
+}
+
+export interface AdminUserRow {
+  id: string;
+  name: string;
+  email: string;
+  is_admin: boolean;
+  created_at: string;
+  resume_count: number;
+  interview_count: number;
+  jd_count: number;
+  application_count: number;
+  roadmap_count: number;
+}
+
+export interface AdminUserDetail extends AdminUserRow {
+  resumes: { id: string; filename: string; ats_score: number; created_at: string }[];
+  interview_sessions: { id: string; job_role: string; status: string; overall_score: number; created_at: string }[];
+  job_applications: { job_title: string; company: string; status: string; applied_at: string }[];
+  cri: { cri_total: number; percentile: number; recorded_at: string } | null;
+}
+
+export interface AdminUsersResponse {
+  total: number;
+  page: number;
+  page_size: number;
+  users: AdminUserRow[];
+}
+

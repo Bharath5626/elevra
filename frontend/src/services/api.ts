@@ -16,6 +16,10 @@ import type {
   MatchScoreResult,
   CoverLetterResult,
   ApplyKit,
+  AdminStats,
+  AdminUserRow,
+  AdminUserDetail,
+  AdminUsersResponse,
 } from '../types';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -268,6 +272,63 @@ export const profileAPI = {
 
   update: async (updates: Record<string, unknown>) => {
     const { data } = await api.patch('/profile/me', updates);
+    return data;
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+// ADMIN  (uses a separate localStorage key so admin token
+//         never collides with regular user session)
+// ═══════════════════════════════════════════════════════
+const ADMIN_TOKEN_KEY = 'admin_access_token';
+
+const adminApi = axios.create({
+  baseURL: API_BASE,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+adminApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export const adminAPI = {
+  login: async (email: string, password: string): Promise<{ access_token: string; name: string; email: string }> => {
+    const { data } = await adminApi.post('/admin/login', { email, password });
+    localStorage.setItem(ADMIN_TOKEN_KEY, data.access_token);
+    return data;
+  },
+
+  logout: () => {
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+  },
+
+  isLoggedIn: (): boolean => !!localStorage.getItem(ADMIN_TOKEN_KEY),
+
+  getStats: async (): Promise<AdminStats> => {
+    const { data } = await adminApi.get('/admin/stats');
+    return data;
+  },
+
+  /** Returns the URL for the SSE stream — EventSource handles auth via query param */
+  statsStreamUrl: (): string => {
+    const token = localStorage.getItem(ADMIN_TOKEN_KEY) || '';
+    return `${API_BASE}/admin/stats/stream?interval=5&token=${encodeURIComponent(token)}`;
+  },
+
+  getUsers: async (page = 1, search = ''): Promise<AdminUsersResponse> => {
+    const { data } = await adminApi.get('/admin/users', { params: { page, page_size: 20, search } });
+    return data;
+  },
+
+  getUserDetail: async (id: string): Promise<AdminUserDetail> => {
+    const { data } = await adminApi.get(`/admin/users/${id}`);
+    return data;
+  },
+
+  promoteUser: async (id: string, isAdmin: boolean): Promise<AdminUserRow> => {
+    const { data } = await adminApi.post(`/admin/promote/${id}`, null, { params: { is_admin: isAdmin } });
     return data;
   },
 };
