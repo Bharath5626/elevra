@@ -101,10 +101,14 @@ export default function JobsPage() {
   const handleOneClickApply = async (job: JobListing) => {
     setOneClickJob(job);
     setOneClickError('');
+
+    // Extension not installed — open URL directly and show install prompt
     if (!extensionAvailable) {
+      window.open(job.apply_url, '_blank', 'noopener,noreferrer');
       setOneClickStatus('idle');
       return;
     }
+
     setOneClickStatus('fetching');
     try {
       const kit = await profileAPI.getApplyKit();
@@ -114,6 +118,8 @@ export default function JobsPage() {
       window.postMessage({ type: 'ELEVRA_APPLY', payload: { jobUrl: job.apply_url, userData: kit } }, '*');
       setOneClickStatus('waiting');
     } catch {
+      // Profile/resume missing — still open the URL so the user isn't stuck
+      window.open(job.apply_url, '_blank', 'noopener,noreferrer');
       setOneClickStatus('error');
       setOneClickError('Could not load your profile. Upload a resume first.');
     }

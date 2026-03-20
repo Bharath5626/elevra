@@ -67,11 +67,16 @@ export default function ResumePage() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [history, setHistory] = useState<ResumeAnalysis[]>([]);
   const [histLoading, setHistLoading] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0);
   const popupRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  const resetFile = () => { setFile(null); setFileInputKey(k => k + 1); };
+
   const loadResult = (data: ResumeAnalysis) => {
     setResult(data);
+    resetFile();
+    setJd('');
   };
 
   const openHistory = async () => {
@@ -340,13 +345,13 @@ export default function ResumePage() {
               {file && (
                 <button
                   type="button"
-                  onClick={(e) => { e.preventDefault(); setFile(null); }}
+                  onClick={(e) => { e.preventDefault(); resetFile(); }}
                   style={{ fontSize: 12, color: P, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
                 >
                   Remove
                 </button>
               )}
-              <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={(e) => setFile(e.target.files?.[0] || null)} />
+              <input key={fileInputKey} type="file" accept=".pdf" style={{ display: 'none' }} onChange={(e) => setFile(e.target.files?.[0] || null)} />
             </label>
 
             {/* JD textarea */}

@@ -229,45 +229,81 @@ function isJobApplicationForm() {
   return hasEmail && hasName;
 }
 
+// Dispatch a full pointer + mouse event sequence so SPAs (LinkedIn, Workday…)
+// that listen on pointerdown/mousedown are also triggered, not just click.
+function safeClick(el) {
+  try {
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const opts = { bubbles: true, cancelable: true };
+    el.dispatchEvent(new MouseEvent('mouseover',  opts));
+    el.dispatchEvent(new PointerEvent('pointerdown', opts));
+    el.dispatchEvent(new MouseEvent('mousedown',  opts));
+    el.dispatchEvent(new PointerEvent('pointerup',   opts));
+    el.dispatchEvent(new MouseEvent('mouseup',    opts));
+    el.click();
+  } catch (_) { /* ignore */ }
+  return true;
+}
+
 // Try to click an "Apply" button on listing pages to advance to the form
 function tryClickApplyButton() {
-  const APPLY_RE = /^(apply|apply now|apply here|apply for this job|apply to this job|quick apply|easy apply|1-click apply|one.click apply|fast apply|apply online|continue to apply|submit application|start application|apply with linkedin|apply with indeed)$/i;
+  // Exact match (whitespace-normalised)
+  const EXACT_RE = /^(apply|apply now|apply here|apply for this job|apply to this job|quick apply|easy apply|1-click apply|one.click apply|fast apply|apply online|continue to apply|submit application|start application|apply with linkedin|apply with indeed)$/i;
+  const EXCLUDE_RE = /login|sign.?up|logout|account|register/i;
 
-  // Priority 1: buttons/links whose text exactly matches
-  for (const el of document.querySelectorAll('button, a, [role="button"]')) {
-    const text = (el.textContent || el.value || el.ariaLabel || '').trim();
-    if (APPLY_RE.test(text)) {
-      el.click();
-      return true;
-    }
+  // Normalise all inter-word whitespace so icon-wrapped buttons still match
+  const norm = (str) => (str || '').replace(/\s+/g, ' ').trim();
+
+  // Priority 1: exact text / aria-label match on interactive elements
+  for (const el of document.querySelectorAll(
+    'button, a, [role="button"], input[type="submit"], input[type="button"]'
+  )) {
+    const text  = norm(el.tagName === 'INPUT' ? el.value : el.textContent);
+    const label = norm(el.getAttribute('aria-label') || '');
+    if (EXACT_RE.test(text) || EXACT_RE.test(label)) return safeClick(el);
   }
 
-  // Priority 2: any element with an apply-related aria-label
-  for (const el of document.querySelectorAll('[aria-label]')) {
-    if (APPLY_RE.test((el.getAttribute('aria-label') || '').trim())) {
-      el.click();
-      return true;
-    }
+  // Priority 2: links whose pathname starts with /apply
+  for (const a of document.querySelectorAll('a[href]')) {
+    if (EXCLUDE_RE.test(a.href)) continue;
+    if (/\/apply(\?|\/|$)/i.test(a.pathname || '')) return safeClick(a);
   }
 
-  // Priority 3: links whose href contains /apply (but not login/signup/logout)
-  for (const a of document.querySelectorAll('a[href*="/apply"]')) {
-    const href = a.href || '';
-    if (/login|signup|sign-up|logout|account/i.test(href)) continue;
-    a.click();
-    return true;
+  // Priority 3: partial word match — "Apply Today", "Apply →", etc.
+  for (const el of document.querySelectorAll(
+    'button, a[href], [role="button"], input[type="submit"], input[type="button"]'
+  )) {
+    const text  = norm(el.tagName === 'INPUT' ? el.value : el.textContent);
+    const label = norm(el.getAttribute('aria-label') || '');
+    if (EXCLUDE_RE.test(text) || EXCLUDE_RE.test(label)) continue;
+    if (text.length > 80 || label.length > 80) continue; // skip prose paragraphs
+    if (/\bapply\b/i.test(text) || /\bapply\b/i.test(label)) return safeClick(el);
   }
 
   return false;
 }
 
-function waitForFormElements(maxWait = 8000) {
+// After the Apply button has been clicked on a SPA (no navigation), the
+// form that appears may not yet have email + name fields (e.g. LinkedIn's
+// Easy Apply modal shows phone/resume first). Accept any visible form with
+// at least one text-like input as "good enough" after the click.
+function isAnyInputForm() {
+  return !!document.querySelector(
+    'input[type="text"], input[type="email"], input[type="tel"], ' +
+    'input[type="number"], textarea, input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"])'
+  );
+}
+
+function waitForFormElements(maxWait = 10000) {
   return new Promise((resolve) => {
     const start = Date.now();
     let clickedApply = false;
     const check = () => {
+      // Full job-application form (best case)
       if (isJobApplicationForm()) return resolve(true);
-      // If no form found yet, try clicking Apply button once
+      // After clicking Apply on a SPA, accept any visible input form
+      if (clickedApply && isAnyInputForm()) return resolve(true);
+      // Try clicking the Apply button once page has settled
       if (!clickedApply && Date.now() - start > 1500) {
         clickedApply = tryClickApplyButton();
       }
