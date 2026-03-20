@@ -331,6 +331,15 @@ export const adminAPI = {
     const { data } = await adminApi.post(`/admin/promote/${id}`, null, { params: { is_admin: isAdmin } });
     return data;
   },
+
+  blockUser: async (id: string, blocked: boolean): Promise<AdminUserRow> => {
+    const { data } = await adminApi.post(`/admin/block/${id}`, null, { params: { blocked } });
+    return data;
+  },
+
+  deleteUser: async (id: string): Promise<void> => {
+    await adminApi.delete(`/admin/users/${id}`);
+  },
 };
 
 export default api;

@@ -431,7 +431,12 @@ export default function AdminDashboardPage() {
                     <td style={{ padding: '15px 20px', textAlign: 'center' }}><Badge color="#10b981">{u.application_count}</Badge></td>
                     <td style={{ padding: '15px 20px', textAlign: 'center' }}><Badge color="#ec4899">{u.roadmap_count}</Badge></td>
                     <td style={{ padding: '15px 20px' }}>
-                      {u.is_admin ? <Badge color="#dc2626">Admin</Badge> : <Badge color="#64748b">User</Badge>}
+                      {u.is_admin
+                        ? <Badge color="#dc2626">Admin</Badge>
+                        : u.is_blocked
+                          ? <Badge color="#f97316">Blocked</Badge>
+                          : <Badge color="#64748b">User</Badge>
+                      }
                     </td>
                     <td style={{ padding: '15px 20px' }}>
                       <button
@@ -554,6 +559,7 @@ export default function AdminDashboardPage() {
                       </div>
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         {detail.is_admin && <Badge color="#dc2626">Admin</Badge>}
+                        {detail.is_blocked && <Badge color="#f97316">Blocked</Badge>}
                         <Badge color="#64748b">Joined {new Date(detail.created_at).toLocaleDateString()}</Badge>
                         {detail.cri && <Badge color="#f97316">CRI {detail.cri.cri_total}</Badge>}
                       </div>
@@ -638,8 +644,10 @@ export default function AdminDashboardPage() {
                       </Section>
                     )}
 
-                    {/* Promote / demote */}
-                    <div style={{ marginTop: 28, paddingTop: 24, borderTop: `1px solid ${BORDER}` }}>
+                    {/* Actions: promote / block / delete */}
+                    <div style={{ marginTop: 28, paddingTop: 24, borderTop: `1px solid ${BORDER}`, display: 'flex', flexDirection: 'column', gap: 10 }}>
+
+                      {/* Promote / demote */}
                       <button
                         onClick={async () => {
                           const updated = await adminAPI.promoteUser(detail.id, !detail.is_admin);
@@ -647,16 +655,57 @@ export default function AdminDashboardPage() {
                           setUsers(us => us.map(u => u.id === updated.id ? { ...u, is_admin: updated.is_admin } : u));
                         }}
                         style={{
-                          width: '100%', padding: '12px 0', borderRadius: 12,
+                          width: '100%', padding: '11px 0', borderRadius: 10,
                           border: `1.5px solid ${detail.is_admin ? 'rgba(239,68,68,.25)' : P + '40'}`,
                           background: detail.is_admin ? 'rgba(239,68,68,.06)' : P_BG,
                           color: detail.is_admin ? '#ef4444' : P,
-                          fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                          transition: 'opacity 0.15s',
+                          fontSize: 13, fontWeight: 700, cursor: 'pointer',
                         } as React.CSSProperties}
                       >
                         {detail.is_admin ? '✕ Remove Admin' : '↑ Promote to Admin'}
                       </button>
+
+                      {/* Block / unblock — disabled for admins */}
+                      {!detail.is_admin && (
+                        <button
+                          onClick={async () => {
+                            const updated = await adminAPI.blockUser(detail.id, !detail.is_blocked);
+                            setDetail(d => d ? { ...d, is_blocked: updated.is_blocked } : d);
+                            setUsers(us => us.map(u => u.id === updated.id ? { ...u, is_blocked: updated.is_blocked } : u));
+                          }}
+                          style={{
+                            width: '100%', padding: '11px 0', borderRadius: 10,
+                            border: `1.5px solid ${detail.is_blocked ? 'rgba(34,197,94,.3)' : 'rgba(249,115,22,.3)'}`,
+                            background: detail.is_blocked ? 'rgba(34,197,94,.07)' : 'rgba(249,115,22,.07)',
+                            color: detail.is_blocked ? '#16a34a' : '#ea580c',
+                            fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                          } as React.CSSProperties}
+                        >
+                          {detail.is_blocked ? '✓ Unblock Account' : '⛔ Block Account'}
+                        </button>
+                      )}
+
+                      {/* Delete — disabled for admins */}
+                      {!detail.is_admin && (
+                        <button
+                          onClick={async () => {
+                            if (!window.confirm(`Permanently delete ${detail.name}'s account and all their data? This cannot be undone.`)) return;
+                            await adminAPI.deleteUser(detail.id);
+                            setDetail(null);
+                            setUsers(us => us.filter(u => u.id !== detail.id));
+                            setUsersTotal(t => t - 1);
+                          }}
+                          style={{
+                            width: '100%', padding: '11px 0', borderRadius: 10,
+                            border: '1.5px solid rgba(239,68,68,.3)',
+                            background: 'rgba(239,68,68,.06)',
+                            color: '#dc2626',
+                            fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                          } as React.CSSProperties}
+                        >
+                          🗑 Delete Account
+                        </button>
+                      )}
                     </div>
                   </>
                 )}

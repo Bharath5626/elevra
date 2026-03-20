@@ -94,10 +94,32 @@ export default function DashboardPage() {
   const [hoveredAction, setHoveredAction]   = useState<string | null>(null);
   const [hoveredSession, setHoveredSession] = useState<string | null>(null);
   const [hoveredCTA, setHoveredCTA]         = useState(false);
+  const [streakDays, setStreakDays]         = useState<Set<number>>(new Set());
+  const [streakCount, setStreakCount]       = useState(0);
 
   useEffect(() => {
     criAPI.getCurrent().then(r => setCri(r)).catch(() => {});
-    interviewAPI.getSessions().then(r => setSessions(r.slice(0, 5))).catch(() => {});
+    interviewAPI.getSessions().then(r => {
+      setSessions(r.slice(0, 5));
+      // Determine Monday of the current week (Mon = 0 … Sun = 6)
+      const now = new Date();
+      const monday = new Date(now);
+      monday.setHours(0, 0, 0, 0);
+      monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+      const active = new Set<number>();
+      r.forEach(s => {
+        const d = new Date(s.created_at);
+        const diff = Math.floor((d.getTime() - monday.getTime()) / 86400000);
+        if (diff >= 0 && diff < 7) active.add(diff);
+      });
+      setStreakDays(active);
+      const todayIdx = (now.getDay() + 6) % 7; // Mon=0, Sun=6
+      let streak = 0;
+      for (let i = todayIdx; i >= 0; i--) {
+        if (active.has(i)) streak++; else break;
+      }
+      setStreakCount(streak);
+    }).catch(() => {});
   }, []);
 
   const statCards = getStatCards(cri);
@@ -538,7 +560,7 @@ export default function DashboardPage() {
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
-                const done = i < 4;
+                const done = streakDays.has(i);
                 return (
                   <div key={day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
                     <div style={{
@@ -555,7 +577,7 @@ export default function DashboardPage() {
               })}
             </div>
             <p style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,.5)', margin: '14px 0 0' }}>
-              4-day streak — keep it going!
+              {streakCount > 0 ? `${streakCount}-day streak — keep it going!` : 'No activity yet — start today!'}
             </p>
           </div>
         </motion.div>

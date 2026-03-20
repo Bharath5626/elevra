@@ -331,6 +331,7 @@ export interface AdminUserRow {
   name: string;
   email: string;
   is_admin: boolean;
+  is_blocked: boolean;
   created_at: string;
   resume_count: number;
   interview_count: number;

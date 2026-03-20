@@ -22,6 +22,7 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     name          = Column(String(255), nullable=False)
     is_admin      = Column(Boolean, default=False, nullable=False)
+    is_blocked    = Column(Boolean, default=False, nullable=False)
     created_at    = Column(DateTime, default=datetime.utcnow)
 
     resume_analyses   = relationship("ResumeAnalysis",   back_populates="user", cascade="all, delete-orphan")

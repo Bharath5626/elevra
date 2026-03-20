@@ -319,6 +319,7 @@ async def list_users(
             "name": u.name,
             "email": u.email,
             "is_admin": u.is_admin,
+            "is_blocked": u.is_blocked,
             "created_at": u.created_at.isoformat(),
             "resume_count":    resume_counts.get(u.id, 0),
             "interview_count": interview_counts.get(u.id, 0),
@@ -386,6 +387,7 @@ async def get_user_detail(
         "name": user.name,
         "email": user.email,
         "is_admin": user.is_admin,
+        "is_blocked": user.is_blocked,
         "created_at": user.created_at.isoformat(),
         "resumes": resumes,
         "interview_sessions": sessions,
@@ -409,4 +411,43 @@ async def promote_user(
         raise HTTPException(status_code=404, detail="User not found")
     user.is_admin = is_admin
     await db.flush()
-    return {"id": user.id, "email": user.email, "is_admin": user.is_admin}
+    return {"id": user.id, "email": user.email, "is_admin": user.is_admin, "is_blocked": user.is_blocked}
+
+
+# ─── Block / unblock user ───────────────────────────────────────────────────────────
+
+@router.post("/block/{user_id}")
+async def block_user(
+    user_id: str,
+    blocked: bool = Query(default=True),
+    _admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user: User | None = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.is_admin:
+        raise HTTPException(status_code=403, detail="Cannot block an admin account")
+    user.is_blocked = blocked
+    await db.flush()
+    return {"id": user.id, "email": user.email, "is_blocked": user.is_blocked, "is_admin": user.is_admin}
+
+
+# ─── Delete user ────────────────────────────────────────────────────────────────────
+
+@router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    _admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user: User | None = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.is_admin:
+        raise HTTPException(status_code=403, detail="Cannot delete an admin account")
+    await db.delete(user)
+    await db.flush()
+    return {"detail": "User deleted successfully", "id": user_id}

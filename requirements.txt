@@ -21,6 +21,7 @@ google-genai>=1.0.0
 faster-whisper==1.2.1
 mediapipe==0.10.32
 deepface==0.0.99
+tf-keras>=2.21.0                   # Required by deepface/TensorFlow 2.21+
 opencv-python-headless==4.13.0.92  # Use headless if on a server
 numpy>=2.0.0
 scipy>=1.17.1

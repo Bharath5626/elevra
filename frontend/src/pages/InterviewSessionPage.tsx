@@ -8,7 +8,24 @@ import type { InterviewSession, InterviewQuestion } from '../types';
 import {
   ChevronRight, ChevronLeft, Loader2, CheckCircle,
   Clock, HelpCircle, Briefcase, Lightbulb,
+  Sparkles, Brain, Eye, Mic2, MessageSquare, History,
 } from 'lucide-react';
+
+const P      = '#2563EB';
+const P_D    = '#1D4ED8';
+const P_BG   = '#EFF6FF';
+const P_BD   = '#BFDBFE';
+const BORDER = '#E5E7EB';
+const TEXT   = '#111827';
+const MUTED  = '#6B7280';
+
+const ANALYSIS_STEPS = [
+  { icon: MessageSquare, label: 'Transcribing answers' },
+  { icon: Brain,         label: 'Scoring technical depth' },
+  { icon: Eye,           label: 'Evaluating eye contact & body language' },
+  { icon: Mic2,          label: 'Analysing speech clarity & confidence' },
+  { icon: Sparkles,      label: 'Generating feedback & insights' },
+];
 
 export default function InterviewSessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -20,6 +37,7 @@ export default function InterviewSessionPage() {
   const [analyzing, setAnalyzing]               = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [loading, setLoading]                   = useState(true);
+  const [activeStep, setActiveStep]             = useState(0);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -37,15 +55,29 @@ export default function InterviewSessionPage() {
   const handleFinish = useCallback(async () => {
     if (!sessionId) return;
     setAnalyzing(true);
+    setAnalysisProgress(0);
+    setActiveStep(0);
+    let highWater = 0; // progress only ever moves forward
+    let stepIdx   = 0;
     try {
       await analysisAPI.triggerAnalysis(sessionId);
       const poll = setInterval(async () => {
         try {
           const status = await analysisAPI.getStatus(sessionId);
-          setAnalysisProgress(status.progress);
+          // clamp to 0–99 and never go backwards
+          const raw = typeof status.progress === 'number' ? status.progress : 0;
+          const clamped = Math.min(99, Math.max(0, raw));
+          if (clamped > highWater) {
+            highWater = clamped;
+            setAnalysisProgress(highWater);
+            // advance step indicator proportionally
+            const newStep = Math.min(ANALYSIS_STEPS.length - 1, Math.floor((highWater / 100) * ANALYSIS_STEPS.length));
+            if (newStep > stepIdx) { stepIdx = newStep; setActiveStep(newStep); }
+          }
           if (status.status === 'completed') {
             clearInterval(poll);
-            navigate(`/interview/${sessionId}/report`);
+            setAnalysisProgress(100);
+            setTimeout(() => navigate(`/interview/${sessionId}/report`), 600);
           } else if (status.status === 'failed') {
             clearInterval(poll);
             setAnalyzing(false);
@@ -82,29 +114,133 @@ export default function InterviewSessionPage() {
 
   /* ── Analyzing overlay ────────────────────────────────── */
   if (analyzing) {
+    const safeProgress = Math.min(100, Math.max(0, analysisProgress));
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '0 24px' }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: '100vh', padding: '24px',
+        background: '#F9FAFB',
+      }}>
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          style={{
-            background: '#fff', borderRadius: 12,
-            border: '1px solid #E5E7EB',
-            boxShadow: '0 4px 20px rgba(0,0,0,.08)',
-            padding: '48px 40px', textAlign: 'center', width: '100%', maxWidth: 440,
-          }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          style={{ width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', gap: 16 }}
         >
-          <div style={{ width: 72, height: 72, borderRadius: 12, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-            <Loader2 size={36} style={{ color: '#2563EB' }} className="animate-spin" />
+          {/* ── Main card ── */}
+          <div style={{
+            background: '#111827',
+            borderRadius: 16,
+            padding: '36px 36px 32px',
+            boxShadow: '0 8px 32px rgba(0,0,0,.2)',
+          }}>
+            {/* Icon + heading */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+              <motion.div
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  width: 52, height: 52, borderRadius: 12, flexShrink: 0,
+                  background: 'rgba(37,99,235,.25)',
+                  border: '1px solid rgba(37,99,235,.4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <Brain size={26} style={{ color: '#93c5fd' }} />
+              </motion.div>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.08em', margin: 0, fontFamily: 'monospace' }}>AI Processing</p>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#fff', margin: '4px 0 0', fontFamily: 'Poppins, sans-serif' }}>Analysing Your Interview</h2>
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+              {ANALYSIS_STEPS.map((step, i) => {
+                const StepIcon = step.icon;
+                const done  = i < activeStep;
+                const active = i === activeStep;
+                return (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                      background: done ? 'rgba(34,197,94,.2)' : active ? 'rgba(37,99,235,.25)' : 'rgba(255,255,255,.06)',
+                      border: `1px solid ${done ? 'rgba(34,197,94,.4)' : active ? 'rgba(37,99,235,.4)' : 'rgba(255,255,255,.1)'}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {done
+                        ? <CheckCircle size={14} style={{ color: '#4ade80' }} />
+                        : active
+                        ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}>
+                            <Loader2 size={14} style={{ color: '#60a5fa' }} />
+                          </motion.div>
+                        : <StepIcon size={14} style={{ color: 'rgba(255,255,255,.25)' }} />
+                      }
+                    </div>
+                    <span style={{
+                      fontSize: 13,
+                      color: done ? 'rgba(255,255,255,.7)' : active ? '#fff' : 'rgba(255,255,255,.3)',
+                      fontWeight: active ? 600 : 400,
+                    }}>{step.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Progress bar */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.07em' }}>Progress</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#60a5fa' }}>{Math.round(safeProgress)}%</span>
+              </div>
+              <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,.1)', overflow: 'hidden' }}>
+                <motion.div
+                  style={{ height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #2563EB, #60a5fa)' }}
+                  animate={{ width: `${safeProgress}%` }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                />
+              </div>
+            </div>
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#111827', marginBottom: 10 }}>
-            Analyzing Your Interview
-          </h2>
-          <p style={{ fontSize: 14, color: '#6B7280', marginBottom: 32, lineHeight: 1.7 }}>
-            AI is evaluating your answers, body language, eye contact, and speech patterns…
-          </p>
-          <ProgressBar value={analysisProgress} label="Analysis Progress" height={10} />
-          <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 16 }}>This may take a few minutes</p>
+
+          {/* ── History reminder card ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{
+              background: P_BG,
+              border: `1px solid ${P_BD}`,
+              borderRadius: 12,
+              padding: '20px 24px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <History size={20} style={{ color: P, flexShrink: 0 }} />
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: TEXT, margin: 0 }}>You don't have to wait here</p>
+                <p style={{ fontSize: 12, color: MUTED, margin: '2px 0 0' }}>Your full report will be ready in the History page.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/history')}
+              style={{
+                flexShrink: 0,
+                padding: '8px 16px',
+                borderRadius: 8,
+                background: P,
+                color: '#fff',
+                border: 'none',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Go to History
+            </button>
+          </motion.div>
         </motion.div>
       </div>
     );

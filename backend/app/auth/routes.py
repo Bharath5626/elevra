@@ -35,6 +35,8 @@ async def login(body: UserLogin, db: AsyncSession = Depends(get_db)):
     user = result.scalar_one_or_none()
     if not user or not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    if user.is_blocked:
+        raise HTTPException(status_code=403, detail="Account has been suspended. Please contact support.")
     token = create_access_token(user.id)
     return TokenResponse(access_token=token)
 
