@@ -16,7 +16,7 @@ export default function StatCard({
   label,
   value,
   icon: Icon,
-  iconColor = '#2563EB',
+  iconColor = '#7C3AED',
   iconBg,
   trend,
   subLabel,
@@ -26,10 +26,10 @@ export default function StatCard({
   return (
     <div style={{
       background: '#fff',
-      border: '1px solid #E7E7E7',
-      borderRadius: 10,
+      border: '1px solid #E9E5F5',
+      borderRadius: 14,
       padding: '20px',
-      boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+      boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
       display: 'flex',
       alignItems: 'center',
       gap: 16,
@@ -49,7 +49,7 @@ export default function StatCard({
         <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 4px', fontWeight: 500 }}>
           {label}
         </p>
-        <p style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0, lineHeight: 1.2, fontFamily: 'Poppins, sans-serif' }}>
+        <p style={{ fontSize: 22, fontWeight: 700, color: '#1E1B4B', margin: 0, lineHeight: 1.2, fontFamily: 'Poppins, sans-serif' }}>
           {value}
         </p>
         {subLabel && (

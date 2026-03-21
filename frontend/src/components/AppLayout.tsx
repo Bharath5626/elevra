@@ -56,10 +56,10 @@ function AppLayoutInner() {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F9FAFB' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8F7FF' }}>
         <div style={{
           width: 36, height: 36, borderRadius: '50%',
-          border: '3px solid #E5E7EB', borderTopColor: '#2563EB',
+          border: '3px solid #E9E5F5', borderTopColor: '#7C3AED',
           animation: 'spin 1s linear infinite',
         }} />
       </div>
@@ -108,7 +108,7 @@ function AppLayoutInner() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 width: 36, height: 36, borderRadius: 8,
                 border: 'none', background: 'transparent',
-              cursor: 'pointer', color: '#111827',
+              cursor: 'pointer', color: '#1E1B4B',
                 flexShrink: 0,
               }}
             >
@@ -120,9 +120,9 @@ function AppLayoutInner() {
           <h1 style={{
             flex: 1,
             fontSize: 15, fontWeight: 700,
-            color: '#111827', margin: 0,
+            color: '#1E1B4B', margin: 0,
             fontFamily: 'Poppins, sans-serif',
-            letterSpacing: '-0.2px',
+            letterSpacing: '-0.3px',
           }}>
             {pageTitle}
           </h1>
@@ -131,20 +131,20 @@ function AppLayoutInner() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 9,
-              padding: '5px 12px 5px 6px', borderRadius: 6,
-              background: '#F9FAFB',
-              border: '1px solid #E5E7EB',
+              padding: '5px 12px 5px 6px', borderRadius: 8,
+              background: '#F5F3FF',
+              border: '1px solid #E9E5F5',
             }}>
               <div style={{
-                width: 26, height: 26, borderRadius: 4,
-                background: '#2563EB',
+                width: 26, height: 26, borderRadius: 6,
+                background: 'linear-gradient(135deg, #7C3AED, #6D28D9)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0, fontSize: 11, fontWeight: 700, color: '#fff',
               }}>
                 {(user?.full_name || user?.email || 'U')[0].toUpperCase()}
               </div>
               <span style={{
-                fontSize: 13, fontWeight: 600, color: '#111827',
+                fontSize: 13, fontWeight: 600, color: '#1E1B4B',
                 maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
                 {user?.full_name || user?.email}
@@ -157,8 +157,8 @@ function AppLayoutInner() {
               title="Logout"
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 34, height: 34, borderRadius: 6,
-              border: '1px solid #E5E7EB',
+              width: 34, height: 34, borderRadius: 8,
+              border: '1px solid #E9E5F5',
               background: 'transparent', cursor: 'pointer',
               color: '#6B7280', transition: 'all 0.15s',
               }}

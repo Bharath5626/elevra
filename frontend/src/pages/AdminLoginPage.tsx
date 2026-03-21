@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      background: 'linear-gradient(135deg, #1E1B4B 0%, #1A1145 100%)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '24px',
     }}>
@@ -50,14 +50,14 @@ export default function AdminLoginPage() {
         {/* Icon */}
         <div style={{
           width: 56, height: 56, borderRadius: 16,
-          background: '#EFF6FF', border: '1.5px solid #BFDBFE',
+          background: '#F5F3FF', border: '1.5px solid #DDD6FE',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           marginBottom: 20,
         }}>
-          <ShieldCheck size={26} color="#2563EB" />
+          <ShieldCheck size={26} color="#7C3AED" />
         </div>
 
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: '0 0 4px', fontFamily: 'Poppins, sans-serif' }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1E1B4B', margin: '0 0 4px', fontFamily: 'Poppins, sans-serif' }}>
           Admin Portal
         </h1>
         <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 28px' }}>
@@ -79,12 +79,12 @@ export default function AdminLoginPage() {
               placeholder="admin@elevra.ai"
               style={{
                 width: '100%', padding: '11px 14px', borderRadius: 10,
-                border: '1.5px solid #E5E7EB', fontSize: 14, color: '#111827',
+                border: '1.5px solid #E9E5F5', fontSize: 14, color: '#1E1B4B',
                 outline: 'none', boxSizing: 'border-box',
                 transition: 'border-color .15s',
               }}
-              onFocus={e => { e.target.style.borderColor = '#2563EB'; }}
-              onBlur={e => { e.target.style.borderColor = '#E5E7EB'; }}
+              onFocus={e => { e.target.style.borderColor = '#7C3AED'; }}
+              onBlur={e => { e.target.style.borderColor = '#E9E5F5'; }}
             />
           </div>
 
@@ -102,12 +102,12 @@ export default function AdminLoginPage() {
                 placeholder="••••••••"
                 style={{
                   width: '100%', padding: '11px 42px 11px 14px', borderRadius: 10,
-                  border: '1.5px solid #E5E7EB', fontSize: 14, color: '#111827',
+                  border: '1.5px solid #E9E5F5', fontSize: 14, color: '#1E1B4B',
                   outline: 'none', boxSizing: 'border-box',
                   transition: 'border-color .15s',
                 }}
-                onFocus={e => { e.target.style.borderColor = '#2563EB'; }}
-                onBlur={e => { e.target.style.borderColor = '#E5E7EB'; }}
+                onFocus={e => { e.target.style.borderColor = '#7C3AED'; }}
+                onBlur={e => { e.target.style.borderColor = '#E9E5F5'; }}
               />
               <button
                 type="button"
@@ -140,7 +140,7 @@ export default function AdminLoginPage() {
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               padding: '13px 0', borderRadius: 10, border: 'none',
-              background: loading ? '#93b7fe' : '#2563EB',
+              background: loading ? '#C4B5FD' : '#7C3AED',
               color: '#fff', fontSize: 15, fontWeight: 600,
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'background .2s',

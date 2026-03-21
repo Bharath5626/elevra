@@ -6,12 +6,12 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 
 /* ── Design tokens — matches the rest of the app ── */
-const P      = '#2563EB';
-const P_D    = '#1D4ED8';
-const TEXT   = '#111827';
+const P      = '#7C3AED';
+const P_D    = '#6D28D9';
+const TEXT   = '#1E1B4B';
 const MUTED  = '#6B7280';
-const BORDER = '#E5E7EB';
-const BG_ALT = '#F9FAFB';
+const BORDER = '#E9E5F5';
+const BG_ALT = '#F8F7FF';
 
 const iconBox: React.CSSProperties = {
   position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
@@ -101,7 +101,7 @@ export default function LoginPage() {
     transition: 'all .2s',
     background: active ? P : 'transparent',
     color: active ? '#fff' : MUTED,
-    boxShadow: active ? '0 2px 8px rgba(37,99,235,.3)' : 'none',
+    boxShadow: active ? '0 2px 8px rgba(124,58,237,.3)' : 'none',
   });
 
   return (
@@ -110,7 +110,7 @@ export default function LoginPage() {
         minHeight: '100vh',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: '90px 20px 40px',
-        background: '#F9FAFB',
+        background: '#F8F7FF',
       }}
     >
       <motion.div
@@ -151,7 +151,7 @@ export default function LoginPage() {
               fontSize: 14, fontWeight: 600, color: TEXT,
               transition: 'background .15s, border-color .15s',
             }}
-            onMouseEnter={e => { if (!googleLoading) { (e.currentTarget as HTMLButtonElement).style.borderColor = '#4285F4'; (e.currentTarget as HTMLButtonElement).style.background = '#F9FAFB'; } }}
+            onMouseEnter={e => { if (!googleLoading) { (e.currentTarget as HTMLButtonElement).style.borderColor = '#4285F4'; (e.currentTarget as HTMLButtonElement).style.background = '#F8F7FF'; } }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = BORDER; (e.currentTarget as HTMLButtonElement).style.background = '#fff'; }}
           >
             {googleLoading ? (
@@ -291,7 +291,7 @@ export default function LoginPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                 width: '100%', padding: '12px 0',
                 border: 'none',
-                background: loading ? '#93C5FD' : P,
+                background: loading ? '#C4B5FD' : P,
                 color: '#fff', fontSize: 14, fontWeight: 600,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 marginTop: 4,

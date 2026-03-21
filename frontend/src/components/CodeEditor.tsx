@@ -118,9 +118,9 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
   return (
     <div style={{
       borderRadius: 12,
-      border: '1px solid #E5E7EB',
+      border: '1px solid #E9E5F5',
       overflow: 'hidden',
-      background: '#0f172a',
+      background: '#1E1B4B',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace",
@@ -132,12 +132,12 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '10px 16px',
-        background: '#1e293b',
+        background: '#1A1145',
         borderBottom: '1px solid rgba(255,255,255,.07)',
         gap: 12,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Code2 size={15} style={{ color: '#60a5fa' }} />
+          <Code2 size={15} style={{ color: '#A78BFA' }} />
           <span style={{ fontSize: 12, fontWeight: 600, color: '#94a3b8', letterSpacing: '.04em' }}>
             CODE EDITOR
           </span>
@@ -162,7 +162,7 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
             }}
           >
             {LANGUAGES.map((l) => (
-              <option key={l} value={l} style={{ background: '#1e293b' }}>{l}</option>
+              <option key={l} value={l} style={{ background: '#1A1145' }}>{l}</option>
             ))}
           </select>
           <ChevronDown size={12} style={{ position: 'absolute', right: 8, color: '#64748b', pointerEvents: 'none' }} />
@@ -177,7 +177,7 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
           style={{
             padding: '14px 10px 14px 0',
             minWidth: 44,
-            background: '#0f172a',
+            background: '#1E1B4B',
             borderRight: '1px solid rgba(255,255,255,.05)',
             textAlign: 'right',
             userSelect: 'none',
@@ -220,7 +220,7 @@ export default function CodeEditor({ value, onChange, language, onLanguageChange
       {/* ── Footer: char count ── */}
       <div style={{
         padding: '6px 16px',
-        background: '#1e293b',
+        background: '#1A1145',
         borderTop: '1px solid rgba(255,255,255,.05)',
         display: 'flex', justifyContent: 'flex-end', alignItems: 'center',
       }}>

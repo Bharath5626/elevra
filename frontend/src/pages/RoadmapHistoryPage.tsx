@@ -41,7 +41,7 @@ export default function RoadmapHistoryPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <Loader2 size={32} className="animate-spin" style={{ color: '#2563EB' }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: '#7C3AED' }} />
       </div>
     );
   }
@@ -64,13 +64,13 @@ export default function RoadmapHistoryPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
             style={{
-              background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7',
-              boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+              background: '#fff', borderRadius: 14, border: '1px solid #E9E5F5',
+              boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
               padding: '60px 40px', textAlign: 'center',
             }}
           >
             <BookOpen size={52} style={{ color: '#D1D5DB', margin: '0 auto 20px', display: 'block' }} />
-            <h3 style={{ fontSize: 20, fontWeight: 600, color: '#111827', margin: '0 0 10px' }}>
+            <h3 style={{ fontSize: 20, fontWeight: 600, color: '#1E1B4B', margin: '0 0 10px' }}>
               No roadmaps yet
             </h3>
             <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, maxWidth: 380, margin: '0 auto 28px' }}>
@@ -81,7 +81,7 @@ export default function RoadmapHistoryPage() {
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '11px 28px', borderRadius: 8,
-                background: '#2563EB',
+                background: '#7C3AED',
                 color: '#fff', fontSize: 15, fontWeight: 600, textDecoration: 'none',
               }}
             >
@@ -104,19 +104,19 @@ export default function RoadmapHistoryPage() {
               >
                 <div
                   style={{
-                    background: '#fff', borderRadius: 10,
-                    border: '1px solid #E7E7E7',
-                    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+                    background: '#fff', borderRadius: 14,
+                    border: '1px solid #E9E5F5',
+                    boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
                     padding: '24px 28px',
                     transition: 'box-shadow .2s, transform .2s',
                     cursor: 'pointer',
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 24px rgba(37,99,235,.12)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 24px rgba(124,58,237,.12)';
                     (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 3px rgba(0,0,0,.05)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)';
                     (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
                   }}
                 >
@@ -139,8 +139,8 @@ export default function RoadmapHistoryPage() {
                         <span style={{
                           display: 'inline-flex', alignItems: 'center', gap: 5,
                           padding: '3px 12px', borderRadius: 999,
-                          background: '#EFF6FF', border: '1px solid #BFDBFE',
-                          color: '#2563EB', fontSize: 12, fontWeight: 600,
+                          background: '#F5F3FF', border: '1px solid #DDD6FE',
+                          color: '#7C3AED', fontSize: 12, fontWeight: 600,
                         }}>
                           <BookOpen size={11} />
                           {rm.plan.weeks?.length ?? 0}-Week Plan
@@ -188,10 +188,10 @@ export default function RoadmapHistoryPage() {
                     {/* Arrow */}
                     <div style={{
                       width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-                      background: '#EFF6FF', border: '1px solid #BFDBFE',
+                      background: '#F5F3FF', border: '1px solid #DDD6FE',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <ArrowRight size={18} style={{ color: '#2563EB' }} />
+                      <ArrowRight size={18} style={{ color: '#7C3AED' }} />
                     </div>
                   </div>
                 </div>

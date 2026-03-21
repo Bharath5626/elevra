@@ -21,20 +21,20 @@ export default function Card({
   return (
     <div style={{
       background: '#fff',
-      border: '1px solid #E7E7E7',
-      borderRadius: 10,
-      boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+      border: '1px solid #E9E5F5',
+      borderRadius: 14,
+      boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
       overflow: 'hidden',
       ...style,
     }}>
       {header && (
         <div style={{
           padding: '14px 20px',
-          borderBottom: '1px solid #E7E7E7',
-          background: '#F9FAFB',
+          borderBottom: '1px solid #E9E5F5',
+          background: '#F8F7FF',
           fontWeight: 600,
           fontSize: 14,
-          color: '#111827',
+          color: '#1E1B4B',
           fontFamily: 'Poppins, sans-serif',
         }}>
           {header}
@@ -48,8 +48,8 @@ export default function Card({
       {footer && (
         <div style={{
           padding: '12px 20px',
-          borderTop: '1px solid #E7E7E7',
-          background: '#F9FAFB',
+          borderTop: '1px solid #E9E5F5',
+          background: '#F8F7FF',
         }}>
           {footer}
         </div>

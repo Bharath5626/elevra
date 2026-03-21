@@ -7,7 +7,15 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const P = '#2563EB';
+/* ── Sidebar theme tokens ────────────────────── */
+const SB_BG      = 'linear-gradient(180deg, #0F0B1E 0%, #1A1145 100%)';
+const SB_BORDER  = 'rgba(139,92,246,.12)';
+const SB_ACTIVE  = 'rgba(139,92,246,.18)';
+const SB_HOVER   = 'rgba(139,92,246,.08)';
+const SB_ACCENT  = '#A78BFA';         // violet-400 — luminous accent
+const SB_TEXT    = 'rgba(255,255,255,.55)';
+const SB_TEXT_ACT = '#fff';
+const SB_PILL    = 'linear-gradient(135deg,#8B5CF6,#6366F1)';
 
 const navItems = [
   { path: '/dashboard',       label: 'Dashboard',       icon: LayoutDashboard },
@@ -55,6 +63,8 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
       style={{
         transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
         width: W,
+        background: SB_BG,
+        borderRight: `1px solid ${SB_BORDER}`,
       }}
     >
       {/* ── Logo ── */}
@@ -62,7 +72,7 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
         height: 64,
         display: 'flex', alignItems: 'center',
         padding: '0 12px',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        borderBottom: `1px solid ${SB_BORDER}`,
         flexShrink: 0,
         gap: 10,
       }}>
@@ -73,17 +83,17 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
             title={slim ? 'Expand sidebar' : 'Collapse sidebar'}
             style={{
               background: 'transparent', border: 'none',
-              color: 'rgba(255,255,255,0.55)', cursor: 'pointer',
+              color: SB_TEXT, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 32, height: 32, borderRadius: 6,
-              flexShrink: 0, transition: 'color 0.13s ease, background 0.13s ease',
+              flexShrink: 0, transition: 'color 0.15s ease, background 0.15s ease',
             }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLButtonElement).style.color = '#fff';
-              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.1)';
+              (e.currentTarget as HTMLButtonElement).style.background = SB_HOVER;
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.55)';
+              (e.currentTarget as HTMLButtonElement).style.color = SB_TEXT;
               (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
             }}
           >
@@ -96,8 +106,8 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
             <img src="/logo.png" alt="Elevra" style={{ height: 28, width: 'auto', display: 'block', flexShrink: 0 }} />
             <span style={{
               flex: 1,
-              fontSize: 16, fontWeight: 700, color: '#fff',
-              letterSpacing: '-0.4px', fontFamily: 'Poppins, sans-serif',
+              fontSize: 17, fontWeight: 800, color: '#fff',
+              letterSpacing: '-0.5px', fontFamily: 'Poppins, sans-serif',
             }}>
               Elevra
             </span>
@@ -109,7 +119,7 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
             onClick={onClose}
             style={{
               marginLeft: 'auto', background: 'transparent', border: 'none',
-              color: 'rgba(255,255,255,0.45)', cursor: 'pointer',
+              color: 'rgba(255,255,255,0.35)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', padding: 4,
             }}
           >
@@ -127,11 +137,11 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
         {!slim && (
           <p style={{
             fontSize: 10, fontWeight: 700,
-            color: 'rgba(255,255,255,0.35)',
-            letterSpacing: '0.12em', textTransform: 'uppercase' as const,
-            padding: '0 12px', margin: '0 0 10px', fontFamily: 'monospace',
+            color: 'rgba(167,139,250,.45)',
+            letterSpacing: '0.14em', textTransform: 'uppercase' as const,
+            padding: '0 12px', margin: '0 0 10px',
           }}>
-            Main
+            Navigation
           </p>
         )}
 
@@ -162,33 +172,46 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: slim ? 'center' : 'flex-start',
-                  gap: slim ? 0 : 10,
+                  gap: slim ? 0 : 11,
                   padding: slim ? '10px 0' : '9px 12px',
-                  marginBottom: 1,
+                  marginBottom: 2,
                   cursor: 'pointer',
                   fontSize: 13.5,
-                  fontWeight: isActive ? 600 : 400,
+                  fontWeight: isActive ? 600 : 450,
+                  letterSpacing: '-0.01em',
                   color: isActive
-                    ? '#fff'
+                    ? SB_TEXT_ACT
                     : isHov
                     ? 'rgba(255,255,255,0.85)'
-                    : 'rgba(255,255,255,0.5)',
+                    : SB_TEXT,
                   background: isActive
-                    ? 'rgba(255,255,255,0.12)'
+                    ? SB_ACTIVE
                     : isHov
-                    ? 'rgba(255,255,255,0.07)'
+                    ? SB_HOVER
                     : 'transparent',
-                  borderLeft: slim ? 'none' : `2px solid ${isActive ? P : 'transparent'}`,
-                  borderRadius: 6,
-                  transition: 'all 0.13s ease',
+                  borderRadius: 8,
+                  transition: 'all 0.15s ease',
                   userSelect: 'none',
+                  position: 'relative',
                 }}
               >
-                <Icon size={16} style={{ flexShrink: 0 }} />
+                {/* Active indicator pill */}
+                {isActive && !slim && (
+                  <div style={{
+                    position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
+                    width: 3, height: 20, borderRadius: 0,
+                    borderTopRightRadius: 3, borderBottomRightRadius: 3,
+                    background: SB_PILL,
+                    boxShadow: '0 0 8px rgba(139,92,246,.5)',
+                  }} />
+                )}
+                <Icon size={16} style={{
+                  flexShrink: 0,
+                  color: isActive ? SB_ACCENT : isHov ? 'rgba(255,255,255,0.7)' : SB_TEXT,
+                  transition: 'color 0.15s ease',
+                }} />
                 {!slim && <span>{label}</span>}
               </div>
-
-              {/* Tooltip rendered inline — replaced by fixed portal below */}
             </div>
           );
         })}
@@ -201,16 +224,17 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
           left: W + 10,
           top: tooltip.y,
           transform: 'translateY(-50%)',
-          background: '#1F2937',
+          background: '#1E1550',
           color: '#fff',
           fontSize: 12,
           fontWeight: 500,
-          padding: '5px 10px',
+          padding: '5px 12px',
           borderRadius: 6,
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
           zIndex: 9999,
-          boxShadow: '0 2px 10px rgba(0,0,0,0.3)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.35)',
+          border: `1px solid ${SB_BORDER}`,
         }}>
           <div style={{
             position: 'absolute',
@@ -219,7 +243,7 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
             width: 0, height: 0,
             borderTop: '4px solid transparent',
             borderBottom: '4px solid transparent',
-            borderRight: '4px solid #1F2937',
+            borderRight: '4px solid #1E1550',
           }} />
           {tooltip.label}
         </div>
@@ -227,8 +251,8 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
 
       {/* ── Footer ── */}
       <div style={{
-        padding: slim ? '10px 0' : '10px 10px',
-        borderTop: '1px solid rgba(255,255,255,0.08)',
+        padding: slim ? '12px 0' : '12px 10px',
+        borderTop: `1px solid ${SB_BORDER}`,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
@@ -240,10 +264,10 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
           title="Logout"
           onMouseEnter={e => {
             (e.currentTarget as HTMLButtonElement).style.color = '#FCA5A5';
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.12)';
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239,68,68,0.1)';
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.4)';
+            (e.currentTarget as HTMLButtonElement).style.color = SB_TEXT;
             (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
           }}
           style={{
@@ -253,10 +277,10 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
             width: '100%',
             padding: slim ? '9px 0' : '9px 12px',
             background: 'transparent', border: 'none',
-            color: 'rgba(255,255,255,0.4)',
+            color: SB_TEXT,
             fontSize: 13.5, fontWeight: 400,
-            cursor: 'pointer', borderRadius: 6,
-            transition: 'all 0.13s ease',
+            cursor: 'pointer', borderRadius: 8,
+            transition: 'all 0.15s ease',
           }}
         >
           <LogOut size={16} style={{ flexShrink: 0 }} />
@@ -265,10 +289,10 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
 
         {!slim && (
           <p style={{
-            fontSize: 11, color: 'rgba(255,255,255,0.18)',
+            fontSize: 10, color: 'rgba(167,139,250,.2)',
             margin: '4px 0 0', letterSpacing: '0.02em', padding: '0 12px',
           }}>
-            Career AI Studio &copy; {new Date().getFullYear()}
+            Elevra &copy; {new Date().getFullYear()}
           </p>
         )}
       </div>

@@ -150,7 +150,7 @@ export default function ReplayPlayer({
   /* --- styles ------------------------------------------- */
   const ctrl: React.CSSProperties = {
     padding: '8px 10px', borderRadius: 8, background: 'none',
-    border: 'none', cursor: 'pointer', color: '#E5E7EB',
+    border: 'none', cursor: 'pointer', color: '#E9E5F5',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   };
 
@@ -158,7 +158,7 @@ export default function ReplayPlayer({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
       {/* -- Video card ----------------------------------- */}
-      <div style={{ backgroundColor: '#111827', borderRadius: 16, overflow: 'hidden', border: '1px solid #374151' }}>
+      <div style={{ backgroundColor: '#1E1B4B', borderRadius: 16, overflow: 'hidden', border: '1px solid #374151' }}>
 
         {/* Video element */}
         <div
@@ -236,7 +236,7 @@ export default function ReplayPlayer({
             <div style={{
               position: 'absolute', top: 0, left: 0, height: '100%',
               borderRadius: 99, pointerEvents: 'none',
-              background: '#2563EB',
+              background: '#7C3AED',
               width: `${progress}%`,
               transition: 'width .1s linear',
             }} />
@@ -256,7 +256,7 @@ export default function ReplayPlayer({
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <button onClick={togglePlay}  style={ctrl}>{isPlaying ? <Pause size={18} /> : <Play size={18} />}</button>
             <button onClick={toggleMute}  style={ctrl}>{isMuted   ? <VolumeX size={18} /> : <Volume2 size={18} />}</button>
-            <span style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(226,232,240,.5)', marginLeft: 4 }}>
+            <span style={{ fontSize: 12, fontFamily: 'Inter, sans-serif', color: 'rgba(226,232,240,.5)', marginLeft: 4 }}>
               {fmt(currentTime)} / {fmtDuration(duration)}
             </span>
           </div>
@@ -265,7 +265,7 @@ export default function ReplayPlayer({
             {transcript && (
               <button
                 onClick={() => setShowTranscript(!showTranscript)}
-                style={{ ...ctrl, backgroundColor: showTranscript ? 'rgba(37,99,235,.15)' : 'transparent', color: showTranscript ? '#2563EB' : '#E5E7EB' }}
+                style={{ ...ctrl, backgroundColor: showTranscript ? 'rgba(124,58,237,.15)' : 'transparent', color: showTranscript ? '#7C3AED' : '#E9E5F5' }}
               >
                 <MessageSquare size={16} />
               </button>
@@ -294,7 +294,7 @@ export default function ReplayPlayer({
       {/* -- Feedback sidebar ------------------------------- */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <Eye size={14} style={{ color: '#2563EB' }} />
+          <Eye size={14} style={{ color: '#7C3AED' }} />
           <span style={{ fontSize: 13, fontWeight: 600, color: '#4B5563' }}>Live Feedback</span>
         </div>
 
@@ -314,7 +314,7 @@ export default function ReplayPlayer({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                  <span style={{ fontSize: 11, fontFamily: 'monospace', opacity: 0.6, marginTop: 1, flexShrink: 0 }}>
+                  <span style={{ fontSize: 11, fontFamily: 'Inter, sans-serif', opacity: 0.6, marginTop: 1, flexShrink: 0 }}>
                     {fmt(f.time_seconds)}
                   </span>
                   <span style={{ lineHeight: 1.55 }}>{f.feedback}</span>

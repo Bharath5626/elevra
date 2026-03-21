@@ -198,7 +198,7 @@ export default function VideoRecorder({
     <div className="card" style={{ overflow: 'hidden' }}>
 
       {/* Video Container */}
-      <div style={{ position: 'relative', aspectRatio: '16/9', background: '#111827', borderRadius: 8, overflow: 'hidden', margin: 16 }}>
+      <div style={{ position: 'relative', aspectRatio: '16/9', background: '#1E1B4B', borderRadius: 8, overflow: 'hidden', margin: 16 }}>
 
         {interviewMode && status !== 'preview' && status !== 'uploading' ? (
           <>
@@ -226,7 +226,7 @@ export default function VideoRecorder({
                       key={i}
                       style={{
                         width: 7, height: 60, borderRadius: 99,
-                        background: 'linear-gradient(180deg, #93c5fd 0%, #2563EB 100%)',
+                        background: 'linear-gradient(180deg, #C4B5FD 0%, #7C3AED 100%)',
                         originY: 1,
                       }}
                       animate={{ scaleY: [0.12, 0.9, 0.35, 1, 0.2, 0.75, 0.12] }}
@@ -236,13 +236,13 @@ export default function VideoRecorder({
                 </div>
               ) : (
                 <motion.div
-                  animate={status === 'recording' ? { boxShadow: ['0 0 0 0px rgba(37,99,235,.5)', '0 0 0 14px rgba(37,99,235,.0)'] } : {}}
+                  animate={status === 'recording' ? { boxShadow: ['0 0 0 0px rgba(124,58,237,.5)', '0 0 0 14px rgba(124,58,237,.0)'] } : {}}
                   transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
                   style={{
                     width: 96, height: 96, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
+                    background: 'linear-gradient(135deg, #6D28D9 0%, #8B5CF6 100%)',
                     border: '3px solid rgba(96,165,250,.3)',
-                    boxShadow: '0 0 40px rgba(37,99,235,.2)',
+                    boxShadow: '0 0 40px rgba(124,58,237,.2)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     position: 'relative', zIndex: 1,
                   }}
@@ -269,7 +269,7 @@ export default function VideoRecorder({
                 position: 'relative', zIndex: 1,
               }}>
                 <motion.div
-                  style={{ width: 7, height: 7, borderRadius: '50%', background: isSpeaking ? '#fbbf24' : status === 'recording' ? '#4ade80' : status === 'submitted' ? '#4ade80' : '#60a5fa' }}
+                  style={{ width: 7, height: 7, borderRadius: '50%', background: isSpeaking ? '#fbbf24' : status === 'recording' ? '#4ade80' : status === 'submitted' ? '#4ade80' : '#A78BFA' }}
                   animate={{ opacity: [1, 0.35, 1] }}
                   transition={{ duration: 1.6, repeat: Infinity }}
                 />
@@ -348,7 +348,7 @@ export default function VideoRecorder({
                 position: 'absolute', bottom: 14, left: 14,
                 padding: '5px 11px', borderRadius: 99,
                 background: 'rgba(0,0,0,.5)', backdropFilter: 'blur(4px)',
-                fontSize: 11, fontFamily: 'monospace', fontWeight: 600, color: '#e2e8f0',
+                fontSize: 11, fontFamily: 'Inter, sans-serif', fontWeight: 600, color: '#e2e8f0',
               }}>
                 {formatTime(elapsed)} / {formatTime(maxDuration)}
               </div>
@@ -396,7 +396,7 @@ export default function VideoRecorder({
                 position: 'absolute', top: 16, right: 16,
                 padding: '6px 12px', borderRadius: 99,
                 background: 'rgba(255,255,255,.12)', backdropFilter: 'blur(6px)',
-                fontSize: 12, fontFamily: 'monospace', fontWeight: 600, color: '#fff',
+                fontSize: 12, fontFamily: 'Inter, sans-serif', fontWeight: 600, color: '#fff',
               }}>
                 {formatTime(elapsed)} / {formatTime(maxDuration)}
               </div>

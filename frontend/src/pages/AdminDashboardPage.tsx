@@ -9,12 +9,12 @@ import {
 import { adminAPI } from '../services/api';
 import type { AdminStats, AdminUserRow, AdminUserDetail } from '../types';
 
-const P      = '#2563EB';
-const P_BG   = '#EFF6FF';
-const BORDER = '#E2E8F0';
-const TEXT   = '#0F172A';
+const P      = '#7C3AED';
+const P_BG   = '#F5F3FF';
+const BORDER = '#E9E5F5';
+const TEXT   = '#1E1B4B';
 const MUTED  = '#64748B';
-const BG     = '#F1F5F9';
+const BG     = '#F5F3FF';
 
 // ── Stat card ─────────────────────────────────────────────────────────────────
 interface StatCardProps {
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
 
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <div style={{
-        background: '#0f172a',
+        background: '#1E1B4B',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         position: 'sticky', top: 0, zIndex: 50,
       }}>
@@ -180,11 +180,11 @@ export default function AdminDashboardPage() {
               background: 'rgba(96,165,250,0.15)', border: '1px solid rgba(96,165,250,0.3)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <ShieldCheck size={18} color="#60A5FA" />
+              <ShieldCheck size={18} color="#A78BFA" />
             </div>
             <div>
               <span style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.01em' }}>
-                Elevra <span style={{ color: '#60A5FA' }}>Admin</span>
+                Elevra <span style={{ color: '#A78BFA' }}>Admin</span>
               </span>
             </div>
           </div>
@@ -323,9 +323,9 @@ export default function AdminDashboardPage() {
                 <p style={{ fontSize: 13, fontWeight: 700, color: TEXT, margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Users size={15} color={P} /> User Growth
                 </p>
-                <MiniStat label="Today"      value={`+${stats.users.last_24h}`}  color="#2563EB" />
-                <MiniStat label="This week"  value={`+${stats.users.last_7d}`}   color="#2563EB" />
-                <MiniStat label="This month" value={`+${stats.users.last_30d}`}  color="#2563EB" />
+                <MiniStat label="Today"      value={`+${stats.users.last_24h}`}  color="#7C3AED" />
+                <MiniStat label="This week"  value={`+${stats.users.last_7d}`}   color="#7C3AED" />
+                <MiniStat label="This month" value={`+${stats.users.last_30d}`}  color="#7C3AED" />
                 <MiniStat label="All time"   value={stats.users.total} />
               </div>
               <div style={{ background: '#fff', borderRadius: 16, border: `1px solid ${BORDER}`, padding: '24px 26px', boxShadow: '0 1px 4px rgba(15,23,42,0.06)' }}>
@@ -402,7 +402,7 @@ export default function AdminDashboardPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ background: '#F8FAFC', borderBottom: `1px solid ${BORDER}` }}>
+                <tr style={{ background: '#F8F7FF', borderBottom: `1px solid ${BORDER}` }}>
                   {['Name', 'Email', 'Joined', 'Resumes', 'Interviews', 'JD', 'Apps', 'Roadmaps', 'Role', ''].map(h => (
                     <th key={h} style={{ padding: '13px 20px', textAlign: 'left', fontWeight: 600, color: MUTED, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
                       {h}
@@ -417,7 +417,7 @@ export default function AdminDashboardPage() {
                   <tr><td colSpan={10} style={{ padding: '56px 0', textAlign: 'center', color: MUTED, fontSize: 14 }}>No users found.</td></tr>
                 ) : users.map((u) => (
                   <tr key={u.id} style={{ borderBottom: `1px solid ${BORDER}` }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#F8FAFC')}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#F8F7FF')}
                     onMouseLeave={e => (e.currentTarget.style.background = '#fff')}
                   >
                     <td style={{ padding: '15px 20px', fontWeight: 600, color: TEXT, whiteSpace: 'nowrap' }}>{u.name}</td>
@@ -475,7 +475,7 @@ export default function AdminDashboardPage() {
                   onClick={() => setUsersPage(p => p - 1)}
                   style={{
                     padding: '7px 16px', borderRadius: 8, border: `1.5px solid ${BORDER}`,
-                    background: '#fff', color: usersPage <= 1 ? '#CBD5E1' : TEXT,
+                    background: '#fff', color: usersPage <= 1 ? '#D4D0E8' : TEXT,
                     cursor: usersPage <= 1 ? 'not-allowed' : 'pointer', fontSize: 13,
                     display: 'flex', alignItems: 'center', gap: 5, fontWeight: 500,
                   }}
@@ -487,7 +487,7 @@ export default function AdminDashboardPage() {
                   onClick={() => setUsersPage(p => p + 1)}
                   style={{
                     padding: '7px 16px', borderRadius: 8, border: `1.5px solid ${BORDER}`,
-                    background: '#fff', color: usersPage >= totalPages ? '#CBD5E1' : TEXT,
+                    background: '#fff', color: usersPage >= totalPages ? '#D4D0E8' : TEXT,
                     cursor: usersPage >= totalPages ? 'not-allowed' : 'pointer', fontSize: 13,
                     display: 'flex', alignItems: 'center', gap: 5, fontWeight: 500,
                   }}
@@ -611,7 +611,7 @@ export default function AdminDashboardPage() {
                               <Badge color={s.status === 'completed' ? '#22c55e' : '#f59e0b'}>
                                 {s.status}
                               </Badge>
-                              {s.overall_score > 0 && <Badge color="#2563EB">{s.overall_score}%</Badge>}
+                              {s.overall_score > 0 && <Badge color="#7C3AED">{s.overall_score}%</Badge>}
                             </div>
                           </div>
                         ))}
@@ -627,7 +627,7 @@ export default function AdminDashboardPage() {
                               <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: TEXT, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>{a.job_title}</p>
                               <p style={{ margin: 0, fontSize: 11, color: MUTED }}>{a.company}</p>
                             </div>
-                            <Badge color={a.status === 'offer' ? '#22c55e' : a.status === 'interviewing' ? '#f59e0b' : a.status === 'rejected' ? '#ef4444' : '#2563EB'}>
+                            <Badge color={a.status === 'offer' ? '#22c55e' : a.status === 'interviewing' ? '#f59e0b' : a.status === 'rejected' ? '#ef4444' : '#7C3AED'}>
                               {a.status}
                             </Badge>
                           </div>
@@ -639,7 +639,7 @@ export default function AdminDashboardPage() {
                     {detail.cri && (
                       <Section title="Career Readiness Index">
                         <MiniStat label="CRI Total"   value={detail.cri.cri_total} color="#f97316" />
-                        <MiniStat label="Percentile"  value={`Top ${Math.round(100 - detail.cri.percentile)}%`} color="#2563EB" />
+                        <MiniStat label="Percentile"  value={`Top ${Math.round(100 - detail.cri.percentile)}%`} color="#7C3AED" />
                         <MiniStat label="Assessed on" value={new Date(detail.cri.recorded_at).toLocaleDateString()} />
                       </Section>
                     )}

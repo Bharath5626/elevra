@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const P      = '#2563EB';
-const P_D    = '#1D4ED8';
-const TEXT   = '#111827';
+const P      = '#7C3AED';
+const P_D    = '#6D28D9';
+const TEXT   = '#1E1B4B';
 const MUTED  = '#6B7280';
-const BORDER = '#E5E7EB';
+const BORDER = '#E9E5F5';
 
 const navLinks = [
   { path: '/dashboard',       label: 'Dashboard' },
@@ -55,6 +55,7 @@ export default function Navbar() {
         {/* ── Logo ── */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none', flexShrink: 0 }}>
           <img src="/logo.png" alt="Elevra" style={{ height: 28, width: 'auto', display: 'block' }} />
+          <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 18, fontWeight: 700, color: TEXT, letterSpacing: '-0.02em' }}>Elevra</span>
         </Link>
 
         {/* ── Desktop Nav (authenticated) ── */}
@@ -105,7 +106,7 @@ export default function Navbar() {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '5px 12px 5px 6px',
-                  border: `1px solid ${BORDER}`, background: '#F9FAFB',
+                  border: `1px solid ${BORDER}`, background: '#F8F7FF',
                 }}>
                   <div style={{
                     width: 22, height: 22,
@@ -130,7 +131,7 @@ export default function Navbar() {
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '7px 14px',
                   fontSize: 13, fontWeight: 500, border: `1px solid ${BORDER}`,
-                  background: hoveredLogout ? '#F9FAFB' : '#fff',
+                  background: hoveredLogout ? '#F8F7FF' : '#fff',
                   color: MUTED, cursor: 'pointer', transition: 'all .15s',
                 }}
               >
@@ -164,7 +165,7 @@ export default function Navbar() {
                   fontSize: 13.5, fontWeight: 500, textDecoration: 'none',
                   border: `1px solid ${BORDER}`,
                   color: hoveredSignIn ? TEXT : MUTED,
-                  background: hoveredSignIn ? '#F9FAFB' : '#fff',
+                  background: hoveredSignIn ? '#F8F7FF' : '#fff',
                   transition: 'all .15s',
                 }}
               >
@@ -220,7 +221,7 @@ export default function Navbar() {
                       textDecoration: 'none',
                       color: isActive ? P : TEXT,
                       borderLeft: `2px solid ${isActive ? P : 'transparent'}`,
-                      background: isActive ? '#EFF6FF' : 'transparent',
+                      background: isActive ? '#F5F3FF' : 'transparent',
                       transition: 'all .15s',
                     }}
                   >

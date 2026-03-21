@@ -158,7 +158,7 @@ const JOB_ROLES = [
 
 const difficulties = [
   { value: '1', label: 'Fresher',   desc: 'Entry-level questions',  color: '#22c55e' },
-  { value: '2', label: 'Junior',    desc: '0–1 years experience',   color: '#3b82f6' },
+  { value: '2', label: 'Junior',    desc: '0–1 years experience',   color: '#8B5CF6' },
   { value: '3', label: 'Mid-Level', desc: '1–3 years experience',   color: '#f59e0b' },
   { value: '4', label: 'Senior',    desc: '3–5 years experience',   color: '#ef4444' },
   { value: '5', label: 'Lead',      desc: '5+ years experience',    color: '#a855f7' },
@@ -170,11 +170,11 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.35, delay },
 });
 
-const P      = '#2563EB';
-const P_BG   = '#EFF6FF';
-const P_BD   = '#BFDBFE';
-const BORDER = '#E5E7EB';
-const TEXT   = '#111827';
+const P      = '#7C3AED';
+const P_BG   = '#F5F3FF';
+const P_BD   = '#DDD6FE';
+const BORDER = '#E9E5F5';
+const TEXT   = '#1E1B4B';
 const MUTED  = '#6B7280';
 
 export default function InterviewSetupPage() {
@@ -316,22 +316,22 @@ export default function InterviewSetupPage() {
           transition={{ duration: 0.3, ease: 'easeOut' }}
           style={{
             background: '#fff', borderRadius: 20,
-            boxShadow: '0 24px 64px rgba(0,0,0,.2)',
+            boxShadow: '0 24px 64px rgba(30,27,75,.18)',
             width: '100%', maxWidth: 580,
             overflow: 'hidden',
           }}
         >
           {/* Header */}
           <div style={{
-            background: '#111827',
+            background: '#1E1B4B',
             padding: '28px 32px 24px',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(37,99,235,.25)', border: '1px solid rgba(37,99,235,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(124,58,237,.25)', border: '1px solid rgba(124,58,237,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <span style={{ fontSize: 22 }}>💡</span>
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.08em', margin: 0, fontFamily: 'monospace' }}>Before you begin</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.08em', margin: 0, fontFamily: 'Inter, sans-serif' }}>Before you begin</p>
                 <h2 style={{ fontSize: 19, fontWeight: 700, color: '#fff', margin: '3px 0 0', fontFamily: 'Poppins, sans-serif' }}>Interview Tips</h2>
               </div>
             </div>
@@ -343,7 +343,7 @@ export default function InterviewSetupPage() {
           {/* Tips grid */}
           <div style={{ padding: '24px 32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             {TIPS.map((tip) => (
-              <div key={tip.title} style={{ background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB', padding: '16px 18px' }}>
+              <div key={tip.title} style={{ background: '#F8F7FF', borderRadius: 12, border: '1px solid #E9E5F5', padding: '16px 18px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   <span style={{ fontSize: 18 }}>{tip.emoji}</span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>{tip.title}</span>
@@ -357,7 +357,7 @@ export default function InterviewSetupPage() {
           <div style={{ padding: '0 32px 28px', display: 'flex', gap: 12 }}>
             <button
               onClick={() => setShowTips(false)}
-              style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: '1px solid #E5E7EB', background: '#fff', fontSize: 14, fontWeight: 600, color: MUTED, cursor: 'pointer' }}
+              style={{ flex: 1, padding: '12px 0', borderRadius: 14, border: '1px solid #E9E5F5', background: '#fff', fontSize: 14, fontWeight: 600, color: MUTED, cursor: 'pointer' }}
             >
               Back
             </button>
@@ -534,7 +534,7 @@ export default function InterviewSetupPage() {
                     }}
                   >
                     {jobRole.trim().length === 0 && (
-                      <div style={{ padding: '8px 14px 4px', fontSize: 10, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '.1em', fontFamily: 'monospace' }}>
+                      <div style={{ padding: '8px 14px 4px', fontSize: 10, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '.1em', fontFamily: 'Inter, sans-serif' }}>
                         All Roles — scroll to browse
                       </div>
                     )}
@@ -565,14 +565,14 @@ export default function InterviewSetupPage() {
                           padding: '9px 14px',
                           fontSize: 13,
                           color: highlightIdx === suggestions.length ? P : MUTED,
-                          background: highlightIdx === suggestions.length ? P_BG : '#F9FAFB',
+                          background: highlightIdx === suggestions.length ? P_BG : '#F8F7FF',
                           borderLeft: `2px solid ${highlightIdx === suggestions.length ? P : 'transparent'}`,
                           borderTop: `1px solid ${BORDER}`,
                           cursor: 'pointer', fontStyle: 'italic',
                           display: 'flex', alignItems: 'center', gap: 8,
                         }}
                       >
-                        <span style={{ fontSize: 11, background: P_BG, border: `1px solid ${P_BD}`, color: P, padding: '1px 7px', fontStyle: 'normal', fontWeight: 700, fontFamily: 'monospace' }}>
+                        <span style={{ fontSize: 11, background: P_BG, border: `1px solid ${P_BD}`, color: P, padding: '1px 7px', fontStyle: 'normal', fontWeight: 700, fontFamily: 'Inter, sans-serif' }}>
                           CUSTOM
                         </span>
                         Use "{jobRole}"

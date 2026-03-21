@@ -26,18 +26,18 @@ const s = {
 
   card: {
     backgroundColor: '#ffffff',
-    borderRadius: 10,
-    border: '1px solid #E7E7E7',
-    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+    borderRadius: 14,
+    border: '1px solid #E9E5F5',
+    boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
     padding: 24,
     marginBottom: 20,
   } as React.CSSProperties,
 
   cardFlush: {
     backgroundColor: '#ffffff',
-    borderRadius: 10,
-    border: '1px solid #E7E7E7',
-    boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+    borderRadius: 14,
+    border: '1px solid #E9E5F5',
+    boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
     overflow: 'hidden',
     marginBottom: 16,
   } as React.CSSProperties,
@@ -49,8 +49,8 @@ const s = {
     borderRadius: 999,
     fontSize: 12,
     fontWeight: 600,
-    backgroundColor: color === 'warning' ? '#fef9c3' : color === 'info' ? '#dbeafe' : '#f1f5f9',
-    color: color === 'warning' ? '#854d0e' : color === 'info' ? '#1d4ed8' : '#4B5563',
+    backgroundColor: color === 'warning' ? '#fef9c3' : color === 'info' ? '#EDE9FE' : '#F5F3FF',
+    color: color === 'warning' ? '#854d0e' : color === 'info' ? '#6D28D9' : '#4B5563',
   }),
 
   weekBtn: {
@@ -69,7 +69,7 @@ const s = {
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#F5F3FF',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -77,7 +77,7 @@ const s = {
   } as React.CSSProperties,
 
   expandedContent: {
-    borderTop: '1px solid #E5E7EB',
+    borderTop: '1px solid #E9E5F5',
     padding: '20px 24px 28px',
   } as React.CSSProperties,
 
@@ -114,7 +114,7 @@ const s = {
     gap: 10,
     padding: '10px 12px',
     borderRadius: 10,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F8F7FF',
     textDecoration: 'none',
     marginBottom: 8,
   } as React.CSSProperties,
@@ -138,8 +138,8 @@ const s = {
   centerCard: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
-    border: '1px solid #E5E7EB',
-    boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+    border: '1px solid #E9E5F5',
+    boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
     padding: 48,
     textAlign: 'center' as const,
     width: '100%',
@@ -162,7 +162,7 @@ const s = {
     gap: 8,
     padding: '10px 22px',
     borderRadius: 10,
-    backgroundColor: '#2563EB',
+    backgroundColor: '#7C3AED',
     color: '#fff',
     fontSize: 14,
     fontWeight: 600,
@@ -219,7 +219,7 @@ export default function RoadmapPage() {
   if (loading) {
     return (
       <div style={s.centered}>
-        <Loader2 size={32} className="animate-spin" style={{ color: '#2563EB' }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: '#7C3AED' }} />
       </div>
     );
   }
@@ -230,13 +230,13 @@ export default function RoadmapPage() {
       <div style={s.centered}>
         <div style={s.centerCard}>
           <div style={{
-            width: 64, height: 64, borderRadius: 10, backgroundColor: '#EFF6FF',
+            width: 64, height: 64, borderRadius: 10, backgroundColor: '#F5F3FF',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 20px',
           }}>
-            <Loader2 size={30} className="animate-spin" style={{ color: '#2563EB' }} />
+            <Loader2 size={30} className="animate-spin" style={{ color: '#7C3AED' }} />
           </div>
-          <h3 style={{ fontSize: 20, fontWeight: 700, color: '#111827', margin: '0 0 12px' }}>
+          <h3 style={{ fontSize: 20, fontWeight: 700, color: '#1E1B4B', margin: '0 0 12px' }}>
             Generating Your Roadmap
           </h3>
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, margin: 0 }}>
@@ -254,7 +254,7 @@ export default function RoadmapPage() {
       <div style={s.centered}>
         <div style={s.centerCard}>
           <BookOpen size={48} style={{ color: '#9CA3AF', margin: '0 auto 16px', display: 'block' }} />
-          <h3 style={{ fontSize: 18, fontWeight: 600, color: '#111827', margin: '0 0 10px' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 600, color: '#1E1B4B', margin: '0 0 10px' }}>
             Could not generate roadmap
           </h3>
           <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 24px' }}>
@@ -270,17 +270,17 @@ export default function RoadmapPage() {
 
   const { plan } = roadmap;
 
-  const weekColors = ['#2563EB', '#7C3AED', '#059669', '#D97706', '#DC2626', '#0891B2'];
-  const weekTracks  = ['#DBEAFE', '#EDE9FE', '#D1FAE5', '#FEF3C7', '#FEE2E2', '#CFFAFE'];
+  const weekColors = ['#7C3AED', '#7C3AED', '#059669', '#D97706', '#DC2626', '#0891B2'];
+  const weekTracks  = ['#EDE9FE', '#EDE9FE', '#D1FAE5', '#FEF3C7', '#FEE2E2', '#CFFAFE'];
 
   const totalTasks     = plan.weeks.reduce((n, w) => n + w.daily_tasks.length, 0);
   const totalResources = plan.weeks.reduce((n, w) => n + w.resources.length, 0);
 
   const resourceIcon = (type: string) => {
     if (type === 'video')    return { icon: <Video    size={13} />, color: '#ef4444', bg: '#FEE2E2', label: 'Video'    };
-    if (type === 'article')  return { icon: <FileText size={13} />, color: '#2563EB', bg: '#DBEAFE', label: 'Article'  };
+    if (type === 'article')  return { icon: <FileText size={13} />, color: '#7C3AED', bg: '#EDE9FE', label: 'Article'  };
     if (type === 'practice') return { icon: <Code     size={13} />, color: '#059669', bg: '#D1FAE5', label: 'Practice' };
-    return                          { icon: <ExternalLink size={13} />, color: '#6B7280', bg: '#F3F4F6', label: 'Link' };
+    return                          { icon: <ExternalLink size={13} />, color: '#6B7280', bg: '#F0EEFA', label: 'Link' };
   };
 
   return (
@@ -300,15 +300,15 @@ export default function RoadmapPage() {
           </div>
         )}
 
-        <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 26, fontWeight: 800, color: '#111827', margin: '0 0 8px' }}>
-          Your <span style={{ color: '#2563EB' }}>30-Day Learning Plan</span>
+        <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 26, fontWeight: 800, color: '#1E1B4B', margin: '0 0 8px' }}>
+          Your <span style={{ color: '#7C3AED' }}>30-Day Learning Plan</span>
         </h1>
         <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.7, margin: '0 0 20px', maxWidth: 660 }}>{plan.summary}</p>
 
         {/* Stats bar */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
           {[
-            { icon: <Calendar size={13} />, value: `${plan.weeks.length} Weeks`,       color: '#2563EB', bg: '#EFF6FF', bd: '#BFDBFE' },
+            { icon: <Calendar size={13} />, value: `${plan.weeks.length} Weeks`,       color: '#7C3AED', bg: '#F5F3FF', bd: '#DDD6FE' },
             { icon: <Target   size={13} />, value: `${totalTasks} Tasks`,              color: '#7C3AED', bg: '#F5F3FF', bd: '#DDD6FE' },
             { icon: <BookOpen size={13} />, value: `${totalResources} Resources`,      color: '#059669', bg: '#ECFDF5', bd: '#A7F3D0' },
             { icon: <Zap      size={13} />, value: `${plan.quick_wins?.length ?? 0} Quick Wins`, color: '#D97706', bg: '#FFFBEB', bd: '#FDE68A' },
@@ -354,7 +354,7 @@ export default function RoadmapPage() {
 
           return (
             <motion.div key={i} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.06 }}
-              style={{ background: '#fff', borderRadius: 12, border: '1px solid #E7E7E7', boxShadow: '0 1px 4px rgba(0,0,0,.05)', overflow: 'hidden' }}
+              style={{ background: '#fff', borderRadius: 12, border: '1px solid #E9E5F5', boxShadow: '0 1px 4px rgba(0,0,0,.05)', overflow: 'hidden' }}
             >
               {/* Week header button */}
               <button
@@ -369,7 +369,7 @@ export default function RoadmapPage() {
 
                 {/* Focus + meta */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: '0 0 4px' }}>{week.focus}</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#1E1B4B', margin: '0 0 4px' }}>{week.focus}</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                     <span style={{ fontSize: 11, fontWeight: 600, color: '#6B7280' }}>📋 {week.daily_tasks.length} tasks</span>
                     {week.resources.length > 0 && <span style={{ fontSize: 11, fontWeight: 600, color: '#6B7280' }}>📚 {week.resources.length} resources</span>}
@@ -377,7 +377,7 @@ export default function RoadmapPage() {
                 </div>
 
                 {/* Chevron */}
-                <div style={{ width: 28, height: 28, borderRadius: 6, background: isOpen ? track : '#F9FAFB', border: `1px solid ${isOpen ? color + '44' : '#E5E7EB'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 6, background: isOpen ? track : '#F8F7FF', border: `1px solid ${isOpen ? color + '44' : '#E9E5F5'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {isOpen ? <ChevronUp size={14} color={color} /> : <ChevronDown size={14} color="#9CA3AF" />}
                 </div>
               </button>
@@ -398,7 +398,7 @@ export default function RoadmapPage() {
                       <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '.08em', margin: '0 0 12px' }}>Daily Tasks</p>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: week.resources.length > 0 ? 24 : 0 }}>
                         {week.daily_tasks.map((task, j) => (
-                          <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 14px', borderRadius: 8, background: '#F9FAFB', border: '1px solid #F3F4F6' }}>
+                          <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 14px', borderRadius: 8, background: '#F8F7FF', border: '1px solid #F0EEFA' }}>
                             <div style={{ width: 22, height: 22, borderRadius: 6, background: track, border: `1px solid ${color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 11, fontWeight: 800, color, fontFamily: 'Poppins, sans-serif' }}>
                               {j + 1}
                             </div>
@@ -416,9 +416,9 @@ export default function RoadmapPage() {
                               const ri = resourceIcon(res.type);
                               return (
                                 <a key={j} href={res.url} target="_blank" rel="noopener noreferrer"
-                                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 8, background: '#fff', border: '1px solid #E7E7E7', textDecoration: 'none', transition: 'border-color .15s' }}
+                                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 8, background: '#fff', border: '1px solid #E9E5F5', textDecoration: 'none', transition: 'border-color .15s' }}
                                   onMouseEnter={e => (e.currentTarget.style.borderColor = color)}
-                                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#E7E7E7')}
+                                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#E9E5F5')}
                                 >
                                   <div style={{ width: 28, height: 28, borderRadius: 6, background: ri.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: ri.color }}>
                                     {ri.icon}

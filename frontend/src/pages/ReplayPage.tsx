@@ -27,7 +27,7 @@ export default function ReplayPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <Loader2 size={32} className="animate-spin" style={{ color: '#2563EB' }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: '#7C3AED' }} />
       </div>
     );
   }
@@ -44,8 +44,8 @@ export default function ReplayPage() {
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '8px 20px', borderRadius: 8,
-              border: '1.5px solid #BFDBFE', backgroundColor: 'transparent',
-              color: '#2563EB', fontSize: 13, fontWeight: 600, textDecoration: 'none',
+              border: '1.5px solid #DDD6FE', backgroundColor: 'transparent',
+              color: '#7C3AED', fontSize: 13, fontWeight: 600, textDecoration: 'none',
             }}
           >
             <ChevronLeft size={14} /> Back to Report
@@ -69,9 +69,9 @@ export default function ReplayPage() {
           >
             <ChevronLeft size={14} /> Back to Report
           </Link>
-          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 28, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>
+          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 28, fontWeight: 700, color: '#1E1B4B', margin: '0 0 8px' }}>
             Interview{' '}
-            <span style={{ color: '#2563EB' }}>
+            <span style={{ color: '#7C3AED' }}>
               Replay
             </span>
           </h1>
@@ -91,9 +91,9 @@ export default function ReplayPage() {
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',
-                border: i === selectedIdx ? '1.5px solid #2563EB' : '1.5px solid #E5E7EB',
-                backgroundColor: i === selectedIdx ? '#EFF6FF' : '#fff',
-                color: i === selectedIdx ? '#2563EB' : '#6B7280',
+                border: i === selectedIdx ? '1.5px solid #7C3AED' : '1.5px solid #E9E5F5',
+                backgroundColor: i === selectedIdx ? '#F5F3FF' : '#fff',
+                color: i === selectedIdx ? '#7C3AED' : '#6B7280',
                 transition: 'all .15s',
               }}
             >

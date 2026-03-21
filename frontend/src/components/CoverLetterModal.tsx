@@ -90,9 +90,9 @@ export default function CoverLetterModal({ isOpen, onClose, job, resumeAnalysisI
           ) : (
             <div style={{
               width: 40, height: 40, borderRadius: 10,
-              background: '#EFF6FF', border: '1px solid #BFDBFE',
+              background: '#F5F3FF', border: '1px solid #DDD6FE',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#2563EB', fontWeight: 700, fontSize: 16, flexShrink: 0,
+              color: '#7C3AED', fontWeight: 700, fontSize: 16, flexShrink: 0,
             }}>
               {job.company.charAt(0)}
             </div>
@@ -167,7 +167,7 @@ export default function CoverLetterModal({ isOpen, onClose, job, resumeAnalysisI
               color: '#fff',
               background: copied
                 ? '#22c55e'
-                : '#2563EB',
+                : '#7C3AED',
               opacity: !letter || generating ? 0.5 : 1,
               transition: 'all .2s',
             }}

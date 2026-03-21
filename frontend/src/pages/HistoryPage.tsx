@@ -22,7 +22,7 @@ export default function HistoryPage() {
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return '#22c55e';
-    if (score >= 60) return '#3b82f6';
+    if (score >= 60) return '#8B5CF6';
     if (score >= 40) return '#f59e0b';
     return '#ef4444';
   };
@@ -60,7 +60,7 @@ export default function HistoryPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Loader2 size={36} className="animate-spin" style={{ color: '#2563EB' }} />
+        <Loader2 size={36} className="animate-spin" style={{ color: '#7C3AED' }} />
       </div>
     );
   }
@@ -101,7 +101,7 @@ export default function HistoryPage() {
                 <AlertTriangle size={18} style={{ color: '#EF4444' }} />
               </div>
               <div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1E1B4B', margin: '0 0 6px' }}>
                   Delete Interview?
                 </h3>
                 <p style={{ fontSize: 13.5, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
@@ -115,7 +115,7 @@ export default function HistoryPage() {
                 disabled={deleting}
                 style={{
                   padding: '9px 20px', borderRadius: 8,
-                  border: '1px solid #E5E7EB', background: '#fff',
+                  border: '1px solid #E9E5F5', background: '#fff',
                   cursor: 'pointer', fontSize: 14, fontWeight: 500, color: '#374151',
                 }}
               >
@@ -152,9 +152,9 @@ export default function HistoryPage() {
               gap: 16, marginBottom: 24,
             }}
           >
-            <StatCard label="Total Sessions" value={sessions.length}    icon={History}   iconColor="#2563EB" />
+            <StatCard label="Total Sessions" value={sessions.length}    icon={History}   iconColor="#7C3AED" />
             <StatCard label="Average Score"  value={`${avgScore}%`}    icon={TrendingUp} iconColor="#22c55e" />
-            <StatCard label="Best Score"     value={`${bestScore}/100`} icon={Award}      iconColor="#3b82f6" />
+            <StatCard label="Best Score"     value={`${bestScore}/100`} icon={Award}      iconColor="#8B5CF6" />
             <StatCard label="Completed"      value={completed}          icon={CheckCircle} iconColor="#a855f7" />
           </motion.div>
         )}
@@ -173,9 +173,9 @@ export default function HistoryPage() {
               onClick={() => setFilter(f)}
               style={{
                 padding: '8px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                border: filter === f ? '1.5px solid #2563EB' : '1.5px solid #E5E7EB',
-                background: filter === f ? '#EFF6FF' : '#fff',
-                color: filter === f ? '#2563EB' : '#6B7280',
+                border: filter === f ? '1.5px solid #7C3AED' : '1.5px solid #E9E5F5',
+                background: filter === f ? '#F5F3FF' : '#fff',
+                color: filter === f ? '#7C3AED' : '#6B7280',
                 transition: 'all .2s',
               }}
             >
@@ -190,13 +190,13 @@ export default function HistoryPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             style={{
-              background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7',
-              boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+              background: '#fff', borderRadius: 14, border: '1px solid #E9E5F5',
+              boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
               padding: '64px 32px', textAlign: 'center',
             }}
           >
             <div style={{
-              width: 72, height: 72, borderRadius: 18, background: '#F9FAFB',
+              width: 72, height: 72, borderRadius: 18, background: '#F8F7FF',
               display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
             }}>
               <History size={32} style={{ color: '#9CA3AF' }} />
@@ -212,7 +212,7 @@ export default function HistoryPage() {
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '12px 28px', borderRadius: 8,
-                background: '#2563EB', color: '#fff',
+                background: '#7C3AED', color: '#fff',
                 fontSize: 14, fontWeight: 600, textDecoration: 'none',
               }}
             >
@@ -238,34 +238,34 @@ export default function HistoryPage() {
                     style={{ textDecoration: 'none', display: 'block' }}
                   >
                     <div style={{
-                      background: '#fff', borderRadius: 10,
-                      border: '1px solid #E7E7E7',
-                      boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+                      background: '#fff', borderRadius: 14,
+                      border: '1px solid #E9E5F5',
+                      boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
                       padding: '18px 24px',
                       display: 'flex', alignItems: 'center', gap: 16,
                       transition: 'box-shadow .2s, border-color .2s',
                     }}
                       onMouseEnter={e => {
                         (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,.08)';
-                        (e.currentTarget as HTMLDivElement).style.borderColor = '#BFDBFE';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = '#DDD6FE';
                       }}
                       onMouseLeave={e => {
                         (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,.04)';
-                        (e.currentTarget as HTMLDivElement).style.borderColor = '#E5E7EB';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = '#E9E5F5';
                       }}
                     >
                       {/* Icon */}
                       <div style={{
                         width: 48, height: 48, borderRadius: 12, flexShrink: 0,
-                        background: '#EFF6FF',
+                        background: '#F5F3FF',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
-                        <Mic size={22} style={{ color: '#2563EB' }} />
+                        <Mic size={22} style={{ color: '#7C3AED' }} />
                       </div>
 
                       {/* Main info */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 15, fontWeight: 600, color: '#111827', margin: '0 0 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontSize: 15, fontWeight: 600, color: '#1E1B4B', margin: '0 0 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {session.job_role}
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>

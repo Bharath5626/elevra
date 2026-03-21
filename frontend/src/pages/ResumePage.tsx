@@ -5,12 +5,12 @@ import ProgressBar from '../components/ProgressBar';
 import { resumeAPI } from '../services/api';
 import type { ResumeAnalysis } from '../types';
 
-const P = '#2563EB';
-const P_BG = '#EFF6FF';
-const P_BD = '#BFDBFE';
-const TEXT = '#111827';
+const P = '#7C3AED';
+const P_BG = '#F5F3FF';
+const P_BD = '#DDD6FE';
+const TEXT = '#1E1B4B';
 const MUTED = '#6B7280';
-const BORDER = '#E5E7EB';
+const BORDER = '#E9E5F5';
 
 const sectionTitle: React.CSSProperties = {
   fontSize: 13,
@@ -49,7 +49,7 @@ function renderBold(text: string) {
   const segments = text.split(/\*\*([^*]+)\*\*/g);
   return segments.map((seg, i) =>
     i % 2 === 1
-      ? <strong key={i} style={{ fontWeight: 700, color: '#1e3a8a' }}>{seg}</strong>
+      ? <strong key={i} style={{ fontWeight: 700, color: '#4C1D95' }}>{seg}</strong>
       : seg
   );
 }
@@ -137,19 +137,19 @@ export default function ResumePage() {
           onClick={openHistory}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '7px 14px', borderRadius: 8, border: '1px solid #E5E7EB',
+            padding: '7px 14px', borderRadius: 8, border: '1px solid #E9E5F5',
             background: '#fff', color: '#374151', fontSize: 13, fontWeight: 600,
             cursor: 'pointer', flexShrink: 0, marginLeft: 16,
             transition: 'all .15s',
           }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = '#EFF6FF';
-            (e.currentTarget as HTMLButtonElement).style.borderColor = '#BFDBFE';
+            (e.currentTarget as HTMLButtonElement).style.background = '#F5F3FF';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = '#DDD6FE';
             (e.currentTarget as HTMLButtonElement).style.color = P;
           }}
           onMouseLeave={e => {
             (e.currentTarget as HTMLButtonElement).style.background = '#fff';
-            (e.currentTarget as HTMLButtonElement).style.borderColor = '#E5E7EB';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = '#E9E5F5';
             (e.currentTarget as HTMLButtonElement).style.color = '#374151';
           }}
         >
@@ -177,18 +177,18 @@ export default function ResumePage() {
               style={{
                 position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 101,
                 width: 420, background: '#fff',
-                boxShadow: '-4px 0 32px rgba(0,0,0,0.12)',
+                boxShadow: '-4px 0 32px rgba(124,58,237,.08)',
                 display: 'flex', flexDirection: 'column',
               }}
             >
               {/* Header */}
               <div style={{
-                padding: '20px 24px', borderBottom: '1px solid #E5E7EB',
+                padding: '20px 24px', borderBottom: '1px solid #E9E5F5',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <History size={16} style={{ color: P }} />
-                  <span style={{ fontSize: 16, fontWeight: 700, color: '#111827', fontFamily: 'Poppins, sans-serif' }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: '#1E1B4B', fontFamily: 'Poppins, sans-serif' }}>
                     Analysis History
                   </span>
                 </div>
@@ -220,23 +220,23 @@ export default function ResumePage() {
                         style={{
                           display: 'flex', alignItems: 'center', gap: 14,
                           padding: '14px 16px', borderRadius: 10,
-                          border: '1px solid #E5E7EB', background: '#fff',
+                          border: '1px solid #E9E5F5', background: '#fff',
                           cursor: 'pointer', textAlign: 'left', width: '100%',
                           transition: 'all .15s',
                         }}
                         onMouseEnter={e => {
-                          (e.currentTarget as HTMLButtonElement).style.background = '#EFF6FF';
-                          (e.currentTarget as HTMLButtonElement).style.borderColor = '#BFDBFE';
+                          (e.currentTarget as HTMLButtonElement).style.background = '#F5F3FF';
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = '#DDD6FE';
                         }}
                         onMouseLeave={e => {
                           (e.currentTarget as HTMLButtonElement).style.background = '#fff';
-                          (e.currentTarget as HTMLButtonElement).style.borderColor = '#E5E7EB';
+                          (e.currentTarget as HTMLButtonElement).style.borderColor = '#E9E5F5';
                         }}
                       >
                         {/* Icon */}
                         <div style={{
                           width: 40, height: 40, borderRadius: 8, flexShrink: 0,
-                          background: '#EFF6FF', border: '1px solid #BFDBFE',
+                          background: '#F5F3FF', border: '1px solid #DDD6FE',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
                           <FileText size={18} style={{ color: P }} />
@@ -245,7 +245,7 @@ export default function ResumePage() {
                         {/* Details */}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{
-                            fontSize: 13, fontWeight: 700, color: '#111827',
+                            fontSize: 13, fontWeight: 700, color: '#1E1B4B',
                             margin: '0 0 4px',
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                           }}>
@@ -298,9 +298,9 @@ export default function ResumePage() {
             transition={{ delay: 0.1 }}
             style={{
               background: '#fff',
-              borderRadius: 10,
-              border: '1px solid #E7E7E7',
-              boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+              borderRadius: 14,
+              border: '1px solid #E9E5F5',
+              boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
               padding: '28px',
               display: 'flex', flexDirection: 'column', gap: 24,
             }}
@@ -318,8 +318,8 @@ export default function ResumePage() {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
                 padding: '36px 24px',
                 border: `2px dashed ${dragOver ? P : file ? '#22c55e' : BORDER}`,
-                borderRadius: 10,
-                background: dragOver ? 'rgba(37,99,235,.04)' : file ? 'rgba(34,197,94,.04)' : '#F9FAFB',
+                borderRadius: 14,
+                background: dragOver ? 'rgba(124,58,237,.04)' : file ? 'rgba(34,197,94,.04)' : '#F8F7FF',
                 cursor: 'pointer',
                 transition: 'all .2s ease',
               }}
@@ -393,7 +393,7 @@ export default function ResumePage() {
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                 width: '100%', padding: '15px 0', borderRadius: 8, border: 'none',
-                background: !file ? '#9CA3AF' : loading ? '#93b7fe' : P,
+                background: !file ? '#9CA3AF' : loading ? '#C4B5FD' : P,
                 color: !file ? '#6B7280' : '#fff',
                 fontSize: 15, fontWeight: 600,
                 cursor: !file || loading ? 'not-allowed' : 'pointer',
@@ -413,16 +413,16 @@ export default function ResumePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             style={{
-              background: '#fff', borderRadius: 10,
-              border: '1px solid #E7E7E7',
-              boxShadow: '0px 2px 5px rgba(0,0,0,0.06)',
+              background: '#fff', borderRadius: 14,
+              border: '1px solid #E9E5F5',
+              boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
               padding: '28px', display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center',
             }}
           >
             {!result ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 0' }}>
-                <div style={{ width: 64, height: 64, borderRadius: 10, background: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <div style={{ width: 64, height: 64, borderRadius: 10, background: '#F8F7FF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
                   <FileText size={28} style={{ opacity: 0.3 }} />
                 </div>
                 <p style={{ fontSize: 15, fontWeight: 600, color: MUTED, margin: '0 0 6px' }}>Your score will appear here</p>
@@ -431,7 +431,7 @@ export default function ResumePage() {
             ) : (() => {
               const score = result.ats_score || 0;
               const grade = score >= 80 ? { label: 'Excellent',  color: '#16a34a', track: '#dcfce7', arc: '#22c55e' }
-                          : score >= 65 ? { label: 'Good',       color: '#2563EB', track: '#DBEAFE', arc: '#3b82f6' }
+                          : score >= 65 ? { label: 'Good',       color: '#7C3AED', track: '#EDE9FE', arc: '#8B5CF6' }
                           : score >= 50 ? { label: 'Fair',        color: '#d97706', track: '#fef3c7', arc: '#f59e0b' }
                           :               { label: 'Needs Work',  color: '#dc2626', track: '#fee2e2', arc: '#ef4444' };
 
@@ -522,7 +522,7 @@ export default function ResumePage() {
                       cursor: 'pointer', display: 'flex', alignItems: 'center',
                       justifyContent: 'center', gap: 6, transition: 'background .15s',
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#DBEAFE')}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#EDE9FE')}
                     onMouseLeave={e => (e.currentTarget.style.background = P_BG)}
                   >
                     View Full Analysis <ChevronDown size={15} />
@@ -555,7 +555,7 @@ export default function ResumePage() {
                 if (hasAny) return null;
                 return (
                   <div style={{
-                    background: '#fff', borderRadius: 10,
+                    background: '#fff', borderRadius: 14,
                     border: '1px solid #FDE68A',
                     padding: '28px 28px',
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -575,8 +575,8 @@ export default function ResumePage() {
 
               {/* ── Section navigator ── */}
               <div style={{
-                background: '#fff', borderRadius: 10,
-                border: '1px solid #E7E7E7',
+                background: '#fff', borderRadius: 14,
+                border: '1px solid #E9E5F5',
                 padding: '12px 20px',
                 display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8,
               }}>
@@ -624,7 +624,7 @@ export default function ResumePage() {
               {result.overall_suggestion && (() => {
                 const parts = parseSuggestion(result.overall_suggestion);
                 return (
-                  <div id="sec-rec" style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 10, padding: '20px 24px' }}>
+                  <div id="sec-rec" style={{ background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: 10, padding: '20px 24px' }}>
                     {/* Header */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                       <div style={{ width: 32, height: 32, borderRadius: 8, background: P, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -635,7 +635,7 @@ export default function ResumePage() {
 
                     {/* Intro paragraph */}
                     {parts.filter(p => p.type === 'intro').map((p, i) => (
-                      <p key={i} style={{ fontSize: 13, color: '#1e40af', lineHeight: 1.7, margin: '0 0 16px' }}>
+                      <p key={i} style={{ fontSize: 13, color: '#5B21B6', lineHeight: 1.7, margin: '0 0 16px' }}>
                         {renderBold(p.body)}
                       </p>
                     ))}
@@ -647,7 +647,7 @@ export default function ResumePage() {
                           <div key={i} style={{
                             display: 'flex', gap: 14, alignItems: 'flex-start',
                             background: '#fff', borderRadius: 8,
-                            border: '1px solid #BFDBFE', padding: '14px 16px',
+                            border: '1px solid #DDD6FE', padding: '14px 16px',
                           }}>
                             <div style={{
                               width: 26, height: 26, borderRadius: 6, flexShrink: 0,
@@ -658,7 +658,7 @@ export default function ResumePage() {
                               {i + 1}
                             </div>
                             <div>
-                              <p style={{ fontSize: 13, fontWeight: 700, color: '#1e3a8a', margin: '0 0 4px' }}>{p.title}</p>
+                              <p style={{ fontSize: 13, fontWeight: 700, color: '#4C1D95', margin: '0 0 4px' }}>{p.title}</p>
                               <p style={{ fontSize: 13, color: '#374151', margin: 0, lineHeight: 1.65 }}>
                                 {renderBold(p.body)}
                               </p>
@@ -675,7 +675,7 @@ export default function ResumePage() {
 
                 {/* Missing keywords */}
                 {result.keyword_gaps && result.keyword_gaps.length > 0 && (
-                  <div id="sec-kw" style={{ background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
+                  <div id="sec-kw" style={{ background: '#fff', borderRadius: 14, border: '1px solid #E9E5F5', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                       <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(217,119,6,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <AlertCircle size={15} color="#d97706" />
@@ -697,7 +697,7 @@ export default function ResumePage() {
 
                 {/* Skills found */}
                 {result.skills_found && result.skills_found.length > 0 && (
-                  <div id="sec-sk" style={{ background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
+                  <div id="sec-sk" style={{ background: '#fff', borderRadius: 14, border: '1px solid #E9E5F5', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                       <div style={{ width: 30, height: 30, borderRadius: 7, background: 'rgba(22,163,74,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <CheckCircle size={15} color="#16a34a" />
@@ -720,7 +720,7 @@ export default function ResumePage() {
 
               {/* Bullet improvements — before/after */}
               {result.weak_bullets && result.weak_bullets.length > 0 && (
-                <div id="sec-bu" style={{ background: '#fff', borderRadius: 10, border: '1px solid #E7E7E7', boxShadow: '0 1px 4px rgba(0,0,0,.05)', overflow: 'hidden' }}>
+                <div id="sec-bu" style={{ background: '#fff', borderRadius: 14, border: '1px solid #E9E5F5', boxShadow: '0 1px 4px rgba(0,0,0,.05)', overflow: 'hidden' }}>
                   <button
                     onClick={() => setShowBullets(!showBullets)}
                     style={{
@@ -745,7 +745,7 @@ export default function ResumePage() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        style={{ borderTop: '1px solid #E7E7E7', padding: '8px 24px 24px' }}
+                        style={{ borderTop: '1px solid #E9E5F5', padding: '8px 24px 24px' }}
                       >
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
                           {result.weak_bullets.map((wb, i) => (
@@ -769,7 +769,7 @@ export default function ResumePage() {
 
               {/* Bias / inclusion warnings */}
               {result.bias_flags && result.bias_flags.length > 0 && (
-                <div id="sec-bi" style={{ background: '#fff', borderRadius: 10, border: '1px solid #FDE68A', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
+                <div id="sec-bi" style={{ background: '#fff', borderRadius: 14, border: '1px solid #FDE68A', boxShadow: '0 1px 4px rgba(0,0,0,.05)', padding: '22px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
                     <div style={{ width: 30, height: 30, borderRadius: 7, background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <AlertCircle size={15} color="#ca8a04" />

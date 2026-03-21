@@ -11,17 +11,20 @@ import { useAuth } from '../context/AuthContext';
 import type { CRIScore, InterviewSession } from '../types';
 import { criAPI, interviewAPI } from '../services/api';
 
-/* ── design tokens ── */
-const P      = '#2563EB';
-const P_D    = '#1D4ED8';
-const P_BG   = '#EFF6FF';
-const P_BD   = '#BFDBFE';
+/* ── premium design tokens ── */
+const P      = '#7C3AED';   // violet-600
+const P_D    = '#6D28D9';   // violet-700
+const P_L    = '#8B5CF6';   // violet-500
+const P_BG   = '#F5F3FF';   // violet-50
+const P_BD   = '#DDD6FE';   // violet-200
 const BG     = '#FFFFFF';
-const BG_ALT = '#F9FAFB';
-const TEXT   = '#111827';
-const TEXT2  = '#374151';
+const BG_PAGE= '#F8F7FF';   // warm-tinted page
+const TEXT   = '#1E1B4B';   // indigo-950
+const TEXT2  = '#4338CA';   // indigo-700
 const MUTED  = '#6B7280';
-const BORDER = '#E5E7EB';
+const BORDER = '#E9E5F5';   // soft violet-tinted border
+const CARD_S = '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)';
+const HERO_BG= 'linear-gradient(135deg, #1E1B4B 0%, #312E81 40%, #4C1D95 100%)';
 
 const quickActions = [
   { icon: FileSearch, label: 'Resume Analysis', path: '/resume' },
@@ -39,8 +42,8 @@ const mockCRI: CRIScore = {
 };
 
 const scoreColor = (s: number) => s >= 70 ? '#16a34a' : s >= 50 ? '#d97706' : '#dc2626';
-const scoreBg    = (s: number) => s >= 70 ? 'rgba(22,163,74,.1)' : s >= 50 ? 'rgba(217,119,6,.1)' : 'rgba(220,38,38,.1)';
-const difficultyColor = (d: string) => d === 'Advanced' ? P : d === 'Intermediate' ? TEXT2 : MUTED;
+const scoreBg    = (s: number) => s >= 70 ? 'rgba(22,163,74,.08)' : s >= 50 ? 'rgba(217,119,6,.08)' : 'rgba(220,38,38,.08)';
+const difficultyColor = (d: string) => d === 'Advanced' ? P : d === 'Intermediate' ? '#4338CA' : MUTED;
 
 /* ── mini sparkline data ── */
 const sparkPoints = [52, 58, 61, 55, 65, 68, 72];
@@ -125,7 +128,7 @@ export default function DashboardPage() {
   const statCards = getStatCards(cri);
 
   return (
-    <div style={{ padding: '32px 32px 64px', maxWidth: 1320, margin: '0 auto', background: BG_ALT, minHeight: '100vh' }}>
+    <div style={{ padding: '32px 32px 64px', maxWidth: 1320, margin: '0 auto', background: BG_PAGE, minHeight: '100vh' }}>
 
       {/* ══ Hero banner ══════════════════════════════════════ */}
       <motion.div
@@ -134,31 +137,36 @@ export default function DashboardPage() {
         style={{
           position: 'relative',
           marginBottom: 36,
-          padding: '32px 36px',
-          background: '#111827',
+          padding: '36px 40px',
+          background: HERO_BG,
           border: 'none',
-          borderRadius: 12,
-          boxShadow: '0 4px 16px rgba(27,43,30,.25)',
+          borderRadius: 16,
+          boxShadow: '0 8px 32px rgba(30,27,75,.25)',
+          overflow: 'hidden',
         }}
       >
+        {/* Decorative gradient orbs */}
+        <div style={{ position: 'absolute', width: 260, height: 260, borderRadius: '50%', background: 'rgba(139,92,246,.15)', filter: 'blur(80px)', top: -60, right: -40, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', background: 'rgba(99,102,241,.1)', filter: 'blur(60px)', bottom: -50, left: 60, pointerEvents: 'none' }} />
+
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
           <div>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
-              background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
-              padding: '4px 12px', marginBottom: 14, borderRadius: 20,
-              fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
-              letterSpacing: '.08em', textTransform: 'uppercase' as const, fontFamily: 'monospace',
+              background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(167,139,250,0.3)',
+              padding: '4px 14px', marginBottom: 14, borderRadius: 20,
+              fontSize: 11, fontWeight: 700, color: '#C4B5FD',
+              letterSpacing: '.08em', textTransform: 'uppercase' as const,
             }}>
               <Sparkles size={11} />
-              Intelligent Career Studio
+              Career Intelligence
             </div>
-            <h2 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 26, fontWeight: 800, color: '#fff', margin: '0 0 8px', lineHeight: 1.25 }}>
+            <h2 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 28, fontWeight: 800, color: '#fff', margin: '0 0 8px', lineHeight: 1.2, letterSpacing: '-0.5px' }}>
               Welcome back,{' '}
-              <span style={{ color: '#93C5FD' }}>{user?.full_name || 'User'}</span>
+              <span style={{ background: 'linear-gradient(135deg, #C4B5FD, #818CF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.full_name || 'User'}</span>
             </h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', margin: 0, maxWidth: 460 }}>
-              Your career readiness score is <strong style={{ color: '#fff' }}>{cri.cri_total}%</strong> — keep pushing. Here's today's overview.
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', margin: 0, maxWidth: 460 }}>
+              Your career readiness score is <strong style={{ color: '#C4B5FD' }}>{cri.cri_total}%</strong> — keep pushing. Here's today's overview.
             </p>
           </div>
 
@@ -168,14 +176,17 @@ export default function DashboardPage() {
             onMouseLeave={() => setHoveredCTA(false)}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '11px 22px',
-              background: '#fff',
-              color: '#111827', fontWeight: 700, fontSize: 14,
+              padding: '12px 24px',
+              background: hoveredCTA ? '#fff' : 'rgba(255,255,255,.95)',
+              color: '#1E1B4B', fontWeight: 700, fontSize: 14,
               textDecoration: 'none',
               border: 'none',
-              borderRadius: 8,
-              transition: 'opacity .18s',
+              borderRadius: 10,
+              transition: 'all .2s',
               flexShrink: 0,
+              boxShadow: hoveredCTA ? '0 4px 20px rgba(139,92,246,.3)' : '0 2px 8px rgba(0,0,0,.1)',
+              transform: hoveredCTA ? 'translateY(-1px)' : 'none',
+              letterSpacing: '-0.01em',
             }}
           >
             <Zap size={16} />
@@ -200,14 +211,19 @@ export default function DashboardPage() {
             style={{
               background: BG,
               border: `1px solid ${BORDER}`,
-              borderRadius: 12,
+              borderRadius: 14,
               padding: '24px 24px 22px',
-              boxShadow: '0 1px 4px rgba(0,0,0,.05)',
+              boxShadow: CARD_S,
+              position: 'relative',
+              overflow: 'hidden',
             }}
           >
+            {/* Subtle top accent line */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${P_L}, ${P_D})`, opacity: 0.5 }} />
+
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
               <div style={{
-                width: 40, height: 40, borderRadius: 10,
+                width: 42, height: 42, borderRadius: 11,
                 background: P_BG, border: `1px solid ${P_BD}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
@@ -216,7 +232,7 @@ export default function DashboardPage() {
               {card.trend !== undefined && (
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 4,
-                  background: 'rgba(22,163,74,.1)', borderRadius: 6,
+                  background: 'rgba(22,163,74,.08)', borderRadius: 6,
                   padding: '3px 8px', fontSize: 11, fontWeight: 700, color: '#16a34a',
                 }}>
                   <TrendingUp size={11} />
@@ -228,7 +244,7 @@ export default function DashboardPage() {
             <div style={{ marginBottom: 6 }}>
               <p style={{ fontSize: 12, color: MUTED, fontWeight: 500, margin: '0 0 4px', letterSpacing: '.01em' }}>{card.label}</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-                <span style={{ fontSize: 32, fontWeight: 800, color: TEXT, fontFamily: 'Poppins, sans-serif', lineHeight: 1 }}>
+                <span style={{ fontSize: 34, fontWeight: 800, color: TEXT, fontFamily: 'Poppins, sans-serif', lineHeight: 1, letterSpacing: '-0.02em' }}>
                   {card.value}
                 </span>
                 <span style={{ fontSize: 16, fontWeight: 700, color: MUTED }}>{card.unit}</span>
@@ -237,7 +253,7 @@ export default function DashboardPage() {
 
             {card.sparkline && (
               <svg width={80} height={32} style={{ marginBottom: 6, display: 'block' }}>
-                <path d={sparkPath} fill="none" stroke={P} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                <path d={sparkPath} fill="none" stroke={P_L} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             )}
 
@@ -259,8 +275,8 @@ export default function DashboardPage() {
           <div style={{
             background: BG,
             border: `1px solid ${BORDER}`,
-            borderRadius: 10,
-            boxShadow: '0 1px 3px rgba(0,0,0,.04)',
+            borderRadius: 14,
+            boxShadow: CARD_S,
             overflow: 'hidden',
           }}>
             <div style={{
@@ -269,11 +285,11 @@ export default function DashboardPage() {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: P_D, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 3px', fontFamily: 'monospace' }}>Readiness Index</p>
-                <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0 }}>CRI Breakdown</h3>
+                <p style={{ fontSize: 10, fontWeight: 700, color: P_L, textTransform: 'uppercase' as const, letterSpacing: '.1em', margin: '0 0 3px' }}>Readiness Index</p>
+                <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0, letterSpacing: '-0.01em' }}>CRI Breakdown</h3>
               </div>
               <div style={{
-                width: 32, height: 32, borderRadius: 8,
+                width: 34, height: 34, borderRadius: 9,
                 background: P_BG, border: `1px solid ${P_BD}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
@@ -314,12 +330,12 @@ export default function DashboardPage() {
                       <span style={{ fontSize: 12, fontWeight: 600, color: TEXT2 }}>{bar.label}</span>
                       <span style={{ fontSize: 12, fontWeight: 700, color: TEXT }}>{bar.value}%</span>
                     </div>
-                    <div style={{ height: 6, background: BG_ALT, border: `1px solid ${BORDER}` }}>
+                    <div style={{ height: 6, background: P_BG, border: `1px solid ${BORDER}`, borderRadius: 3 }}>
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${bar.value}%` }}
                         transition={{ duration: 1.1, ease: 'easeOut', delay: 0.4 }}
-                        style={{ height: '100%', background: P }}
+                        style={{ height: '100%', background: `linear-gradient(90deg, ${P}, ${P_L})`, borderRadius: 3 }}
                       />
                     </div>
                   </div>
@@ -355,8 +371,8 @@ export default function DashboardPage() {
             <div style={{
               background: BG,
               border: `1px solid ${BORDER}`,
-              borderRadius: 10,
-              boxShadow: '0 1px 3px rgba(0,0,0,.04)',
+              borderRadius: 14,
+              boxShadow: CARD_S,
               overflow: 'hidden',
             }}>
               <div style={{
@@ -365,8 +381,8 @@ export default function DashboardPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: P_D, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 3px', fontFamily: 'monospace' }}>Jump Right In</p>
-                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0 }}>Quick Actions</h3>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: P_L, textTransform: 'uppercase' as const, letterSpacing: '.1em', margin: '0 0 3px' }}>Jump Right In</p>
+                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0, letterSpacing: '-0.01em' }}>Quick Actions</h3>
                 </div>
                 <Zap size={16} style={{ color: '#F59E0B' }} />
               </div>
@@ -381,20 +397,22 @@ export default function DashboardPage() {
                     style={{
                       padding: '20px 12px 16px',
                       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
-                      textDecoration: 'none', borderRadius: 10,
-                      background: hoveredAction === a.label ? P_BG : BG_ALT,
+                      textDecoration: 'none', borderRadius: 12,
+                      background: hoveredAction === a.label ? P_BG : BG_PAGE,
                       border: `1px solid ${hoveredAction === a.label ? P_BD : BORDER}`,
-                      transition: 'all .18s',
+                      transition: 'all .2s',
+                      transform: hoveredAction === a.label ? 'translateY(-2px)' : 'none',
+                      boxShadow: hoveredAction === a.label ? '0 4px 16px rgba(124,58,237,.1)' : 'none',
                     }}
                   >
                     <div style={{
-                      width: 44, height: 44, borderRadius: 10,
-                      background: hoveredAction === a.label ? P : P_BG,
+                      width: 44, height: 44, borderRadius: 11,
+                      background: hoveredAction === a.label ? `linear-gradient(135deg, ${P}, ${P_L})` : P_BG,
                       border: `1px solid ${P_BD}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'background .18s',
+                      transition: 'all .2s',
                     }}>
-                      <a.icon size={20} style={{ color: hoveredAction === a.label ? '#fff' : P, transition: 'color .18s' }} />
+                      <a.icon size={20} style={{ color: hoveredAction === a.label ? '#fff' : P, transition: 'color .2s' }} />
                     </div>
                     <span style={{ fontSize: 11, fontWeight: 600, color: TEXT, textAlign: 'center' as const, lineHeight: 1.4 }}>
                       {a.label}
@@ -414,8 +432,8 @@ export default function DashboardPage() {
             <div style={{
               background: BG,
               border: `1px solid ${BORDER}`,
-              borderRadius: 10,
-              boxShadow: '0 1px 3px rgba(0,0,0,.04)',
+              borderRadius: 14,
+              boxShadow: CARD_S,
               overflow: 'hidden',
             }}>
               <div style={{
@@ -424,18 +442,19 @@ export default function DashboardPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: P_D, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 3px', fontFamily: 'monospace' }}>Interview History</p>
-                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0 }}>Recent Sessions</h3>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: P_L, textTransform: 'uppercase' as const, letterSpacing: '.1em', margin: '0 0 3px' }}>Interview History</p>
+                  <h3 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 16, fontWeight: 700, color: TEXT, margin: 0, letterSpacing: '-0.01em' }}>Recent Sessions</h3>
                 </div>
                 <Link
                   to="/history"
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 5,
-                    padding: '6px 14px', borderRadius: 6,
+                    padding: '6px 14px', borderRadius: 8,
                     background: P_BG, color: P,
                     fontWeight: 600, fontSize: 12,
                     textDecoration: 'none',
                     border: `1px solid ${P_BD}`,
+                    transition: 'all .15s',
                   }}
                 >
                   View All <ArrowRight size={12} />
@@ -499,7 +518,7 @@ export default function DashboardPage() {
                           </span>
                           <span style={{
                             padding: '2px 8px', fontSize: 11, fontWeight: 600, borderRadius: 4,
-                            background: BG_ALT,
+                            background: BG_PAGE,
                             color: difficultyColor(s.difficulty),
                             border: `1px solid ${BORDER}`,
                           }}>
@@ -543,19 +562,24 @@ export default function DashboardPage() {
           transition={{ delay: 0.5 }}
         >
           <div style={{
-            background: '#111827',
+            background: HERO_BG,
             border: 'none',
-            borderRadius: 12,
+            borderRadius: 16,
             padding: '28px 28px 24px',
-            boxShadow: '0 4px 16px rgba(27,43,30,.2)',
+            boxShadow: '0 8px 32px rgba(30,27,75,.2)',
+            position: 'relative',
+            overflow: 'hidden',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Zap size={16} style={{ color: '#fff' }} />
+            {/* Decorative orb */}
+            <div style={{ position: 'absolute', width: 120, height: 120, borderRadius: '50%', background: 'rgba(139,92,246,.12)', filter: 'blur(40px)', top: -20, right: -10, pointerEvents: 'none' }} />
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18, position: 'relative' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 9, background: 'rgba(139,92,246,0.2)', border: '1px solid rgba(167,139,250,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Zap size={16} style={{ color: '#C4B5FD' }} />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.45)', textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: 0, fontFamily: 'monospace' }}>This Week</p>
-                <h4 style={{ fontFamily: 'Poppins, sans-serif', color: '#fff', fontSize: 15, fontWeight: 700, margin: 0 }}>Practice Streak</h4>
+                <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(196,181,253,.5)', textTransform: 'uppercase' as const, letterSpacing: '.1em', margin: 0 }}>This Week</p>
+                <h4 style={{ fontFamily: 'Poppins, sans-serif', color: '#fff', fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: '-0.01em' }}>Practice Streak</h4>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
@@ -564,19 +588,20 @@ export default function DashboardPage() {
                 return (
                   <div key={day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
                     <div style={{
-                      width: '100%', aspectRatio: '1', minWidth: 0,
-                      background: done ? P : 'rgba(255,255,255,.08)',
-                      border: done ? `1px solid ${P_D}` : '1px solid rgba(255,255,255,.12)',
+                      width: '100%', aspectRatio: '1', minWidth: 0, borderRadius: 6,
+                      background: done ? `linear-gradient(135deg, ${P}, ${P_L})` : 'rgba(255,255,255,.06)',
+                      border: done ? '1px solid rgba(139,92,246,.4)' : '1px solid rgba(255,255,255,.08)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: done ? '0 2px 8px rgba(139,92,246,.3)' : 'none',
                     }}>
                       {done && <span style={{ fontSize: 11, color: '#fff' }}>✓</span>}
                     </div>
-                    <span style={{ fontSize: 9, fontWeight: 600, color: done ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.35)', letterSpacing: '.02em' }}>{day}</span>
+                    <span style={{ fontSize: 9, fontWeight: 600, color: done ? '#C4B5FD' : 'rgba(255,255,255,.3)', letterSpacing: '.02em' }}>{day}</span>
                   </div>
                 );
               })}
             </div>
-            <p style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,.5)', margin: '14px 0 0' }}>
+            <p style={{ marginTop: 14, fontSize: 12, color: 'rgba(196,181,253,.45)', margin: '14px 0 0' }}>
               {streakCount > 0 ? `${streakCount}-day streak — keep it going!` : 'No activity yet — start today!'}
             </p>
           </div>
@@ -591,17 +616,17 @@ export default function DashboardPage() {
           <div style={{
             background: BG,
             border: `1px solid ${BORDER}`,
-            borderRadius: 12,
+            borderRadius: 16,
             padding: '28px 28px 24px',
-            boxShadow: '0 1px 4px rgba(0,0,0,.05)',
+            boxShadow: CARD_S,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: P_BG, border: `1px solid ${P_BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 9, background: P_BG, border: `1px solid ${P_BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Sparkles size={16} style={{ color: P }} />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: P_D, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: 0, fontFamily: 'monospace' }}>Smart Insight</p>
-                <h4 style={{ fontFamily: 'Poppins, sans-serif', color: TEXT, fontSize: 15, fontWeight: 700, margin: 0 }}>Today's Tip</h4>
+                <p style={{ fontSize: 10, fontWeight: 700, color: P_L, textTransform: 'uppercase' as const, letterSpacing: '.1em', margin: 0 }}>Smart Insight</p>
+                <h4 style={{ fontFamily: 'Poppins, sans-serif', color: TEXT, fontSize: 15, fontWeight: 700, margin: 0, letterSpacing: '-0.01em' }}>Today's Tip</h4>
               </div>
             </div>
 

@@ -6,20 +6,20 @@ import {
 } from 'lucide-react';
 
 // ── Design tokens ──────────────────────────────────────────────
-// Single-hue system: enterprise blue (Microsoft Fluent / Google Material)
-const P      = '#2563EB';   // primary blue
-const P_D    = '#1D4ED8';   // primary dark (hover)
-const P_BG   = '#EFF6FF';   // primary tint bg
-const P_BD   = '#BFDBFE';   // primary tint border
+// Deep Indigo + Luminous Violet premium system
+const P      = '#7C3AED';   // primary violet
+const P_D    = '#6D28D9';   // primary dark (hover)
+const P_BG   = '#F5F3FF';   // primary tint bg
+const P_BD   = '#DDD6FE';   // primary tint border
 
 const BG     = '#FFFFFF';
-const BG_ALT = '#F9FAFB';   // neutral-50
-const TEXT   = '#111827';   // slate-950
+const BG_ALT = '#F8F7FF';   // neutral-50
+const TEXT   = '#1E1B4B';   // slate-950
 const TEXT2  = '#374151';   // slate-700
 const MUTED  = '#6B7280';   // slate-500
-const BORDER = '#E5E7EB';   // slate-200
-const NAVY   = '#111827';   // CTA bg
-const NAVY2  = '#111827';   // footer bg
+const BORDER = '#E9E5F5';   // slate-200
+const NAVY   = '#1E1B4B';   // CTA bg
+const NAVY2  = '#1E1B4B';   // footer bg
 
 // ── Feature data ───────────────────────────────────────────────
 const features = [
@@ -406,7 +406,7 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ background: '#0A0F1E', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <footer style={{ background: '#0F0B1E', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         {/* Main footer grid */}
         <div className="container" style={{ padding: '64px 32px 48px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '40px 48px' }}>
@@ -415,6 +415,7 @@ export default function LandingPage() {
             <div style={{ gridColumn: 'span 1', minWidth: 180 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
                 <img src="/logo.png" alt="Elevra" style={{ height: 28, width: 'auto', display: 'block' }} />
+                <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em' }}>Elevra</span>
               </div>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', lineHeight: 1.7, maxWidth: 220 }}>
                 Career preparation built for the modern job market.
@@ -423,31 +424,48 @@ export default function LandingPage() {
 
             {/* Product col */}
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', textTransform: 'uppercase' as const, fontFamily: 'monospace', marginBottom: 16 }}>Product</p>
-              {['Resume Analysis', 'Mock Interviews', 'Learning Roadmap', 'Job Matching', 'Interview History'].map(item => (
-                <a key={item} href="#" style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 10, transition: 'color .15s' }}
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', textTransform: 'uppercase' as const, fontFamily: 'Inter, sans-serif', marginBottom: 16 }}>Product</p>
+              {[
+                { label: 'Resume Analysis', to: '/resume' },
+                { label: 'Mock Interviews', to: '/interview/setup' },
+                { label: 'Learning Roadmap', to: '/roadmap/history' },
+                { label: 'Job Matching', to: '/jobs' },
+                { label: 'Interview History', to: '/history' },
+              ].map(item => (
+                <Link key={item.label} to={item.to} style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 10, transition: 'color .15s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.4)'; }}>
-                  {item}
-                </a>
+                  {item.label}
+                </Link>
               ))}
             </div>
 
             {/* Company col */}
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', textTransform: 'uppercase' as const, fontFamily: 'monospace', marginBottom: 16 }}>Company</p>
-              {['About', 'Careers', 'Blog', 'Press'].map(item => (
-                <a key={item} href="#" style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 10, transition: 'color .15s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.4)'; }}>
-                  {item}
-                </a>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', textTransform: 'uppercase' as const, fontFamily: 'Inter, sans-serif', marginBottom: 16 }}>Company</p>
+              {[
+                { label: 'Dashboard', to: '/dashboard' },
+                { label: 'Applications', to: '/applications' },
+                { label: 'About', to: '#features' },
+                { label: 'How It Works', to: '#how-it-works' },
+              ].map(item => (
+                item.to.startsWith('#')
+                  ? <a key={item.label} href={item.to} style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 10, transition: 'color .15s' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+                      {item.label}
+                    </a>
+                  : <Link key={item.label} to={item.to} style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 10, transition: 'color .15s' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+                      {item.label}
+                    </Link>
               ))}
             </div>
 
             {/* Legal col */}
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', textTransform: 'uppercase' as const, fontFamily: 'monospace', marginBottom: 16 }}>Legal</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em', textTransform: 'uppercase' as const, fontFamily: 'Inter, sans-serif', marginBottom: 16 }}>Legal</p>
               {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'Security'].map(item => (
                 <a key={item} href="#" style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginBottom: 10, transition: 'color .15s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}
