@@ -75,16 +75,39 @@ export default function ReplayPlayer({
     const video = videoRef.current;
     if (!video) return;
 
+    let durationProbed = false;
+
     const trySetDuration = () => {
       const d = video.duration;
-      if (isFinite(d) && d > 0) setDuration(d);
+      if (isFinite(d) && d > 0) { setDuration(d); durationProbed = true; }
     };
+
+    // Chromium workaround: raw MediaRecorder WebM files report Infinity
+    // duration because the Cues index is at the tail of the file.  Seeking
+    // to a huge value forces the browser to discover the real length, then
+    // we seek back to the original position.
+    const probeDuration = () => {
+      if (durationProbed) return;
+      const d = video.duration;
+      if (isFinite(d) && d > 0) { setDuration(d); durationProbed = true; return; }
+      // Only probe once: seek to a large time; the browser will clamp to
+      // the real end and fire `durationchange` + `timeupdate`.
+      const savedTime = video.currentTime;
+      const onSeeked = () => {
+        video.removeEventListener('seeked', onSeeked);
+        const realDur = video.duration;
+        if (isFinite(realDur) && realDur > 0) { setDuration(realDur); durationProbed = true; }
+        // Seek back to where the user was (or the start).
+        video.currentTime = savedTime;
+      };
+      video.addEventListener('seeked', onSeeked);
+      video.currentTime = 1e10;
+    };
+
     const onTimeUpdate = () => {
       setCurrentTime(video.currentTime);
-      // Re-check duration on every tick — for raw MediaRecorder WebM files
-      // duration starts as Infinity and becomes finite once enough is buffered.
       const d = video.duration;
-      if (isFinite(d) && d > 0) setDuration(d);
+      if (isFinite(d) && d > 0 && !durationProbed) { setDuration(d); durationProbed = true; }
       setActiveFeedback(feedbackTimestamps.filter((f) => Math.abs(f.time_seconds - video.currentTime) < 2));
     };
     const onEnded = () => setIsPlaying(false);
@@ -94,6 +117,8 @@ export default function ReplayPlayer({
     video.addEventListener('durationchange', trySetDuration);
     video.addEventListener('canplay',        trySetDuration);
     video.addEventListener('ended',          onEnded);
+    // Trigger the Infinity-duration workaround once enough data is buffered
+    video.addEventListener('loadeddata',     probeDuration);
     // Also try immediately in case already loaded
     trySetDuration();
 
@@ -103,6 +128,7 @@ export default function ReplayPlayer({
       video.removeEventListener('durationchange', trySetDuration);
       video.removeEventListener('canplay',        trySetDuration);
       video.removeEventListener('ended',          onEnded);
+      video.removeEventListener('loadeddata',     probeDuration);
     };
   }, [feedbackTimestamps]);
 

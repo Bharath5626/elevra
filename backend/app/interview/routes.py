@@ -143,12 +143,15 @@ async def upload_answer(
     import subprocess as _sp
     try:
         _sp.run(
-            ["ffmpeg", "-y", "-i", raw_path, "-c", "copy", tmp_path],
+            ["ffmpeg", "-y", "-fflags", "+genpts", "-i", raw_path,
+             "-c", "copy", "-f", "webm", tmp_path],
             check=True, timeout=60,
             stdout=_sp.DEVNULL, stderr=_sp.DEVNULL,
         )
         os.remove(raw_path)
-    except Exception:
+        logger.info("Upload remux OK: %s", tmp_path)
+    except Exception as exc:
+        logger.warning("Upload remux failed (%s), using raw file", exc)
         # ffmpeg unavailable or failed — fall back to the raw file
         os.rename(raw_path, tmp_path)
 
@@ -302,14 +305,32 @@ async def stream_video(
     base, ext = os.path.splitext(raw_path)
     remuxed_path = base + "_remuxed" + ext
 
-    if not os.path.exists(remuxed_path):
+    def _has_duration(path: str) -> bool:
+        """Return True if ffprobe can read a finite duration from the file."""
+        try:
+            r = _sp.run(
+                ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                 "-of", "default=noprint_wrappers=1:nokey=1", path],
+                capture_output=True, text=True, timeout=30,
+            )
+            val = (r.stdout or "").strip()
+            return val not in ("", "N/A") and float(val) > 0
+        except Exception:
+            return False
+
+    # Only remux if the remuxed file doesn't exist or lacks a valid duration
+    need_remux = not os.path.exists(remuxed_path) or not _has_duration(remuxed_path)
+    if need_remux:
         try:
             _sp.run(
-                ["ffmpeg", "-y", "-i", raw_path, "-c", "copy", remuxed_path],
+                ["ffmpeg", "-y", "-fflags", "+genpts", "-i", raw_path,
+                 "-c", "copy", "-f", "webm", remuxed_path],
                 check=True, timeout=120,
                 stdout=_sp.DEVNULL, stderr=_sp.DEVNULL,
             )
-        except Exception:
+            logger.info("Remuxed video for seeking: %s", remuxed_path)
+        except Exception as exc:
+            logger.warning("ffmpeg remux failed (%s), serving raw file", exc)
             remuxed_path = raw_path  # ffmpeg unavailable — serve original as fallback
 
     file_path = remuxed_path if os.path.exists(remuxed_path) else raw_path
