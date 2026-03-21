@@ -414,10 +414,7 @@ export default function LandingPage() {
             {/* Brand col */}
             <div style={{ gridColumn: 'span 1', minWidth: 180 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
-                <div style={{ width: 28, height: 28, background: P, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ color: '#fff', fontSize: 13, fontWeight: 900, fontFamily: 'Poppins, sans-serif' }}>E</span>
-                </div>
-                <span style={{ color: '#fff', fontWeight: 700, fontSize: 15, fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.3px' }}>elevra</span>
+                <img src="/logo.png" alt="Elevra" style={{ height: 28, width: 'auto', display: 'block' }} />
               </div>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', lineHeight: 1.7, maxWidth: 220 }}>
                 Career preparation built for the modern job market.

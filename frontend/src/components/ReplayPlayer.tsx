@@ -18,6 +18,7 @@ export default function ReplayPlayer({
 }: ReplayPlayerProps) {
   const videoRef     = useRef<HTMLVideoElement>(null);
   const timelineRef  = useRef<HTMLDivElement>(null);
+  const isDragging   = useRef(false);
 
   const [isPlaying,      setIsPlaying]      = useState(false);
   const [currentTime,    setCurrentTime]    = useState(0);
@@ -39,13 +40,32 @@ export default function ReplayPlayer({
     setIsMuted(!isMuted);
   }, [isMuted]);
 
-  const seekTo = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!videoRef.current || !timelineRef.current || !duration || !isFinite(duration)) return;
+  /** Resolve a mouse/touch X position to a video time and seek there */
+  const seekFromClientX = useCallback((clientX: number) => {
+    if (!videoRef.current || !timelineRef.current) return;
+    const dur = videoRef.current.duration;
+    if (!isFinite(dur) || dur <= 0) return;
     const rect  = timelineRef.current.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const target = ratio * duration;
-    if (isFinite(target)) videoRef.current.currentTime = target;
-  }, [duration]);
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    videoRef.current.currentTime = ratio * dur;
+  }, []);
+
+  const handleTimelineMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    isDragging.current = true;
+    seekFromClientX(e.clientX);
+
+    const onMove = (ev: MouseEvent) => {
+      if (isDragging.current) seekFromClientX(ev.clientX);
+    };
+    const onUp = () => {
+      isDragging.current = false;
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup',   onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup',   onUp);
+  }, [seekFromClientX]);
 
   const toggleFullscreen = useCallback(() => {
     videoRef.current?.requestFullscreen();
@@ -55,28 +75,51 @@ export default function ReplayPlayer({
     const video = videoRef.current;
     if (!video) return;
 
-    const onTimeUpdate = () => {
-      const t = video.currentTime;
-      setCurrentTime(t);
-      setActiveFeedback(feedbackTimestamps.filter((f) => Math.abs(f.time_seconds - t) < 2));
+    const trySetDuration = () => {
+      const d = video.duration;
+      if (isFinite(d) && d > 0) setDuration(d);
     };
-    const onLoaded = () => { if (isFinite(video.duration) && video.duration > 0) setDuration(video.duration); };
-    const onEnded  = () => setIsPlaying(false);
+    const onTimeUpdate = () => {
+      setCurrentTime(video.currentTime);
+      // Re-check duration on every tick — for raw MediaRecorder WebM files
+      // duration starts as Infinity and becomes finite once enough is buffered.
+      const d = video.duration;
+      if (isFinite(d) && d > 0) setDuration(d);
+      setActiveFeedback(feedbackTimestamps.filter((f) => Math.abs(f.time_seconds - video.currentTime) < 2));
+    };
+    const onEnded = () => setIsPlaying(false);
 
     video.addEventListener('timeupdate',     onTimeUpdate);
-    video.addEventListener('loadedmetadata', onLoaded);
-    video.addEventListener('durationchange', onLoaded);
+    video.addEventListener('loadedmetadata', trySetDuration);
+    video.addEventListener('durationchange', trySetDuration);
+    video.addEventListener('canplay',        trySetDuration);
     video.addEventListener('ended',          onEnded);
+    // Also try immediately in case already loaded
+    trySetDuration();
+
     return () => {
       video.removeEventListener('timeupdate',     onTimeUpdate);
-      video.removeEventListener('loadedmetadata', onLoaded);
-      video.removeEventListener('durationchange', onLoaded);
+      video.removeEventListener('loadedmetadata', trySetDuration);
+      video.removeEventListener('durationchange', trySetDuration);
+      video.removeEventListener('canplay',        trySetDuration);
       video.removeEventListener('ended',          onEnded);
     };
   }, [feedbackTimestamps]);
 
-  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const fmt = (s: number) =>
+    isFinite(s) && s > 0
+      ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
+      : '0:00';
+  const fmtDuration = (s: number) =>
+    isFinite(s) && s > 0
+      ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
+      : '--:--';
+  // Use video element's live duration as the ground truth to avoid stale-state lag
+  const rawDuration = videoRef.current?.duration ?? duration;
+  const liveDuration = isFinite(rawDuration) && rawDuration > 0 ? rawDuration : duration;
+  const progress = (liveDuration > 0 && isFinite(liveDuration))
+    ? Math.min(100, (currentTime / liveDuration) * 100)
+    : 0;
 
   /* --- styles ------------------------------------------- */
   const ctrl: React.CSSProperties = {
@@ -124,10 +167,10 @@ export default function ReplayPlayer({
         <div style={{ padding: '12px 16px 0' }}>
           <div
             ref={timelineRef}
-            onClick={seekTo}
+            onMouseDown={handleTimelineMouseDown}
             style={{
               position: 'relative', width: '100%', height: 10,
-              borderRadius: 99, cursor: 'pointer',
+              borderRadius: 99, cursor: 'pointer', userSelect: 'none',
               backgroundColor: 'rgba(148,163,184,.15)',
             }}
           >
@@ -188,7 +231,7 @@ export default function ReplayPlayer({
             <button onClick={togglePlay}  style={ctrl}>{isPlaying ? <Pause size={18} /> : <Play size={18} />}</button>
             <button onClick={toggleMute}  style={ctrl}>{isMuted   ? <VolumeX size={18} /> : <Volume2 size={18} />}</button>
             <span style={{ fontSize: 12, fontFamily: 'monospace', color: 'rgba(226,232,240,.5)', marginLeft: 4 }}>
-              {fmt(currentTime)} / {fmt(duration)}
+              {fmt(currentTime)} / {fmtDuration(duration)}
             </span>
           </div>
 

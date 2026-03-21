@@ -122,6 +122,15 @@ async def migrate():
             ALTER TABLE users
               ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN NOT NULL DEFAULT FALSE;
         """))
+        # ── Code editor answer (coding questions) ──────────────────────────────
+        await conn.execute(text("""
+            ALTER TABLE interview_answers
+              ADD COLUMN IF NOT EXISTS code_text TEXT;
+        """))
+        await conn.execute(text("""
+            ALTER TABLE interview_answers
+              ADD COLUMN IF NOT EXISTS code_correctness_score INTEGER;
+        """))
     print("Migration complete.")
 
 

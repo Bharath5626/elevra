@@ -193,6 +193,8 @@ export default function InterviewSetupPage() {
   const [uploadError, setUploadError]   = useState('');
   const [loading, setLoading]           = useState(false);
   const [error, setError]               = useState('');
+  const [showTips, setShowTips]         = useState(false);
+  const [pendingSession, setPendingSession] = useState<string | null>(null);
 
   /* filter suggestions — starts-with matches first, then contains */
   const suggestions = jobRole.trim().length === 0
@@ -277,7 +279,8 @@ export default function InterviewSetupPage() {
     setLoading(true); setError('');
     try {
       const session = await interviewAPI.startSession(selectedResume, jobRole.trim(), difficulty);
-      navigate(`/interview/${session.id}/session`);
+      setPendingSession(session.id);
+      setShowTips(true);
     } catch {
       setError('Failed to start session. Make sure the backend is running.');
     } finally {
@@ -285,252 +288,336 @@ export default function InterviewSetupPage() {
     }
   };
 
-  return (
-    <div style={{ padding: '24px 28px 48px', maxWidth: 760, margin: '0 auto' }}>
+  const handleEnterInterview = () => {
+    if (pendingSession) navigate(`/interview/${pendingSession}/session`);
+  };
 
-      {/* Header */}
-      <motion.div {...fadeUp(0)} style={{ marginBottom: 40 }}>
-        <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 30, fontWeight: 700, color: TEXT, marginBottom: 8 }}>
+  const TIPS = [
+    { emoji: '👁️', title: 'Eye contact', body: 'Look directly into the camera lens, not at your own face on screen. It feels like eye contact to the interviewer.' },
+    { emoji: '🌟', title: 'STAR method', body: 'For behavioral questions: Situation → Task → Action → Result. Keep each part concise.' },
+    { emoji: '🎙️', title: 'Speak clearly', body: 'Talk at a steady, confident pace. Pausing to think is perfectly fine — silence is better than filler words.' },
+    { emoji: '⏱️', title: 'Watch the timer', body: 'Each question shows a suggested duration. Going slightly over is okay, but don\'t rush to fill time either.' },
+    { emoji: '💡', title: 'Think out loud', body: 'For technical questions, narrate your thought process. Interviewers value reasoning, not just the final answer.' },
+    { emoji: '📷', title: 'Camera & lighting', body: 'Make sure your face is well-lit and the camera is at eye level. A plain background helps the AI track you accurately.' },
+  ];
+
+  return (
+    <>
+    {/* ── Pre-interview tips modal ──────────────────────── */}
+    {showTips && (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+      }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          style={{
+            background: '#fff', borderRadius: 20,
+            boxShadow: '0 24px 64px rgba(0,0,0,.2)',
+            width: '100%', maxWidth: 580,
+            overflow: 'hidden',
+          }}
+        >
+          {/* Header */}
+          <div style={{
+            background: '#111827',
+            padding: '28px 32px 24px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 10 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(37,99,235,.25)', border: '1px solid rgba(37,99,235,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 22 }}>💡</span>
+              </div>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.08em', margin: 0, fontFamily: 'monospace' }}>Before you begin</p>
+                <h2 style={{ fontSize: 19, fontWeight: 700, color: '#fff', margin: '3px 0 0', fontFamily: 'Poppins, sans-serif' }}>Interview Tips</h2>
+              </div>
+            </div>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,.45)', margin: 0, lineHeight: 1.6 }}>
+              Your session for <strong style={{ color: 'rgba(255,255,255,.8)' }}>{jobRole}</strong> is ready. Read these tips before you start.
+            </p>
+          </div>
+
+          {/* Tips grid */}
+          <div style={{ padding: '24px 32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            {TIPS.map((tip) => (
+              <div key={tip.title} style={{ background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB', padding: '16px 18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: 18 }}>{tip.emoji}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>{tip.title}</span>
+                </div>
+                <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.6, margin: 0 }}>{tip.body}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div style={{ padding: '0 32px 28px', display: 'flex', gap: 12 }}>
+            <button
+              onClick={() => setShowTips(false)}
+              style={{ flex: 1, padding: '12px 0', borderRadius: 10, border: '1px solid #E5E7EB', background: '#fff', fontSize: 14, fontWeight: 600, color: MUTED, cursor: 'pointer' }}
+            >
+              Back
+            </button>
+            <button
+              onClick={handleEnterInterview}
+              style={{ flex: 2, padding: '12px 0', borderRadius: 10, border: 'none', background: P, fontSize: 14, fontWeight: 700, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            >
+              I'm ready — Start Interview →
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    )}
+    <div style={{ padding: '20px 28px 24px' }}>
+
+      {/* ── Header ── */}
+      <motion.div {...fadeUp(0)} style={{ marginBottom: 20 }}>
+        <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 26, fontWeight: 700, color: TEXT, marginBottom: 4 }}>
           Mock <span style={{ color: P }}>Interview</span>
         </h1>
-        <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.6 }}>
-          Set up your session — questions are intelligently tailored to your role and experience
+        <p style={{ fontSize: 14, color: MUTED }}>
+          Set up your session — questions are tailored to your role and experience
         </p>
       </motion.div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      {/* ── 2-column grid ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
 
-        {/* Resume picker */}
-        <motion.div {...fadeUp(0.05)} className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 36, height: 36, background: P_BG, border: `1px solid ${P_BD}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <FileText size={18} style={{ color: P }} />
+        {/* ── LEFT: Resume + Job Role stacked ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Resume picker */}
+          <motion.div {...fadeUp(0.08)} className="card" style={{ margin: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <div style={{ width: 34, height: 34, background: P_BG, border: `1px solid ${P_BD}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <FileText size={16} style={{ color: P }} />
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 14, color: TEXT, margin: 0 }}>
+                  Resume <span style={{ fontWeight: 400, fontSize: 12, color: MUTED }}>(optional)</span>
+                </p>
+                <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>Choose saved or upload new</p>
+              </div>
             </div>
-            <div>
-              <p style={{ fontWeight: 700, fontSize: 15, color: TEXT }}>
-                Resume <span style={{ fontWeight: 400, fontSize: 13, color: MUTED }}>(optional)</span>
-              </p>
-              <p style={{ fontSize: 13, color: MUTED }}>Choose a saved resume or upload a new one</p>
-            </div>
-          </div>
 
-          <div style={{ display: 'flex', gap: 10 }}>
-            <select
-              value={selectedResume}
-              onChange={e => setSelectedResume(e.target.value)}
-              className="input"
-              style={{ flex: 1, fontSize: 14 }}
-            >
-              <option value="">— No resume —</option>
-              {resumes.map(r => (
-                <option key={r.id} value={r.id}>
-                  {r.filename}  •  ATS {r.ats_score ?? 0}/100
-                </option>
-              ))}
-            </select>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <select
+                value={selectedResume}
+                onChange={e => setSelectedResume(e.target.value)}
+                className="input"
+                style={{ flex: 1, fontSize: 13 }}
+              >
+                <option value="">— No resume —</option>
+                {resumes.map(r => (
+                  <option key={r.id} value={r.id}>
+                    {r.filename}  •  ATS {r.ats_score ?? 0}/100
+                  </option>
+                ))}
+              </select>
 
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 7,
-                padding: '0 18px', flexShrink: 0,
-                border: `1.5px solid ${P}`, background: P_BG, color: P,
-                fontSize: 13, fontWeight: 600, borderRadius: 6,
-                cursor: uploading ? 'not-allowed' : 'pointer',
-                opacity: uploading ? 0.6 : 1, whiteSpace: 'nowrap',
-              }}
-            >
-              {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-              {uploading ? 'Analyzing…' : 'Upload'}
-            </button>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.doc,.docx"
-              style={{ display: 'none' }}
-              onChange={e => {
-                const file = e.target.files?.[0];
-                if (file) handleFileUpload(file);
-                e.target.value = '';
-              }}
-            />
-          </div>
-
-          <AnimatePresence>
-            {uploadError && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '10px 14px', marginTop: 12, borderRadius: 8,
-                  background: 'rgba(239,68,68,.07)', border: '1px solid rgba(239,68,68,.2)',
-                  fontSize: 13, color: '#ef4444',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '0 14px', flexShrink: 0,
+                  border: `1.5px solid ${P}`, background: P_BG, color: P,
+                  fontSize: 13, fontWeight: 600, borderRadius: 6,
+                  cursor: uploading ? 'not-allowed' : 'pointer',
+                  opacity: uploading ? 0.6 : 1, whiteSpace: 'nowrap',
                 }}
               >
-                <AlertCircle size={14} style={{ flexShrink: 0 }} />
-                {uploadError}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+                {uploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                {uploading ? 'Analyzing…' : 'Upload'}
+              </button>
 
-        {/* Job Role combobox */}
-        <motion.div {...fadeUp(0.1)} className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 36, height: 36, background: P_BG, border: `1px solid ${P_BD}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Briefcase size={18} style={{ color: P }} />
-            </div>
-            <div>
-              <p style={{ fontWeight: 700, fontSize: 15, color: TEXT }}>Job Role</p>
-              <p style={{ fontSize: 13, color: MUTED }}>
-                Type to search or enter a custom role
-              </p>
-            </div>
-          </div>
-
-          {/* combobox wrapper */}
-          <div style={{ position: 'relative' }}>
-            {/* input row */}
-            <div style={{
-              display: 'flex', alignItems: 'center',
-              border: `1.5px solid ${showDrop ? P : BORDER}`,
-              background: '#fff',
-              transition: 'border-color .15s',
-              padding: '0 12px', gap: 8,
-            }}>
-              <Search size={15} style={{ color: MUTED, flexShrink: 0 }} />
               <input
-                ref={inputRef}
-                type="text"
-                value={jobRole}
-                onChange={e => { setJobRole(e.target.value); setShowDrop(true); setHighlightIdx(-1); }}
-                onFocus={() => setShowDrop(true)}
-                onKeyDown={handleKeyDown}
-                placeholder="e.g. Frontend Developer, Data Scientist..."
-                style={{
-                  flex: 1, border: 'none', outline: 'none',
-                  fontSize: 14, color: TEXT, background: 'transparent',
-                  padding: '12px 0', fontFamily: 'inherit',
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx"
+                style={{ display: 'none' }}
+                onChange={e => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(file);
+                  e.target.value = '';
                 }}
               />
-              {jobRole && (
-                <button
-                  onClick={() => { setJobRole(''); setHighlightIdx(-1); inputRef.current?.focus(); }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: MUTED, display: 'flex', padding: 2 }}
-                >
-                  <X size={14} />
-                </button>
-              )}
-              <ChevronDown
-                size={15}
-                style={{ color: MUTED, flexShrink: 0, transform: showDrop ? 'rotate(180deg)' : 'none', transition: 'transform .2s', cursor: 'pointer' }}
-                onClick={() => { setShowDrop(v => !v); inputRef.current?.focus(); }}
-              />
             </div>
 
-            {/* dropdown */}
             <AnimatePresence>
-              {showDrop && (suggestions.length > 0 || showCustomRow) && (
+              {uploadError && (
                 <motion.div
-                  ref={dropdownRef}
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.12 }}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
                   style={{
-                    position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
-                    background: '#fff', border: `1px solid ${BORDER}`,
-                    boxShadow: '0 8px 24px rgba(0,0,0,.1)',
-                    zIndex: 100, maxHeight: 340, overflowY: 'auto',
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '8px 12px', marginTop: 10, borderRadius: 8,
+                    background: 'rgba(239,68,68,.07)', border: '1px solid rgba(239,68,68,.2)',
+                    fontSize: 12, color: '#ef4444',
                   }}
                 >
-                  {jobRole.trim().length === 0 && (
-                    <div style={{ padding: '8px 14px 4px', fontSize: 10, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '.1em', fontFamily: 'monospace' }}>
-                      All Roles — scroll to browse
-                    </div>
-                  )}
-
-                  {suggestions.map((r, i) => (
-                    <div
-                      key={r}
-                      onMouseDown={() => selectRole(r)}
-                      onMouseEnter={() => setHighlightIdx(i)}
-                      style={{
-                        padding: '10px 14px',
-                        fontSize: 14, color: highlightIdx === i ? P : TEXT,
-                        background: highlightIdx === i ? P_BG : 'transparent',
-                        borderLeft: `2px solid ${highlightIdx === i ? P : 'transparent'}`,
-                        cursor: 'pointer', transition: 'all .1s',
-                        fontWeight: highlightIdx === i ? 600 : 400,
-                      }}
-                    >
-                      {r}
-                    </div>
-                  ))}
-
-                  {showCustomRow && (
-                    <div
-                      onMouseDown={() => { setShowDrop(false); }}
-                      onMouseEnter={() => setHighlightIdx(suggestions.length)}
-                      style={{
-                        padding: '10px 14px',
-                        fontSize: 14,
-                        color: highlightIdx === suggestions.length ? P : MUTED,
-                        background: highlightIdx === suggestions.length ? P_BG : '#F9FAFB',
-                        borderLeft: `2px solid ${highlightIdx === suggestions.length ? P : 'transparent'}`,
-                        borderTop: `1px solid ${BORDER}`,
-                        cursor: 'pointer', fontStyle: 'italic',
-                        display: 'flex', alignItems: 'center', gap: 8,
-                      }}
-                    >
-                      <span style={{ fontSize: 12, background: P_BG, border: `1px solid ${P_BD}`, color: P, padding: '1px 7px', fontStyle: 'normal', fontWeight: 700, fontFamily: 'monospace' }}>
-                        CUSTOM
-                      </span>
-                      Use "{jobRole}"
-                    </div>
-                  )}
+                  <AlertCircle size={13} style={{ flexShrink: 0 }} />
+                  {uploadError}
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
 
-          {/* selected badge */}
-          {jobRole.trim() && (
-            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 12, color: MUTED }}>Selected:</span>
-              <span style={{
-                fontSize: 12, fontWeight: 700, color: P,
-                background: P_BG, border: `1px solid ${P_BD}`,
-                padding: '2px 10px',
-              }}>
-                {jobRole}
-              </span>
-              {!isExactMatch && jobRole.trim() && (
-                <span style={{ fontSize: 11, color: '#d97706', background: '#fffbeb', border: '1px solid #fde68a', padding: '1px 8px', fontWeight: 600 }}>
-                  Custom
-                </span>
-              )}
+          {/* Job Role combobox */}
+          <motion.div {...fadeUp(0.12)} className="card" style={{ margin: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <div style={{ width: 34, height: 34, background: P_BG, border: `1px solid ${P_BD}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Briefcase size={16} style={{ color: P }} />
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 14, color: TEXT, margin: 0 }}>Job Role</p>
+                <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>Search or enter a custom role</p>
+              </div>
             </div>
-          )}
-        </motion.div>
 
-        {/* Difficulty */}
-        <motion.div {...fadeUp(0.2)} className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 36, height: 36, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <BarChart2 size={18} style={{ color: '#d97706' }} />
+            {/* combobox wrapper */}
+            <div style={{ position: 'relative' }}>
+              <div style={{
+                display: 'flex', alignItems: 'center',
+                border: `1.5px solid ${showDrop ? P : BORDER}`,
+                background: '#fff', transition: 'border-color .15s',
+                padding: '0 12px', gap: 8, borderRadius: 6,
+              }}>
+                <Search size={14} style={{ color: MUTED, flexShrink: 0 }} />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={jobRole}
+                  onChange={e => { setJobRole(e.target.value); setShowDrop(true); setHighlightIdx(-1); }}
+                  onFocus={() => setShowDrop(true)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="e.g. Frontend Developer, Data Scientist..."
+                  style={{
+                    flex: 1, border: 'none', outline: 'none',
+                    fontSize: 13, color: TEXT, background: 'transparent',
+                    padding: '11px 0', fontFamily: 'inherit',
+                  }}
+                />
+                {jobRole && (
+                  <button
+                    onClick={() => { setJobRole(''); setHighlightIdx(-1); inputRef.current?.focus(); }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: MUTED, display: 'flex', padding: 2 }}
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+                <ChevronDown
+                  size={14}
+                  style={{ color: MUTED, flexShrink: 0, transform: showDrop ? 'rotate(180deg)' : 'none', transition: 'transform .2s', cursor: 'pointer' }}
+                  onClick={() => { setShowDrop(v => !v); inputRef.current?.focus(); }}
+                />
+              </div>
+
+              {/* dropdown */}
+              <AnimatePresence>
+                {showDrop && (suggestions.length > 0 || showCustomRow) && (
+                  <motion.div
+                    ref={dropdownRef}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.12 }}
+                    style={{
+                      position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+                      background: '#fff', border: `1px solid ${BORDER}`,
+                      boxShadow: '0 8px 24px rgba(0,0,0,.1)',
+                      zIndex: 200, maxHeight: 280, overflowY: 'auto', borderRadius: 8,
+                    }}
+                  >
+                    {jobRole.trim().length === 0 && (
+                      <div style={{ padding: '8px 14px 4px', fontSize: 10, fontWeight: 700, color: MUTED, textTransform: 'uppercase', letterSpacing: '.1em', fontFamily: 'monospace' }}>
+                        All Roles — scroll to browse
+                      </div>
+                    )}
+
+                    {suggestions.map((r, i) => (
+                      <div
+                        key={r}
+                        onMouseDown={() => selectRole(r)}
+                        onMouseEnter={() => setHighlightIdx(i)}
+                        style={{
+                          padding: '9px 14px',
+                          fontSize: 13, color: highlightIdx === i ? P : TEXT,
+                          background: highlightIdx === i ? P_BG : 'transparent',
+                          borderLeft: `2px solid ${highlightIdx === i ? P : 'transparent'}`,
+                          cursor: 'pointer', transition: 'all .1s',
+                          fontWeight: highlightIdx === i ? 600 : 400,
+                        }}
+                      >
+                        {r}
+                      </div>
+                    ))}
+
+                    {showCustomRow && (
+                      <div
+                        onMouseDown={() => { setShowDrop(false); }}
+                        onMouseEnter={() => setHighlightIdx(suggestions.length)}
+                        style={{
+                          padding: '9px 14px',
+                          fontSize: 13,
+                          color: highlightIdx === suggestions.length ? P : MUTED,
+                          background: highlightIdx === suggestions.length ? P_BG : '#F9FAFB',
+                          borderLeft: `2px solid ${highlightIdx === suggestions.length ? P : 'transparent'}`,
+                          borderTop: `1px solid ${BORDER}`,
+                          cursor: 'pointer', fontStyle: 'italic',
+                          display: 'flex', alignItems: 'center', gap: 8,
+                        }}
+                      >
+                        <span style={{ fontSize: 11, background: P_BG, border: `1px solid ${P_BD}`, color: P, padding: '1px 7px', fontStyle: 'normal', fontWeight: 700, fontFamily: 'monospace' }}>
+                          CUSTOM
+                        </span>
+                        Use "{jobRole}"
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* selected badge */}
+            {jobRole.trim() && (
+              <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, color: MUTED }}>Selected:</span>
+                <span style={{
+                  fontSize: 12, fontWeight: 700, color: P,
+                  background: P_BG, border: `1px solid ${P_BD}`,
+                  padding: '2px 10px', borderRadius: 4,
+                }}>
+                  {jobRole}
+                </span>
+                {!isExactMatch && jobRole.trim() && (
+                  <span style={{ fontSize: 11, color: '#d97706', background: '#fffbeb', border: '1px solid #fde68a', padding: '1px 8px', borderRadius: 4, fontWeight: 600 }}>
+                    Custom
+                  </span>
+                )}
+              </div>
+            )}
+          </motion.div>
+
+        </div>{/* end LEFT column */}
+
+        {/* ── RIGHT: Difficulty ── */}
+        <motion.div {...fadeUp(0.05)} className="card" style={{ margin: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <div style={{ width: 34, height: 34, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <BarChart2 size={16} style={{ color: '#d97706' }} />
             </div>
             <div>
-              <p style={{ fontWeight: 700, fontSize: 15, color: TEXT }}>Difficulty Level</p>
-              <p style={{ fontSize: 13, color: MUTED }}>Match questions to your experience level</p>
+              <p style={{ fontWeight: 700, fontSize: 14, color: TEXT, margin: 0 }}>Difficulty Level</p>
+              <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>Match to your experience</p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {difficulties.map(d => {
               const active = difficulty === d.value;
               return (
@@ -538,73 +625,75 @@ export default function InterviewSetupPage() {
                   key={d.value}
                   onClick={() => setDifficulty(d.value)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 16,
-                    padding: '14px 18px',
+                    display: 'flex', alignItems: 'center', gap: 14,
+                    padding: '11px 16px', borderRadius: 8,
                     border: `1.5px solid ${active ? d.color + '60' : BORDER}`,
                     background: active ? d.color + '0d' : '#fff',
                     cursor: 'pointer', transition: 'all .18s', textAlign: 'left',
                   }}
                 >
                   <div style={{
-                    width: 14, height: 14, borderRadius: '50%', background: d.color, flexShrink: 0,
+                    width: 12, height: 12, borderRadius: '50%', background: d.color, flexShrink: 0,
                     boxShadow: active ? `0 0 0 4px ${d.color}25` : 'none', transition: 'box-shadow .2s',
                   }} />
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: TEXT, marginBottom: 2 }}>{d.label}</p>
-                    <p style={{ fontSize: 12, color: MUTED }}>{d.desc}</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: TEXT, margin: 0 }}>{d.label}</p>
+                    <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>{d.desc}</p>
                   </div>
-                  {active && <div style={{ width: 8, height: 8, borderRadius: '50%', background: d.color, flexShrink: 0 }} />}
+                  {active && <div style={{ width: 7, height: 7, borderRadius: '50%', background: d.color, flexShrink: 0 }} />}
                 </button>
               );
             })}
           </div>
         </motion.div>
 
-        {/* Error */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '14px 18px', borderRadius: 8,
-              background: 'rgba(239,68,68,.07)', border: '1px solid rgba(239,68,68,.25)',
-              fontSize: 14, color: '#ef4444',
-            }}
-          >
-            <AlertCircle size={16} style={{ flexShrink: 0 }} />
-            {error}
-          </motion.div>
-        )}
+      </div>{/* end 2-column grid */}
 
-        {/* Start button */}
-        <motion.div {...fadeUp(0.3)}>
-          <button
-            onClick={handleStart}
-            disabled={loading || !jobRole.trim()}
-            style={{
-              width: '100%', padding: '16px 0', fontSize: 16, borderRadius: 8,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              background: loading || !jobRole.trim() ? '#9CA3AF' : P,
-              color: '#fff', border: 'none',
-              fontWeight: 700, cursor: loading || !jobRole.trim() ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit', transition: 'background .18s',
-            }}
-          >
-            {loading ? (
-              <><Loader2 size={20} className="animate-spin" /> Generating Questions...</>
-            ) : (
-              <><Mic size={20} /> Start Mock Interview <ArrowRight size={18} /></>
-            )}
-          </button>
-
-          <p style={{ textAlign: 'center', fontSize: 13, color: MUTED, marginTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            <Sparkles size={13} />
-            6 tailored questions will be generated based on your role and experience level
-          </p>
+      {/* ── Error ── */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '12px 16px', borderRadius: 8, marginTop: 16,
+            background: 'rgba(239,68,68,.07)', border: '1px solid rgba(239,68,68,.25)',
+            fontSize: 13, color: '#ef4444',
+          }}
+        >
+          <AlertCircle size={15} style={{ flexShrink: 0 }} />
+          {error}
         </motion.div>
+      )}
 
-      </div>
+      {/* ── Start button ── */}
+      <motion.div {...fadeUp(0.18)} style={{ marginTop: 20 }}>
+        <button
+          onClick={handleStart}
+          disabled={loading || !jobRole.trim()}
+          style={{
+            width: '100%', padding: '15px 0', fontSize: 15, borderRadius: 8,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            background: loading || !jobRole.trim() ? '#9CA3AF' : P,
+            color: '#fff', border: 'none',
+            fontWeight: 700, cursor: loading || !jobRole.trim() ? 'not-allowed' : 'pointer',
+            fontFamily: 'inherit', transition: 'background .18s',
+          }}
+        >
+          {loading ? (
+            <><Loader2 size={18} className="animate-spin" /> Generating Questions...</>
+          ) : (
+            <><Mic size={18} /> Start Mock Interview <ArrowRight size={16} /></>
+          )}
+        </button>
+
+        <p style={{ textAlign: 'center', fontSize: 12, color: MUTED, marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+          <Sparkles size={12} />
+          6 tailored questions will be generated based on your role and experience level
+        </p>
+      </motion.div>
+
     </div>
+    </>
   );
 }

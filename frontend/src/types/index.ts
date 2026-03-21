@@ -75,7 +75,7 @@ export interface JDAnalysis {
 export interface InterviewQuestion {
   id: number;
   text: string;
-  type: 'technical' | 'behavioral';
+  type: 'technical_concept' | 'coding' | 'behavioral' | 'situational' | 'system_design' | 'hr';
   focus_area: string;
   expected_duration_seconds: number;
 }
@@ -114,6 +114,7 @@ export interface InterviewAnswer {
   question_index: number;
   question_text: string;
   video_url: string;
+  code_text?: string;
   transcript: string;
   filler_count: number;
   wpm: number;
@@ -125,6 +126,7 @@ export interface InterviewAnswer {
   technical_score: number;
   structure_score: number;
   depth_score: number;
+  code_correctness_score?: number;
   overall_score: number;
   strengths: string[];
   improvements: string[];

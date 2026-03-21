@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { InterviewGuardProvider } from '../context/InterviewGuardContext';
 import Sidebar from './Sidebar';
 
 const routeTitles: Record<string, string> = {
@@ -25,7 +26,7 @@ function getPageTitle(pathname: string): string {
   return 'Career AI Studio';
 }
 
-export default function AppLayout() {
+function AppLayoutInner() {
   const { user, logout, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -173,5 +174,13 @@ export default function AppLayout() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function AppLayout() {
+  return (
+    <InterviewGuardProvider>
+      <AppLayoutInner />
+    </InterviewGuardProvider>
   );
 }

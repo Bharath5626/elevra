@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useInterviewGuard } from '../context/InterviewGuardContext';
 import {
   LayoutDashboard, FileText, Video, BookOpen,
   Briefcase, Clock, Target, X, Menu, LogOut,
@@ -33,8 +34,19 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
   const [tooltip, setTooltip] = useState<{ label: string; y: number } | null>(null);
   const sidebarRef = useRef<HTMLElement>(null);
 
+  const guard = useInterviewGuard();
   const slim = isCollapsed && !isMobile;
   const W = slim ? 56 : 240;
+
+  const handleNavClick = (to: string) => {
+    const safe = guard.requestNavigation(to, () => navigate(to), () => {});
+    if (safe) navigate(to);
+  };
+
+  const handleLogout = () => {
+    const safe = guard.requestNavigation('/login', () => { logout(); navigate('/login'); }, () => {});
+    if (safe) { logout(); navigate('/login'); }
+  };
 
   return (
     <aside
@@ -81,20 +93,13 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
 
         {!slim && (
           <>
-            <div style={{
-              width: 28, height: 28,
-              background: P,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0, borderRadius: 6,
-            }}>
-              <span style={{ color: '#fff', fontSize: 13, fontWeight: 900, letterSpacing: '-0.5px' }}>E</span>
-            </div>
+            <img src="/logo.png" alt="Elevra" style={{ height: 28, width: 'auto', display: 'block', flexShrink: 0 }} />
             <span style={{
               flex: 1,
               fontSize: 16, fontWeight: 700, color: '#fff',
               letterSpacing: '-0.4px', fontFamily: 'Poppins, sans-serif',
             }}>
-              elevra
+              Elevra
             </span>
           </>
         )}
@@ -148,8 +153,11 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
               }}
               onMouseLeave={() => setTooltip(null)}
             >
-              <Link
-                to={path}
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => handleNavClick(path)}
+                onKeyDown={e => e.key === 'Enter' && handleNavClick(path)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -157,7 +165,7 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
                   gap: slim ? 0 : 10,
                   padding: slim ? '10px 0' : '9px 12px',
                   marginBottom: 1,
-                  textDecoration: 'none',
+                  cursor: 'pointer',
                   fontSize: 13.5,
                   fontWeight: isActive ? 600 : 400,
                   color: isActive
@@ -173,11 +181,12 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
                   borderLeft: slim ? 'none' : `2px solid ${isActive ? P : 'transparent'}`,
                   borderRadius: 6,
                   transition: 'all 0.13s ease',
+                  userSelect: 'none',
                 }}
               >
                 <Icon size={16} style={{ flexShrink: 0 }} />
                 {!slim && <span>{label}</span>}
-              </Link>
+              </div>
 
               {/* Tooltip rendered inline — replaced by fixed portal below */}
             </div>
@@ -227,7 +236,7 @@ export default function Sidebar({ isOpen, isMobile, onClose, isCollapsed, onTogg
       }}>
         {/* Logout button */}
         <button
-          onClick={() => { logout(); navigate('/login'); }}
+          onClick={handleLogout}
           title="Logout"
           onMouseEnter={e => {
             (e.currentTarget as HTMLButtonElement).style.color = '#FCA5A5';

@@ -138,10 +138,13 @@ export const interviewAPI = {
     return data;
   },
 
-  uploadAnswer: async (sessionId: string, questionIndex: number, videoBlob: Blob): Promise<void> => {
+  uploadAnswer: async (sessionId: string, questionIndex: number, videoBlob: Blob, codeText?: string): Promise<void> => {
     const formData = new FormData();
     formData.append('video', videoBlob, `answer_${questionIndex}.webm`);
     formData.append('question_index', String(questionIndex));
+    if (codeText !== undefined && codeText !== '') {
+      formData.append('code_text', codeText);
+    }
     await api.post(`/interview/${sessionId}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -160,6 +163,10 @@ export const interviewAPI = {
   getSessions: async (): Promise<InterviewSession[]> => {
     const { data } = await api.get('/interview/sessions');
     return data;
+  },
+
+  discardSession: async (sessionId: string): Promise<void> => {
+    await api.delete(`/interview/${sessionId}`);
   },
 };
 

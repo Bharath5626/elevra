@@ -2,8 +2,8 @@ import logging
 import os
 import tempfile
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form, BackgroundTasks
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile, File, Form, BackgroundTasks
+from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -108,6 +108,7 @@ async def upload_answer(
     session_id: str,
     video: UploadFile = File(...),
     question_index: int = Form(...),
+    code_text: Optional[str] = Form(default=None),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -130,9 +131,26 @@ async def upload_answer(
     # Save video to temp storage (swap for DO Spaces in production)
     video_bytes = await video.read()
     tmp_dir = tempfile.mkdtemp()
+    raw_path = os.path.join(tmp_dir, f"answer_{question_index}_raw.webm")
     tmp_path = os.path.join(tmp_dir, f"answer_{question_index}.webm")
-    with open(tmp_path, "wb") as f:
+    with open(raw_path, "wb") as f:
         f.write(video_bytes)
+
+    # Remux with ffmpeg (stream copy, no re-encode) so the seek index / duration
+    # metadata is written at the START of the file.  MediaRecorder WebM files
+    # normally put the index at the END, which means browsers can't show total
+    # duration or seek until the whole file is downloaded.
+    import subprocess as _sp
+    try:
+        _sp.run(
+            ["ffmpeg", "-y", "-i", raw_path, "-c", "copy", tmp_path],
+            check=True, timeout=60,
+            stdout=_sp.DEVNULL, stderr=_sp.DEVNULL,
+        )
+        os.remove(raw_path)
+    except Exception:
+        # ffmpeg unavailable or failed — fall back to the raw file
+        os.rename(raw_path, tmp_path)
 
     # Upsert answer record
     answer_r = await db.execute(
@@ -144,12 +162,15 @@ async def upload_answer(
     answer = answer_r.scalar_one_or_none()
     if answer:
         answer.video_url = tmp_path
+        if code_text is not None:
+            answer.code_text = code_text
     else:
         answer = InterviewAnswer(
             session_id=session_id,
             question_index=question_index,
             question_text=question_text,
             video_url=tmp_path,
+            code_text=code_text,
         )
         db.add(answer)
     await db.flush()
@@ -247,6 +268,7 @@ async def get_answers(
 async def stream_video(
     session_id: str,
     question_index: int,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(_get_video_user),
 ):
@@ -273,7 +295,100 @@ async def stream_video(
     if not os.path.exists(answer.video_url):
         raise HTTPException(status_code=404, detail="Video file is no longer available (server may have restarted)")
 
-    return FileResponse(answer.video_url, media_type="video/webm")
+    # Lazily remux old/raw MediaRecorder WebM files so browsers can read
+    # duration and seek immediately (raw WebM has its index at the end).
+    import subprocess as _sp
+    raw_path = answer.video_url
+    base, ext = os.path.splitext(raw_path)
+    remuxed_path = base + "_remuxed" + ext
+
+    if not os.path.exists(remuxed_path):
+        try:
+            _sp.run(
+                ["ffmpeg", "-y", "-i", raw_path, "-c", "copy", remuxed_path],
+                check=True, timeout=120,
+                stdout=_sp.DEVNULL, stderr=_sp.DEVNULL,
+            )
+        except Exception:
+            remuxed_path = raw_path  # ffmpeg unavailable — serve original as fallback
+
+    file_path = remuxed_path if os.path.exists(remuxed_path) else raw_path
+    file_size = os.path.getsize(file_path)
+    range_header = request.headers.get("range")
+
+    def _iter_file(start: int, length: int):
+        with open(file_path, "rb") as fh:
+            fh.seek(start)
+            remaining = length
+            while remaining > 0:
+                chunk = fh.read(min(65536, remaining))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
+                yield chunk
+
+    if range_header:
+        # e.g. "bytes=0-1023"
+        range_val = range_header.replace("bytes=", "")
+        start_str, _, end_str = range_val.partition("-")
+        start = int(start_str) if start_str else 0
+        end   = int(end_str)   if end_str   else file_size - 1
+        end   = min(end, file_size - 1)
+        content_length = end - start + 1
+        return StreamingResponse(
+            _iter_file(start, content_length),
+            status_code=206,
+            media_type="video/webm",
+            headers={
+                "Content-Range":   f"bytes {start}-{end}/{file_size}",
+                "Accept-Ranges":   "bytes",
+                "Content-Length":  str(content_length),
+            },
+        )
+
+    return StreamingResponse(
+        _iter_file(0, file_size),
+        status_code=200,
+        media_type="video/webm",
+        headers={
+            "Accept-Ranges":  "bytes",
+            "Content-Length": str(file_size),
+        },
+    )
+
+
+@router.delete("/{session_id}", status_code=204)
+async def discard_session(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Discard an in-progress interview session and all its answers."""
+    r = await db.execute(
+        select(InterviewSession).where(
+            InterviewSession.id == session_id,
+            InterviewSession.user_id == current_user.id,
+        )
+    )
+    session = r.scalar_one_or_none()
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # Delete all answers first (cascade-safe)
+    answers = await db.execute(
+        select(InterviewAnswer).where(InterviewAnswer.session_id == session_id)
+    )
+    for answer in answers.scalars().all():
+        # Clean up temp video files if they exist
+        if answer.video_url and os.path.exists(answer.video_url):
+            try:
+                os.remove(answer.video_url)
+            except OSError:
+                pass
+        await db.delete(answer)
+
+    await db.delete(session)
+    await db.commit()
 
 
 @router.get("/{session_id}/status", response_model=AnalysisStatusOut)

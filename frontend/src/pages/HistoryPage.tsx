@@ -3,13 +3,16 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { interviewAPI } from '../services/api';
 import type { InterviewSession } from '../types';
-import { History, Mic, ChevronRight, TrendingUp, TrendingDown, Calendar, Loader2, Sparkles, ArrowRight, Filter, Award, CheckCircle } from 'lucide-react';
+import { History, Mic, ChevronRight, TrendingUp, TrendingDown, Calendar, Loader2, Sparkles, ArrowRight, Filter, Award, CheckCircle, Trash2, AlertTriangle } from 'lucide-react';
 import StatCard from '../components/StatCard';
 
 export default function HistoryPage() {
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'completed' | 'in_progress'>('all');
+  const [deleteTarget, setDeleteTarget] = useState<InterviewSession | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   useEffect(() => {
     interviewAPI.getSessions().then(setSessions).catch(() => {}).finally(() => setLoading(false));
@@ -40,6 +43,20 @@ export default function HistoryPage() {
     return 'none';
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await interviewAPI.discardSession(deleteTarget.id);
+      setSessions(prev => prev.filter(s => s.id !== deleteTarget.id));
+    } catch {
+      // silently ignore
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -55,6 +72,73 @@ export default function HistoryPage() {
 
   return (
     <div style={{ padding: '24px 28px 48px' }}>
+
+      {/* ── Delete Confirmation Modal ── */}
+      {deleteTarget && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(0,0,0,0.55)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 16,
+        }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.18 }}
+            style={{
+              background: '#fff', borderRadius: 16,
+              padding: '28px 28px 24px',
+              width: '100%', maxWidth: 420,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 20 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                background: '#FEF2F2', border: '1px solid #FECACA',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <AlertTriangle size={18} style={{ color: '#EF4444' }} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: '0 0 6px' }}>
+                  Delete Interview?
+                </h3>
+                <p style={{ fontSize: 13.5, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
+                  <strong style={{ color: '#374151' }}>{deleteTarget.job_role}</strong> will be permanently deleted including its report. This cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                style={{
+                  padding: '9px 20px', borderRadius: 8,
+                  border: '1px solid #E5E7EB', background: '#fff',
+                  cursor: 'pointer', fontSize: 14, fontWeight: 500, color: '#374151',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{
+                  padding: '9px 20px', borderRadius: 8,
+                  border: 'none', background: '#EF4444',
+                  cursor: deleting ? 'not-allowed' : 'pointer',
+                  fontSize: 14, fontWeight: 600, color: '#fff',
+                  opacity: deleting ? 0.7 : 1,
+                  display: 'flex', alignItems: 'center', gap: 8,
+                }}
+              >
+                {deleting ? <><Loader2 size={14} className="animate-spin" /> Deleting...</> : 'Delete'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
         {/* Stats row */}
         {sessions.length > 0 && (
@@ -146,6 +230,8 @@ export default function HistoryPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.04 * i }}
+                  onMouseEnter={() => setHoveredId(session.id)}
+                  onMouseLeave={() => setHoveredId(null)}
                 >
                   <Link
                     to={`/interview/${session.id}/report`}
@@ -215,7 +301,25 @@ export default function HistoryPage() {
                           </span>
                         </div>
 
-                        <ChevronRight size={18} style={{ color: '#9CA3AF' }} />
+                        {hoveredId === session.id ? (
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeleteTarget(session); }}
+                            title="Delete session"
+                            style={{
+                              width: 34, height: 34, borderRadius: 8,
+                              border: '1px solid #FECACA', background: '#FEF2F2',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              cursor: 'pointer', color: '#EF4444',
+                              flexShrink: 0, transition: 'background .13s',
+                            }}
+                            onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = '#FEE2E2'}
+                            onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = '#FEF2F2'}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        ) : (
+                          <ChevronRight size={18} style={{ color: '#9CA3AF' }} />
+                        )}
                       </div>
                     </div>
                   </Link>

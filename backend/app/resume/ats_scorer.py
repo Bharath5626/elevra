@@ -130,9 +130,11 @@ def score_impact_language(text: str) -> float:
     verb_score = min(1.0, verb_hits / 10)
 
     # Quantification component
+    # Only lines that start with an explicit bullet marker are counted —
+    # NOT arbitrary uppercase lines (which would include headers and job titles).
     bullet_lines = [
         l for l in lines
-        if l.startswith(("-", "•", "·", "*", "–")) or (len(l) > 25 and l[0].isupper())
+        if l.startswith(("-", "•", "·", "*", "–", "▪", "●", "○", "◦"))
     ]
     if bullet_lines:
         quantified   = sum(1 for l in bullet_lines if re.search(r'\d+', l))
@@ -145,20 +147,23 @@ def score_impact_language(text: str) -> float:
 
 
 def score_keyword_density(resume_skills: list[str]) -> float:
-    """0.0–1.0.  15+ skills → full score."""
-    return round(min(1.0, len(resume_skills) / 15), 3)
+    """0.0–1.0.  50+ skills → full score."""
+    return round(min(1.0, len(resume_skills) / 50), 3)
 
 
 def normalize_readability(flesch_score: float) -> float:
     """
     Map Flesch Reading Ease (0–100) to 0.0–1.0.
-    Ideal resume range is 40–70 (professional tone without being dense).
+    Ideal resume range: 40–80 (professional yet readable).
+    Below 40 (too dense): linear scale up from 0.
+    Above 80 (too simple): gentle penalty — full score not lost until Flesch 100+.
     """
-    if 40.0 <= flesch_score <= 70.0:
+    if 40.0 <= flesch_score <= 80.0:
         return 1.0
     if flesch_score < 40.0:
         return round(max(0.0, flesch_score / 40.0), 3)
-    return round(max(0.0, 1.0 - (flesch_score - 70.0) / 60.0), 3)
+    # Above 80: lose 1 point per 5 Flesch above 80 (0 at Flesch 130+)
+    return round(max(0.0, 1.0 - (flesch_score - 80.0) / 100.0), 3)
 
 
 # ── Final score calculators ───────────────────────────────────────────────────

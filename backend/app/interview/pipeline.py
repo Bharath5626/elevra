@@ -113,21 +113,36 @@ async def run_analysis_pipeline(
             _update_status(session_id, "processing", base_progress + 75, f"Q{idx+1}: AI evaluation")
             eval_data: dict = {}
             transcript = speech_data.get("transcript", "")
-            try:
-                eval_data = await evaluate_answer(
-                    question=q_text,
-                    transcript=transcript or "(No transcript available)",
-                    role=session.job_role,
-                )
-            except Exception as exc:
-                logger.warning("Q%d AI evaluation failed: %s", idx + 1, exc)
+            if not transcript.strip():
+                # No usable transcript — skip API call entirely
+                logger.warning("Q%d skipping AI evaluation: empty transcript", idx + 1)
                 eval_data = {
-                    "technical_score": 50, "structure_score": 50, "depth_score": 50,
-                    "overall_score": 50, "star_format_used": False, "model_answer_hint": "",
-                    "strengths": [], "improvements": [], "feedback_timestamps": [],
+                    "technical_score": 0, "structure_score": 0, "depth_score": 0,
+                    "overall_score": 0, "star_format_used": False, "model_answer_hint": "",
+                    "strengths": [],
+                    "improvements": ["No speech was detected in the recording. Please ensure your microphone is working and re-record your answer."],
+                    "feedback_timestamps": [],
                 }
+            else:
+                try:
+                    eval_data = await evaluate_answer(
+                        question=q_text,
+                        transcript=transcript,
+                        role=session.job_role,
+                        code_text=answer.code_text or "",
+                    )
+                except Exception as exc:
+                    logger.warning("Q%d AI evaluation failed: %s", idx + 1, exc)
+                    eval_data = {
+                        "technical_score": 0, "structure_score": 0, "depth_score": 0,
+                        "overall_score": 0, "star_format_used": False, "model_answer_hint": "",
+                        "strengths": [],
+                        "improvements": ["AI evaluation failed. Please check your API key or try re-triggering analysis."],
+                        "feedback_timestamps": [],
+                    }
 
             # ── Step: Scoring ────────────────────────────────────────
+            code_correctness = eval_data.get("code_correctness_score")  # None if no code submitted
             final_score = compute_answer_score(
                 technical_score=eval_data.get("technical_score", 50),
                 structure_score=eval_data.get("structure_score", 50),
@@ -135,6 +150,7 @@ async def run_analysis_pipeline(
                 eye_contact_pct=eye_data.get("eye_contact_pct", 0.5),
                 confidence_score=emotion_data.get("confidence_score", 50),
                 speech_clarity_score=speech_data.get("speech_clarity_score", 50),
+                code_correctness_score=code_correctness,
             )
             logger.info("Q%d final score: %d", idx + 1, final_score)
 
@@ -150,6 +166,7 @@ async def run_analysis_pipeline(
             answer.technical_score      = eval_data.get("technical_score", 50)
             answer.structure_score      = eval_data.get("structure_score", 50)
             answer.depth_score          = eval_data.get("depth_score", 50)
+            answer.code_correctness_score = eval_data.get("code_correctness_score")  # None if not a coding question
             answer.overall_score        = final_score
             answer.strengths            = eval_data.get("strengths", [])
             answer.improvements         = eval_data.get("improvements", [])

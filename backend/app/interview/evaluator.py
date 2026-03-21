@@ -32,18 +32,32 @@ async def evaluate_answer(
     question: str,
     transcript: str,
     role: str,
+    code_text: str = "",
 ) -> dict:
     # FIX: Don't use .format() — transcripts/questions often contain { } (JSON, code)
     # which causes KeyError. Build the prompt via concatenation instead.
+
+    has_code = bool(code_text and code_text.strip())
+
     prompt = (
         "Question: " + question + "\n"
         "Transcript: " + transcript[:4000] + "\n"
+    )
+    if has_code:
+        prompt += "Candidate Code:\n" + code_text[:3000] + "\n"
+    prompt += (
         "Role: " + role + "\n\n"
         "Return JSON matching this schema exactly:\n"
         '{\n'
         '  "technical_score": <int 0-100>,\n'
         '  "structure_score": <int 0-100>,\n'
         '  "depth_score": <int 0-100>,\n'
+    )
+    if has_code:
+        prompt += (
+            '  "code_correctness_score": <int 0-100, rate correctness, efficiency, and readability of the submitted code>,\n'
+        )
+    prompt += (
         '  "overall_score": <int 0-100>,\n'
         '  "star_format_used": <boolean>,\n'
         '  "model_answer_hint": <string>,\n'

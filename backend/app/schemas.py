@@ -146,6 +146,7 @@ class InterviewAnswerOut(BaseModel):
     question_index: int
     question_text: str
     video_url: Optional[str] = None
+    code_text: Optional[str] = None
     transcript: Optional[str] = None
     filler_count: int = 0
     wpm: float = 0.0
@@ -157,6 +158,7 @@ class InterviewAnswerOut(BaseModel):
     technical_score: int = 0
     structure_score: int = 0
     depth_score: int = 0
+    code_correctness_score: Optional[int] = None
     overall_score: int = 0
     strengths: list[str] = []
     improvements: list[str] = []

@@ -59,6 +59,16 @@ def analyze_speech(video_path: str) -> dict:
                 words.append({"word": word.word, "start": word.start, "end": word.end})
 
     transcript = " ".join(w["word"].strip() for w in words)
+
+    # Discard transcripts that are almost certainly Whisper hallucinations:
+    # fewer than 3 words almost always means silent/near-silent audio.
+    _HALLUCINATIONS = {
+        'you', 'you you', 'you.', 'thank you', 'thank you.', 'thanks',
+        'thanks.', 'okay', 'ok', 'yeah', 'yes', 'no',
+    }
+    if len(words) < 3 or transcript.lower().strip('. ') in _HALLUCINATIONS:
+        transcript = ""
+
     word_count = len(words)
     duration_seconds = words[-1]["end"] if words else 1
     wpm = (word_count / duration_seconds) * 60 if duration_seconds > 0 else 0.0

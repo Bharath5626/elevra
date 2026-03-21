@@ -54,16 +54,7 @@ export default function Navbar() {
 
         {/* ── Logo ── */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none', flexShrink: 0 }}>
-          <div style={{
-            width: 28, height: 28,
-            background: P,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ color: '#fff', fontSize: 13, fontWeight: 900, letterSpacing: '-0.5px' }}>E</span>
-          </div>
-          <span style={{ fontSize: 15, fontWeight: 700, color: TEXT, letterSpacing: '-0.4px', fontFamily: 'Poppins, sans-serif' }}>
-            elevra
-          </span>
+          <img src="/logo.png" alt="Elevra" style={{ height: 28, width: 'auto', display: 'block' }} />
         </Link>
 
         {/* ── Desktop Nav (authenticated) ── */}

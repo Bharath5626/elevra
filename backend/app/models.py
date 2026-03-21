@@ -109,6 +109,7 @@ class InterviewAnswer(Base):
     question_index       = Column(Integer)
     question_text        = Column(Text)
     video_url            = Column(String(500))
+    code_text            = Column(Text, nullable=True)   # code editor answer (coding questions only)
     transcript           = Column(Text)
     filler_count         = Column(Integer, default=0)
     wpm                  = Column(Float, default=0.0)
@@ -120,6 +121,7 @@ class InterviewAnswer(Base):
     technical_score      = Column(Integer, default=0)
     structure_score      = Column(Integer, default=0)
     depth_score          = Column(Integer, default=0)
+    code_correctness_score = Column(Integer, nullable=True)  # only set for coding questions
     overall_score        = Column(Integer, default=0)
     strengths            = Column(JSON, default=list)
     improvements         = Column(JSON, default=list)
