@@ -91,19 +91,27 @@ async def admin_login(body: AdminLoginBody, db: AsyncSession = Depends(get_db)):
     return {"access_token": token, "token_type": "bearer", "name": user.name, "email": user.email}
 
 
-@router.get("/init")
+class _InitAdminBody(BaseModel):
+    secret: str
+    email: str
+    password: str
+    name: str = "Admin"
+
+
+@router.post("/init")
 async def init_admin(
-    secret: str = Query(..., description="Must equal ADMIN_SECRET from server config"),
-    email: str = Query(...),
-    password: str = Query(...),
-    name: str = Query(default="Admin"),
+    body: _InitAdminBody,
     db: AsyncSession = Depends(get_db),
 ):
     """
     Bootstrap: create or promote an admin account.
-    Call once from your browser:
-      GET /admin/init?secret=YOUR_SECRET&email=you@example.com&password=yourpw
+    Call once via HTTP POST (keeps credentials out of server logs):
+      POST /admin/init  {"secret": "...", "email": "...", "password": "..."}
     """
+    secret = body.secret
+    email = body.email
+    password = body.password
+    name = body.name
     if secret != settings.ADMIN_SECRET:
         raise HTTPException(status_code=403, detail="Invalid admin secret")
 

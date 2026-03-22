@@ -8,6 +8,8 @@ An AI-powered career development platform that combines resume intelligence, moc
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Deploying to DigitalOcean (elevraa.me)](#deploying-to-digitalocean)
+- [Namecheap DNS Setup](#namecheap-dns-setup)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
@@ -186,7 +188,16 @@ npm run dev
 
 ## Docker
 
-Build and run the backend container:
+Build and run the full stack (backend + PostgreSQL) with Docker Compose:
+
+```bash
+# Copy and fill in your production values
+cp .env.example .env
+
+docker compose up -d
+```
+
+Or build and run just the backend container:
 
 ```bash
 docker build -t elevra-backend .
@@ -194,6 +205,29 @@ docker run --env-file .env -p 8000:8000 elevra-backend
 ```
 
 > The image includes `ffmpeg`, `libgl1`, and `libglib2.0-0` for audio/video analysis.
+
+### Running migrations in production
+
+Alembic manages all schema changes. Run this after deploying a new version:
+
+```bash
+# Inside the backend container or from backend/ with your venv active
+alembic upgrade head
+```
+
+For a brand-new deployment, this creates all tables. For existing databases, it applies only new changes.
+
+---
+
+## Admin Bootstrap
+
+After the first deployment, create the admin account via a one-time POST request:
+
+```bash
+curl -X POST https://your-api-url/admin/init \
+  -H "Content-Type: application/json" \
+  -d '{"secret": "YOUR_ADMIN_SECRET", "email": "admin@example.com", "password": "yourpassword", "name": "Admin"}'
+```
 
 ---
 
@@ -248,3 +282,115 @@ Interactive API documentation is available at `/docs` (Swagger UI) and `/redoc`.
 | `SPACES_ENDPOINT` | Spaces endpoint URL | `https://blr1.digitaloceanspaces.com` |
 | `FRONTEND_URL` | Allowed CORS origin | `http://localhost:5173` |
 | `RAPIDAPI_KEY` | RapidAPI key for JSearch job listings | *(optional)* |
+
+---
+
+## Deploying to DigitalOcean
+
+**Domain:** `elevraa.me` → full app (frontend at `/`, backend API at `/api/`)
+
+### Option A — DigitalOcean App Platform (recommended)
+
+App Platform handles SSL, scaling, managed PostgreSQL, and zero-downtime deploys automatically.
+
+#### 1. Install `doctl` and authenticate
+
+```bash
+# macOS/Linux
+brew install doctl
+# Windows: https://docs.digitalocean.com/reference/doctl/how-to/install/
+
+doctl auth init   # paste your DO personal access token
+```
+
+#### 2. Fill in secrets in `.do/app.yaml`
+
+Open [.do/app.yaml](.do/app.yaml) and replace every `REPLACE_WITH_YOUR_*` value. **Alternatively**, leave them as placeholders and set them in the DO console after first deploy (Settings → Environment Variables). Secrets are never stored in plain text by DO.
+
+#### 3. Deploy
+
+```bash
+# First deploy — creates the app
+doctl apps create --spec .do/app.yaml
+
+# Subsequent deploys (after code changes pushed to Git)
+doctl apps update <your-app-id> --spec .do/app.yaml
+```
+
+#### 4. Connect your GitHub repo (easier alternative)
+
+In the [DO console](https://cloud.digitalocean.com/apps), click **Create App → GitHub** and point it at this repo. App Platform auto-deploys on every push to `main`.
+
+#### 5. Add the custom domain in DO console
+
+1. Go to your app → **Settings → Domains**
+2. Add `elevraa.me` → click **Add Domain**
+3. DO will show you a CNAME/A record — follow the [DNS steps below](#namecheap-dns-setup)
+
+---
+
+### Option B — Docker Compose on a Droplet
+
+For a single Droplet (manual control, no managed DB):
+
+```bash
+# On your Droplet
+git clone <your-repo-url> elevra
+cd elevra
+
+# Fill in production values
+cp .env.example .env
+nano .env   # set FRONTEND_URL=https://elevraa.me, DB password, AI key, etc.
+
+docker compose up -d --build
+
+# Run migrations
+docker compose exec backend bash -c "cd /app/backend && alembic upgrade head"
+```
+
+The nginx frontend container listens on port 80 and proxies `/api/*` to the backend automatically.
+
+For HTTPS on a Droplet, put Caddy or Certbot in front of port 80.
+
+---
+
+## Namecheap DNS Setup
+
+Point `elevraa.me` to DigitalOcean by switching to DO nameservers (this also lets DO manage all subdomains from the DO panel).
+
+### Step 1 — Switch nameservers in Namecheap
+
+1. Log in to [namecheap.com](https://namecheap.com) → **Domain List** → click **Manage** next to `elevraa.me`
+2. Under **Nameservers**, select **Custom DNS**
+3. Enter the three DigitalOcean nameservers:
+
+```
+ns1.digitalocean.com
+ns2.digitalocean.com
+ns3.digitalocean.com
+```
+
+4. Click the green tick to save. Propagation takes **15 minutes – 24 hours**.
+
+### Step 2 — Add the domain to DigitalOcean
+
+1. In the [DO console](https://cloud.digitalocean.com/networking/domains) → **Networking → Domains**
+2. Click **Add Domain** → enter `elevraa.me`
+3. DO will show an auto-generated A record pointing to your app
+
+### Step 3 — App Platform domain record
+
+If using App Platform (Option A):
+
+1. App → **Settings → Domains → Add** → enter `elevraa.me`
+2. App Platform gives you a CNAME value (e.g. `elevra-abc.ondigitalocean.app`)
+3. In DO Networking → Domains → `elevraa.me` → add a **CNAME** record:
+   - **Hostname:** `@`
+   - **Value:** `elevra-abc.ondigitalocean.app.`
+
+App Platform provisions a free Let's Encrypt SSL certificate automatically within a few minutes.
+
+### Step 4 — Update Google OAuth
+
+Add `https://elevraa.me` to your OAuth 2.0 client's **Authorised JavaScript origins** in [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
+

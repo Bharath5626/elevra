@@ -1,0 +1,133 @@
+# DigitalOcean App Platform specification
+# Docs: https://docs.digitalocean.com/products/app-platform/reference/app-spec/
+#
+# Deploy:
+#   doctl apps create --spec .do/app.yaml
+#   doctl apps update <app-id> --spec .do/app.yaml
+#
+# After first deploy, add the domain in the DO console and follow the DNS steps
+# in README.md to point elevraa.me → this app.
+
+name: elevra
+region: blr   # Bangalore — same region as your Spaces bucket
+
+# ── Ingress: route /api/* → backend, everything else → frontend ───────────────
+ingress:
+  rules:
+    - component:
+        name: api
+      match:
+        path:
+          prefix: /api
+      transform:
+        strip_path: true   # backend sees /auth/login, not /api/auth/login
+
+    - component:
+        name: frontend
+      match:
+        path:
+          prefix: /
+
+# ── Backend (FastAPI) ─────────────────────────────────────────────────────────
+services:
+  - name: api
+    dockerfile_path: Dockerfile    # root-level backend Dockerfile
+    http_port: 8000
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 20
+      period_seconds: 30
+    envs:
+      - key: DATABASE_URL
+        value: ${db.DATABASE_URL}
+        scope: RUN_TIME
+      - key: FRONTEND_URL
+        value: https://elevraa.me
+        scope: RUN_TIME
+      - key: DEBUG
+        value: "false"
+        scope: RUN_TIME
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+        scope: RUN_TIME
+      - key: CLAUDE_MODEL
+        value: claude-3-5-sonnet-20241022
+        scope: RUN_TIME
+      - key: SPACES_REGION
+        value: blr1
+        scope: RUN_TIME
+      - key: SPACES_BUCKET
+        value: careerai-media
+        scope: RUN_TIME
+      - key: SPACES_ENDPOINT
+        value: https://blr1.digitaloceanspaces.com
+        scope: RUN_TIME
+      # ── Secrets: fill these in the DO console (Settings → Environment Variables)
+      - key: SECRET_KEY
+        value: REPLACE_WITH_YOUR_SECRET_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: AI_API_KEY
+        value: REPLACE_WITH_YOUR_AI_API_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: ADMIN_SECRET
+        value: REPLACE_WITH_YOUR_ADMIN_SECRET
+        type: SECRET
+        scope: RUN_TIME
+      - key: RAPIDAPI_KEY
+        value: REPLACE_WITH_YOUR_RAPIDAPI_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: SPACES_KEY
+        value: REPLACE_WITH_YOUR_SPACES_KEY
+        type: SECRET
+        scope: RUN_TIME
+      - key: SPACES_SECRET
+        value: REPLACE_WITH_YOUR_SPACES_SECRET
+        type: SECRET
+        scope: RUN_TIME
+
+# ── Frontend (React / Vite — built by DO, served as static site) ─────────────
+static_sites:
+  - name: frontend
+    source_dir: frontend
+    build_command: npm run build
+    output_dir: dist
+    environment_slug: node-js
+    catchall_document: index.html   # React Router SPA fallback
+    envs:
+      - key: VITE_API_URL
+        value: https://elevraa.me/api
+        scope: BUILD_TIME
+      - key: VITE_GOOGLE_CLIENT_ID
+        value: REPLACE_WITH_YOUR_GOOGLE_CLIENT_ID
+        scope: BUILD_TIME
+
+# ── Managed PostgreSQL ────────────────────────────────────────────────────────
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    size: db-s-dev-database   # upgrade to db-s-1vcpu-1gb for production traffic
+
+# ── Pre-deploy job: run Alembic migrations before each new release ────────────
+jobs:
+  - name: migrate
+    kind: PRE_DEPLOY
+    dockerfile_path: Dockerfile
+    run_command: bash -c "cd /app/backend && alembic upgrade head"
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    envs:
+      - key: DATABASE_URL
+        value: ${db.DATABASE_URL}
+        scope: RUN_TIME
+
+# ── Custom domain ─────────────────────────────────────────────────────────────
+domains:
+  - domain: elevraa.me
+    type: PRIMARY
+    zone: elevraa.me

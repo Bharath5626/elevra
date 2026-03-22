@@ -7,6 +7,18 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          framer: ['framer-motion'],
+          axios: ['axios'],
+          lucide: ['lucide-react'],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     strictPort: false,

@@ -5,6 +5,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from .config import settings
 from .database import init_db, engine
@@ -43,6 +46,9 @@ _console_handler.setFormatter(_fmt)
 logging.basicConfig(level=logging.INFO, handlers=[_file_handler, _console_handler])
 logger = logging.getLogger("elevra")
 
+# ── Rate limiter (shared across routers) ──────────────────────────────────────
+limiter = Limiter(key_func=get_remote_address, default_limits=[])
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -51,7 +57,7 @@ async def lifespan(app: FastAPI):
         await init_db()
         logger.info("Database initialised successfully.")
     except Exception as e:
-        logger.warning("DB init skipped — could not connect: %s. Start PostgreSQL and restart.", e)
+        logger.warning("DB init skipped — could not connect: %s. Run 'alembic upgrade head' and restart.", e)
     yield
     await engine.dispose()
 
@@ -63,15 +69,21 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # ── CORS ──────────────────────────────────────────────────────────────────────
-app.add_middleware(
-    CORSMiddleware,
+_cors_kwargs: dict = dict(
     allow_origins=[settings.FRONTEND_URL],
-    allow_origin_regex=r"http://localhost:\d+",  # allow any localhost port
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# In dev mode allow any localhost port so the Vite dev server always works.
+if settings.DEBUG:
+    _cors_kwargs["allow_origin_regex"] = r"http://localhost:\d+"
+
+app.add_middleware(CORSMiddleware, **_cors_kwargs)
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(auth_router)

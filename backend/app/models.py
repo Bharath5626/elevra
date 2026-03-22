@@ -4,7 +4,7 @@ from sqlalchemy import (
     Column, String, Integer, Float, Boolean, Text, DateTime,
     ForeignKey, JSON, LargeBinary,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -45,7 +45,7 @@ class ResumeAnalysis(Base):
     raw_text           = Column(Text)
     jd_text            = Column(Text)
     ats_score           = Column(Integer)
-    ats_score_breakdown = Column(JSON, default=dict)   # full deterministic sub-scores
+    ats_score_breakdown = Column(JSONB, default=dict)   # full deterministic sub-scores
     score_mode          = Column(String(20), default="general")  # "jd_provided" | "general"
     keyword_gaps        = Column(JSON, default=list)
     weak_bullets        = Column(JSON, default=list)
@@ -224,14 +224,14 @@ class UserProfile(Base):
     years_of_experience  = Column(Integer, default=0)
 
     # ── Extracted content (from latest resume parse) ──────────────────────────
-    skills           = Column(JSON, default=list)   # flat list of skill strings
+    skills           = Column(JSONB, default=list)   # flat list of skill strings
     experience_raw   = Column(Text)                 # raw experience section text
     education_raw    = Column(Text)                 # raw education section text
-    certifications   = Column(JSON, default=list)   # list of certification strings
+    certifications   = Column(JSONB, default=list)   # list of certification strings
 
-    # ── Job preferences (accumulated from interview sessions) ─────────────────
-    preferred_roles     = Column(JSON, default=list)   # ["Software Engineer", …]
-    preferred_locations = Column(JSON, default=list)   # ["Remote", "New York", …]
+    # ── Job preferences (accumulated from interview sessions) ─────────────────────
+    preferred_roles     = Column(JSONB, default=list)   # ["Software Engineer", …]
+    preferred_locations = Column(JSONB, default=list)   # ["Remote", "New York", …]
 
     # ── Meta ──────────────────────────────────────────────────────────────────
     last_resume_id  = Column(UUID(as_uuid=False), ForeignKey("resume_analyses.id"), nullable=True)
