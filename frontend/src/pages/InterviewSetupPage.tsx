@@ -371,10 +371,10 @@ export default function InterviewSetupPage() {
         </motion.div>
       </div>
     )}
-    <div style={{ padding: '20px 28px 24px' }}>
+    <div style={{ padding: '10px 28px 24px' }}>
 
       {/* ── Header ── */}
-      <motion.div {...fadeUp(0)} style={{ marginBottom: 20 }}>
+      <motion.div {...fadeUp(0)} style={{ marginBottom: 12 }}>
         <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 26, fontWeight: 700, color: TEXT, marginBottom: 4 }}>
           Mock <span style={{ color: P }}>Interview</span>
         </h1>

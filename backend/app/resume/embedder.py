@@ -15,7 +15,7 @@ from collections import Counter
 
 logger = logging.getLogger(__name__)
 
-_GEMINI_EMBEDDING_MODEL = "embedding-001"
+_GEMINI_EMBEDDING_MODEL = "text-embedding-004"
 _MAX_EMBED_CHARS = 8000  # Gemini token limit guard
 
 

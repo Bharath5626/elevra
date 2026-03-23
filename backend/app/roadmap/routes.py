@@ -30,14 +30,19 @@ async def create_roadmap(
     if not session:
         raise HTTPException(status_code=404, detail="Interview session not found")
 
-    # Collect weak areas + missing skills from answers
+    # Collect weak areas from answers, stripping out technical-failure messages
+    # (e.g. "No speech was detected", "microphone", "API evaluation failed")
+    TECHNICAL_NOISE = ("no speech", "microphone", "ai evaluation failed", "re-record", "api key")
     ar = await db.execute(
         select(InterviewAnswer).where(InterviewAnswer.session_id == session_id)
     )
     answers = ar.scalars().all()
     weak_areas: list[str] = []
     for a in answers:
-        weak_areas.extend(a.improvements or [])
+        for item in (a.improvements or []):
+            low = item.lower()
+            if not any(kw in low for kw in TECHNICAL_NOISE):
+                weak_areas.append(item)
     weak_areas = list(dict.fromkeys(weak_areas))[:10]
 
     try:

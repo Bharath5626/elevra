@@ -1,7 +1,9 @@
 from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
+
+from .auth.disposable_domains import is_disposable_email
 
 
 # ════════════════════════════════════════════════════════════
@@ -11,6 +13,16 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     name: str
+
+    @field_validator("email")
+    @classmethod
+    def reject_disposable_email(cls, v: str) -> str:
+        if is_disposable_email(v):
+            raise ValueError(
+                "Temporary or disposable email addresses are not allowed. "
+                "Please use a permanent email address."
+            )
+        return v
 
 
 class UserLogin(BaseModel):

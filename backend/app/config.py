@@ -21,18 +21,18 @@ class Settings(BaseSettings):
     CLAUDE_MODEL: str = "claude-3-5-sonnet-20241022"
     GEMINI_MODEL: str = "gemini-2.5-flash"
 
-    # ── Storage (DigitalOcean Spaces / S3) ────────────────────
-    SPACES_KEY: str = ""
-    SPACES_SECRET: str = ""
-    SPACES_REGION: str = "blr1"
-    SPACES_BUCKET: str = "careerai-media"
-    SPACES_ENDPOINT: str = "https://blr1.digitaloceanspaces.com"
+    # ── Storage (Azure Blob Storage) ──────────────────────────
+    AZURE_STORAGE_CONNECTION_STRING: str = ""
+    AZURE_STORAGE_CONTAINER: str = "careerai-media"
 
     # ── CORS ─────────────────────────────────────────────────
     FRONTEND_URL: str = "http://localhost:5173"
 
     # ── JSearch (RapidAPI) ────────────────────────────────────
     RAPIDAPI_KEY: str = ""
+
+    # ── IPQualityScore ────────────────────────────────────────
+    IPQS_API_KEY: str = ""
 
     # ── Admin ─────────────────────────────────────────────────
     ADMIN_SECRET: str = "elevra-admin-secret-change-in-production"

@@ -8,8 +8,8 @@ An AI-powered career development platform that combines resume intelligence, moc
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Deploying to DigitalOcean (elevraa.me)](#deploying-to-digitalocean)
-- [Namecheap DNS Setup](#namecheap-dns-setup)
+- [Deploying to Azure (elevraa.me)](#deploying-to-azure)
+- [DNS Setup (Namecheap → Azure)](#dns-setup-namecheap--azure)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
@@ -45,7 +45,7 @@ An AI-powered career development platform that combines resume intelligence, moc
 - Python 3.11, FastAPI, SQLAlchemy (async), PostgreSQL, Alembic
 - AI: Google Gemini (`gemini-2.5-flash`) / Anthropic Claude (`claude-3-5-sonnet`) — auto-detected from key prefix
 - Audio/Video analysis: `faster-whisper`, MediaPipe, DeepFace, OpenCV
-- Storage: DigitalOcean Spaces (S3-compatible) via `boto3`
+- Storage: Azure Blob Storage via `azure-storage-blob`
 
 **Frontend**
 - React 19, TypeScript, Vite 6, Tailwind CSS v4
@@ -275,122 +275,210 @@ Interactive API documentation is available at `/docs` (Swagger UI) and `/redoc`.
 | `AI_API_KEY` | Gemini (`AIza…`) or Anthropic (`sk-ant-…`) key | — |
 | `GEMINI_MODEL` | Gemini model name | `gemini-2.5-flash` |
 | `CLAUDE_MODEL` | Claude model name | `claude-3-5-sonnet-20241022` |
-| `SPACES_KEY` | DO Spaces / S3 access key | *(optional)* |
-| `SPACES_SECRET` | DO Spaces / S3 secret | *(optional)* |
-| `SPACES_REGION` | Spaces region | `blr1` |
-| `SPACES_BUCKET` | Spaces bucket name | `careerai-media` |
-| `SPACES_ENDPOINT` | Spaces endpoint URL | `https://blr1.digitaloceanspaces.com` |
+| `AZURE_STORAGE_CONNECTION_STRING` | Azure Blob Storage connection string | *(optional)* |
+| `AZURE_STORAGE_CONTAINER` | Blob container name | `careerai-media` |
 | `FRONTEND_URL` | Allowed CORS origin | `http://localhost:5173` |
 | `RAPIDAPI_KEY` | RapidAPI key for JSearch job listings | *(optional)* |
 
 ---
 
-## Deploying to DigitalOcean
+## Deploying to Azure
 
 **Domain:** `elevraa.me` → full app (frontend at `/`, backend API at `/api/`)
 
-### Option A — DigitalOcean App Platform (recommended)
+**Budget estimate**: ~$30-35/month on a Standard_B2s VM → roughly 3 months from your $100 credit.
 
-App Platform handles SSL, scaling, managed PostgreSQL, and zero-downtime deploys automatically.
+### Azure Blob Storage Setup
 
-#### 1. Install `doctl` and authenticate
+Azure Blob Storage replaces the previous S3-compatible storage for file uploads (resumes, interview recordings).
 
-```bash
-# macOS/Linux
-brew install doctl
-# Windows: https://docs.digitalocean.com/reference/doctl/how-to/install/
+1. In the [Azure Portal](https://portal.azure.com), go to **Storage accounts → Create**:
 
-doctl auth init   # paste your DO personal access token
-```
+   | Setting | Value |
+   |---|---|
+   | Resource group | `elevra-rg` |
+   | Storage account name | `elevramedia` (globally unique, lowercase) |
+   | Region | Same as your VM |
+   | Redundancy | LRS (cheapest) |
 
-#### 2. Fill in secrets in `.do/app.yaml`
+2. Create a container: Storage account → **Containers → + Container**
+   - Name: `careerai-media`
+   - Access level: **Private**
 
-Open [.do/app.yaml](.do/app.yaml) and replace every `REPLACE_WITH_YOUR_*` value. **Alternatively**, leave them as placeholders and set them in the DO console after first deploy (Settings → Environment Variables). Secrets are never stored in plain text by DO.
+3. Get the connection string: Storage account → **Security + networking → Access keys → Show** → copy **Connection string**
 
-#### 3. Deploy
-
-```bash
-# First deploy — creates the app
-doctl apps create --spec .do/app.yaml
-
-# Subsequent deploys (after code changes pushed to Git)
-doctl apps update <your-app-id> --spec .do/app.yaml
-```
-
-#### 4. Connect your GitHub repo (easier alternative)
-
-In the [DO console](https://cloud.digitalocean.com/apps), click **Create App → GitHub** and point it at this repo. App Platform auto-deploys on every push to `main`.
-
-#### 5. Add the custom domain in DO console
-
-1. Go to your app → **Settings → Domains**
-2. Add `elevraa.me` → click **Add Domain**
-3. DO will show you a CNAME/A record — follow the [DNS steps below](#namecheap-dns-setup)
+4. Add to your `.env`:
+   ```env
+   AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=elevramedia;AccountKey=...;EndpointSuffix=core.windows.net
+   AZURE_STORAGE_CONTAINER=careerai-media
+   ```
 
 ---
 
-### Option B — Docker Compose on a Droplet
+### Option A — Azure VM with Docker Compose (recommended)
 
-For a single Droplet (manual control, no managed DB):
+The simplest path: one Linux VM running your existing Docker Compose stack.
+
+#### 1. Create the VM
+
+In the [Azure Portal](https://portal.azure.com) → **Create a resource → Virtual Machine**:
+
+| Setting | Value |
+|---|---|
+| Resource group | `elevra-rg` (create new) |
+| VM name | `elevra-vm` |
+| Region | East US (or nearest to you) |
+| Image | Ubuntu Server 22.04 LTS |
+| Size | **Standard_B2s** (2 vCPU, 4 GB RAM, ~$30/month) |
+| Authentication | SSH public key |
+| Inbound ports | HTTP (80), HTTPS (443), SSH (22) |
+
+Or via Azure CLI:
 
 ```bash
-# On your Droplet
+# Install: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
+az login
+az group create --name elevra-rg --location eastus
+
+az vm create \
+  --resource-group elevra-rg \
+  --name elevra-vm \
+  --image Ubuntu2204 \
+  --size Standard_B2s \
+  --admin-username azureuser \
+  --generate-ssh-keys \
+  --public-ip-sku Standard
+
+# Open HTTP and HTTPS ports
+az vm open-port --resource-group elevra-rg --name elevra-vm --port 80 --priority 100
+az vm open-port --resource-group elevra-rg --name elevra-vm --port 443 --priority 101
+```
+
+Note the **Public IP address** — you'll need it for DNS.
+
+#### 2. Install Docker on the VM
+
+```bash
+ssh azureuser@<your-vm-public-ip>
+
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker azureuser
+newgrp docker
+
+# Install Docker Compose plugin
+sudo apt-get install -y docker-compose-plugin
+
+# Verify
+docker compose version
+```
+
+#### 3. Clone the repo and configure
+
+```bash
 git clone <your-repo-url> elevra
 cd elevra
 
-# Fill in production values
 cp .env.example .env
-nano .env   # set FRONTEND_URL=https://elevraa.me, DB password, AI key, etc.
+nano .env   # fill in all required values
+```
 
+Key values to set in `.env`:
+
+```env
+POSTGRES_PASSWORD=a-strong-random-password
+SECRET_KEY=a-32-char-minimum-random-string
+AI_API_KEY=your-gemini-or-anthropic-key
+FRONTEND_URL=https://elevraa.me
+AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...
+AZURE_STORAGE_CONTAINER=careerai-media
+```
+
+#### 4. Deploy
+
+```bash
+# Build and start all services (backend, frontend nginx, PostgreSQL)
 docker compose up -d --build
 
-# Run migrations
+# Run database migrations
 docker compose exec backend bash -c "cd /app/backend && alembic upgrade head"
+
+# Check status
+docker compose ps
+docker compose logs backend --tail=50
 ```
 
 The nginx frontend container listens on port 80 and proxies `/api/*` to the backend automatically.
 
-For HTTPS on a Droplet, put Caddy or Certbot in front of port 80.
+#### 5. Set up HTTPS with Caddy
+
+Caddy automatically provisions a free Let's Encrypt certificate.
+
+```bash
+# Install Caddy
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor | sudo tee /usr/share/keyrings/caddy-stable-archive-keyring.gpg >/dev/null
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update && sudo apt install caddy
+```
+
+Create `/etc/caddy/Caddyfile`:
+
+```
+elevraa.me {
+    reverse_proxy localhost:80
+}
+```
+
+```bash
+sudo systemctl reload caddy
+```
+
+Caddy handles TLS and forwards to nginx on port 80. Make sure your DNS A record points to the VM IP before running this (Caddy needs to reach Let's Encrypt).
 
 ---
 
-## Namecheap DNS Setup
+### Option B — Azure Container Apps (fully managed)
 
-Point `elevraa.me` to DigitalOcean by switching to DO nameservers (this also lets DO manage all subdomains from the DO panel).
+For a more managed approach without maintaining a VM:
 
-### Step 1 — Switch nameservers in Namecheap
+```bash
+az extension add --name containerapp --upgrade
+az provider register --namespace Microsoft.App
 
-1. Log in to [namecheap.com](https://namecheap.com) → **Domain List** → click **Manage** next to `elevraa.me`
-2. Under **Nameservers**, select **Custom DNS**
-3. Enter the three DigitalOcean nameservers:
-
-```
-ns1.digitalocean.com
-ns2.digitalocean.com
-ns3.digitalocean.com
+az containerapp env create \
+  --name elevra-env \
+  --resource-group elevra-rg \
+  --location eastus
 ```
 
-4. Click the green tick to save. Propagation takes **15 minutes – 24 hours**.
+Push your images to Azure Container Registry first, then deploy each service as a Container App. This is more involved to set up but offers automatic scaling. The VM approach (Option A) is simpler for getting started quickly with your $100 credits.
 
-### Step 2 — Add the domain to DigitalOcean
+---
 
-1. In the [DO console](https://cloud.digitalocean.com/networking/domains) → **Networking → Domains**
-2. Click **Add Domain** → enter `elevraa.me`
-3. DO will show an auto-generated A record pointing to your app
+## DNS Setup (Namecheap → Azure)
 
-### Step 3 — App Platform domain record
+Point `elevraa.me` directly to your Azure VM's public IP — no nameserver change required.
 
-If using App Platform (Option A):
+### Step 1 — Get your VM's public IP
 
-1. App → **Settings → Domains → Add** → enter `elevraa.me`
-2. App Platform gives you a CNAME value (e.g. `elevra-abc.ondigitalocean.app`)
-3. In DO Networking → Domains → `elevraa.me` → add a **CNAME** record:
-   - **Hostname:** `@`
-   - **Value:** `elevra-abc.ondigitalocean.app.`
+In the [Azure Portal](https://portal.azure.com) → **Virtual Machines → elevra-vm → Overview**.
+Copy the **Public IP address**.
 
-App Platform provisions a free Let's Encrypt SSL certificate automatically within a few minutes.
+### Step 2 — Add DNS records in Namecheap
 
-### Step 4 — Update Google OAuth
+1. Log in to [namecheap.com](https://namecheap.com) → **Domain List** → **Manage** next to `elevraa.me`
+2. Go to **Advanced DNS** → **Add New Record**
+3. Add:
+
+   | Type | Host | Value | TTL |
+   |---|---|---|---|
+   | A Record | `@` | `<your-vm-public-ip>` | Automatic |
+   | A Record | `www` | `<your-vm-public-ip>` | Automatic |
+
+4. Save. Propagation takes **15 minutes – 24 hours**.
+
+### Step 3 — Update Google OAuth
 
 Add `https://elevraa.me` to your OAuth 2.0 client's **Authorised JavaScript origins** in [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
 

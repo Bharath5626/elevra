@@ -15,7 +15,10 @@ export default function HistoryPage() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   useEffect(() => {
-    interviewAPI.getSessions().then(setSessions).catch(() => {}).finally(() => setLoading(false));
+    interviewAPI.getSessions()
+      .then((data) => setSessions(data.filter((s) => s.status === 'completed')))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = sessions.filter((s) => filter === 'all' || s.status === filter);

@@ -31,7 +31,7 @@ pdfplumber==0.11.4
 python-docx==1.2.0
 
 # ── Storage / Cloud ───────────────────────────────────────
-boto3==1.35.80
+azure-storage-blob==12.23.1
 
 # ── Utilities ─────────────────────────────────────────────
 python-dotenv==1.0.1

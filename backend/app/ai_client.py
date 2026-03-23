@@ -119,7 +119,25 @@ async def call_ai_json(system: str, prompt: str, max_tokens: int = 4096) -> dict
     """
     Like call_ai but parses the response as JSON.
     Strips markdown fences before parsing.
+    Extracts the outermost JSON object to handle truncated or padded responses.
     """
     raw = await call_ai(system, prompt, max_tokens)
     raw = _strip_fences(raw)
-    return json.loads(raw)
+
+    # Extract the outermost {...} block — guards against leading/trailing text
+    # and attempts to recover a partial JSON object if the response was cut off.
+    start = raw.find("{")
+    end   = raw.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        raw = raw[start : end + 1]
+
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        # Last resort: close any open array/object so json.loads has a chance
+        open_brackets  = raw.count("[") - raw.count("]")
+        open_braces    = raw.count("{") - raw.count("}")
+        raw = raw.rstrip(",").rstrip()
+        raw += "]" * max(0, open_brackets)
+        raw += "}" * max(0, open_braces)
+        return json.loads(raw)

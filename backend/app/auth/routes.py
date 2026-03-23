@@ -10,6 +10,7 @@ from ..models import User
 from ..schemas import UserRegister, UserLogin, GoogleAuthRequest, TokenResponse, UserOut
 from .password import hash_password, verify_password
 from .jwt_handler import create_access_token, get_current_user
+from .disposable_domains import is_disposable_email_live
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 limiter = Limiter(key_func=get_remote_address)
@@ -18,6 +19,12 @@ limiter = Limiter(key_func=get_remote_address)
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit("10/minute")
 async def register(request: Request, body: UserRegister, db: AsyncSession = Depends(get_db)):
+    if await is_disposable_email_live(body.email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Temporary or disposable email addresses are not allowed.",
+        )
+
     existing = await db.execute(select(User).where(User.email == body.email))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -75,6 +82,12 @@ async def google_auth(body: GoogleAuthRequest, db: AsyncSession = Depends(get_db
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Google account email is not verified",
+        )
+
+    if await is_disposable_email_live(email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Temporary or disposable email addresses are not allowed.",
         )
 
     name: str = info.get("name") or email.split("@")[0]

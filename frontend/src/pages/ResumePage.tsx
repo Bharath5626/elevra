@@ -128,6 +128,67 @@ export default function ResumePage() {
   return (
     <div style={{ padding: '24px 28px 48px' }}>
 
+      {/* ── Full-screen analyzing overlay ── */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            key="analyzing-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9999,
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
+              background: 'rgba(245, 243, 255, 0.55)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 20,
+            }}
+          >
+            {/* Spinner ring */}
+            <div style={{ position: 'relative', width: 72, height: 72 }}>
+              <svg
+                viewBox="0 0 72 72"
+                style={{ width: 72, height: 72, animation: 'spin 1s linear infinite' }}
+              >
+                <circle
+                  cx="36" cy="36" r="30"
+                  fill="none"
+                  stroke="#EDE9FE"
+                  strokeWidth="6"
+                />
+                <circle
+                  cx="36" cy="36" r="30"
+                  fill="none"
+                  stroke="#7C3AED"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray="100 90"
+                  strokeDashoffset="25"
+                />
+              </svg>
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+
+            {/* Text */}
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#4C1D95' }}>
+                Analyzing your resume&hellip;
+              </p>
+              <p style={{ margin: '6px 0 0', fontSize: 13, color: '#6B7280' }}>
+                This usually takes 10–20 seconds. Please wait.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Page header row ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>

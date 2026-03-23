@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFil
 from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func, exists
 from ..database import get_db
 from ..models import User, InterviewSession, InterviewAnswer, ResumeAnalysis, UserProfile
 from ..schemas import StartSessionRequest, InterviewSessionOut, InterviewAnswerOut, AnalysisStatusOut
@@ -217,9 +217,16 @@ async def list_sessions(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    # Exclude sessions that are still in_progress AND have no answers submitted
+    # — these are abandoned sessions (user closed/refreshed before answering anything).
+    has_answers = exists().where(InterviewAnswer.session_id == InterviewSession.id)
     r = await db.execute(
         select(InterviewSession)
-        .where(InterviewSession.user_id == current_user.id)
+        .where(
+            InterviewSession.user_id == current_user.id,
+            # keep if: not in_progress, OR in_progress but has at least one answer
+            (InterviewSession.status != "in_progress") | has_answers,
+        )
         .order_by(InterviewSession.created_at.desc())
     )
     return r.scalars().all()

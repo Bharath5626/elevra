@@ -18,12 +18,13 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from ..models import InterviewSession, InterviewAnswer
+from ..models import InterviewSession, InterviewAnswer, LearningRoadmap
 from ..analysis.speech import analyze_speech
 from ..analysis.eye_contact import analyze_eye_contact
 from ..analysis.emotion import analyze_emotion
 from ..analysis.scoring import compute_answer_score
 from .evaluator import evaluate_answer
+from ..roadmap.generator import generate_roadmap
 
 logger = logging.getLogger(__name__)
 
@@ -183,6 +184,32 @@ async def run_analysis_pipeline(
 
         _update_status(session_id, "completed", 100, "Analysis complete")
         logger.info("Pipeline completed for session %s — score: %d", session_id, session.overall_score)
+
+        # ── Auto-generate personalised roadmap ────────────────────────
+        try:
+            TECHNICAL_NOISE = ("no speech", "microphone", "ai evaluation failed", "re-record", "api key")
+            weak_areas: list[str] = []
+            for a in answers:
+                for item in (a.improvements or []):
+                    if not any(kw in item.lower() for kw in TECHNICAL_NOISE):
+                        weak_areas.append(item)
+            weak_areas = list(dict.fromkeys(weak_areas))[:10]
+            plan = await generate_roadmap(
+                role=session.job_role,
+                weak_areas=weak_areas,
+                missing_skills=[],
+                score=session.overall_score or 50,
+            )
+            roadmap = LearningRoadmap(
+                user_id=session.user_id,
+                session_id=session_id,
+                plan=plan,
+            )
+            db.add(roadmap)
+            await db.commit()
+            logger.info("Roadmap auto-generated for session %s", session_id)
+        except Exception as rm_exc:
+            logger.warning("Roadmap auto-generation failed for session %s: %s", session_id, rm_exc)
 
     except Exception as exc:
         _update_status(session_id, "failed", 0, f"Error: {str(exc)}")

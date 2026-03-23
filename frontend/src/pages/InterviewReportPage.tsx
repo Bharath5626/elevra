@@ -8,7 +8,16 @@ import ProgressBar from '../components/ProgressBar';
 import {
   BarChart3, CheckCircle, AlertTriangle, Star,
   Eye, Mic2, Brain, Play, ArrowRight, Loader2, BookOpen, ChevronLeft,
+  MessageSquare, Sparkles,
 } from 'lucide-react';
+
+const ANALYSIS_STEPS = [
+  { icon: MessageSquare, label: 'Transcribing answers' },
+  { icon: Brain,         label: 'Scoring technical depth' },
+  { icon: Eye,           label: 'Evaluating eye contact & body language' },
+  { icon: Mic2,          label: 'Analysing speech clarity & confidence' },
+  { icon: Sparkles,      label: 'Generating feedback & insights' },
+];
 
 export default function InterviewReportPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -18,6 +27,7 @@ export default function InterviewReportPage() {
   const [selectedAnswer, setSelectedAnswer] = useState(0);
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [showRoadmapBanner, setShowRoadmapBanner] = useState(true);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -135,34 +145,91 @@ export default function InterviewReportPage() {
   }
 
   if (session.status !== 'completed' || answers.length === 0) {
+    const progress = analysisStatus?.progress ?? 0;
+    const safeProgress = Math.min(100, Math.max(0, progress));
+    const activeStep = Math.min(
+      ANALYSIS_STEPS.length - 1,
+      Math.floor((safeProgress / 100) * ANALYSIS_STEPS.length),
+    );
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '24px' }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: '100vh', padding: '24px',
+        background: '#F8F7FF',
+      }}>
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{
-            background: '#fff', borderRadius: 12, border: '1px solid #E9E5F5',
-            boxShadow: '0 1px 4px rgba(124,58,237,.05)', padding: '40px 36px',
-            width: '100%', maxWidth: 520,
-          }}
+          transition={{ duration: 0.4 }}
+          style={{ width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', gap: 16 }}
         >
+          {/* ── Main card ── */}
           <div style={{
-            width: 56, height: 56, borderRadius: 10,
-            background: '#F5F3FF',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 24px',
+            background: '#1E1B4B',
+            borderRadius: 16,
+            padding: '36px 36px 32px',
+            boxShadow: '0 8px 32px rgba(30,27,75,.18)',
           }}>
-            <Loader2 size={28} style={{ color: '#7C3AED', animation: 'spin 1s linear infinite' }} />
+            {/* Icon + heading */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+              <motion.div
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  width: 52, height: 52, borderRadius: 12, flexShrink: 0,
+                  background: 'rgba(124,58,237,.25)',
+                  border: '1px solid rgba(124,58,237,.4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <Brain size={26} style={{ color: '#C4B5FD' }} />
+              </motion.div>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', letterSpacing: '.08em', margin: 0 }}>AI Processing</p>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#fff', margin: '4px 0 0' }}>Analysing Your Interview</h2>
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+              {ANALYSIS_STEPS.map((step, i) => {
+                const StepIcon = step.icon;
+                const done   = i < activeStep;
+                const active = i === activeStep;
+                return (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                      background: done ? 'rgba(34,197,94,.2)' : active ? 'rgba(124,58,237,.25)' : 'rgba(255,255,255,.06)',
+                      border: `1px solid ${done ? 'rgba(34,197,94,.4)' : active ? 'rgba(124,58,237,.4)' : 'rgba(255,255,255,.1)'}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {done
+                        ? <CheckCircle size={14} style={{ color: '#4ade80' }} />
+                        : active
+                        ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}>
+                            <Loader2 size={14} style={{ color: '#A78BFA' }} />
+                          </motion.div>
+                        : <StepIcon size={14} style={{ color: 'rgba(255,255,255,.25)' }} />
+                      }
+                    </div>
+                    <span style={{
+                      fontSize: 13,
+                      color: done ? 'rgba(255,255,255,.7)' : active ? '#fff' : 'rgba(255,255,255,.3)',
+                      fontWeight: active ? 600 : 400,
+                    }}>{step.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Progress bar */}
+            <ProgressBar value={safeProgress} label={analysisStatus?.current_step || 'Collecting analysis results'} />
           </div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1E1B4B',
-                       textAlign: 'center', margin: '0 0 10px' }}>
-            Preparing your interview report
-          </h1>
-          <p style={{ fontSize: 14, color: '#6B7280', textAlign: 'center',
-                      lineHeight: 1.65, margin: '0 0 28px' }}>
-            Your real interview metrics are still being processed. This page will update automatically when the report is ready.
+
+          <p style={{ textAlign: 'center', fontSize: 12, color: '#9CA3AF', margin: 0 }}>
+            This page updates automatically — no need to refresh.
           </p>
-          <ProgressBar value={analysisStatus?.progress ?? 0} label={analysisStatus?.current_step || 'Collecting analysis results'} />
         </motion.div>
       </div>
     );
@@ -211,6 +278,61 @@ export default function InterviewReportPage() {
             </div>
           </div>
         </motion.div>
+
+        {/* ── Roadmap-ready banner ────────────────────────────────── */}
+        <AnimatePresence>
+          {showRoadmapBanner && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22 }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                background: 'linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)',
+                border: '1.5px solid #DDD6FE',
+                borderRadius: 12, padding: '14px 18px', marginBottom: 20,
+              }}
+            >
+              <div style={{
+                width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+                background: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <BookOpen size={16} style={{ color: '#fff' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#1E1B4B' }}>
+                  Your personalised learning roadmap is ready!
+                </p>
+                <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#6B7280' }}>
+                  A 30-day plan tailored to this interview has been generated in the Roadmap section.
+                </p>
+              </div>
+              <Link
+                to={`/roadmap/${sessionId}`}
+                style={{
+                  flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '8px 16px', borderRadius: 8, fontSize: 12.5, fontWeight: 600,
+                  background: '#7C3AED', color: '#fff', textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                View Roadmap <ArrowRight size={13} />
+              </Link>
+              <button
+                onClick={() => setShowRoadmapBanner(false)}
+                style={{
+                  flexShrink: 0, background: 'none', border: 'none',
+                  cursor: 'pointer', color: '#9CA3AF', padding: 4, lineHeight: 1,
+                  fontSize: 18, fontWeight: 300,
+                }}
+                aria-label="Dismiss"
+              >
+                ×
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Overall score card ───────────────────────────── */}
         <motion.div

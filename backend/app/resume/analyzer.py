@@ -168,8 +168,8 @@ async def analyze_resume(
             sections_found = ", ".join(sections_found) or "none detected",
             section_pct    = round(section_score * 100),
             format_pct     = round(format_score * 100),
-            resume_text    = resume_text[:5000],
-            jd_text        = jd_text[:3000],
+            resume_text    = resume_text[:3000],
+            jd_text        = jd_text[:1500],
         )
 
     else:
@@ -200,7 +200,7 @@ async def analyze_resume(
             skills_found   = ", ".join(resume_skills[:15]) or "none detected",
             format_issues  = ", ".join(format_issues) or "none",
             sections_found = ", ".join(sections_found) or "none detected",
-            resume_text    = resume_text[:6000],
+            resume_text    = resume_text[:3000],
         )
 
     # 3. AI qualitative feedback (score is already fixed — AI only suggests)
