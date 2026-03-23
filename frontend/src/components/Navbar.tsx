@@ -47,7 +47,7 @@ export default function Navbar() {
       transition: 'border-color .2s, box-shadow .2s',
     }}>
       <div style={{
-        maxWidth: 1280, margin: '0 auto', padding: '0 32px',
+        maxWidth: 1280, margin: '0 auto', padding: wide < 480 ? '0 16px' : '0 32px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         height: 62,
       }}>

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { jobsAPI } from '../services/api';
 import type { JobApplication } from '../types';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 
 const STATUS_OPTIONS = [
   { value: 'applied', label: 'Applied', icon: Clock, color: '#8B5CF6' },
@@ -23,6 +24,8 @@ export default function ApplicationsPage() {
   const [apps, setApps] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const winW = useWindowWidth();
+  const isMobile = winW < 640;
 
   useEffect(() => {
     jobsAPI.getApplications().then(setApps).catch(() => {}).finally(() => setLoading(false));
@@ -72,7 +75,7 @@ export default function ApplicationsPage() {
   }
 
   return (
-    <div style={{ padding: '24px 28px 48px' }}>
+    <div style={{ padding: isMobile ? '16px 16px 40px' : '24px 28px 48px' }}>
 
         {/* ── Header ──────────────────────────────── */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
@@ -112,7 +115,7 @@ export default function ApplicationsPage() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}
+          style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 2 : 4}, 1fr)`, gap: 14, marginBottom: 28 }}
         >
           {stats.map((s) => (
             <div key={s.value} style={{ ...card, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -160,92 +163,90 @@ export default function ApplicationsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -40 }}
                     transition={{ delay: idx * 0.03 }}
-                    style={{ ...card, padding: '22px 26px' }}
+                    style={{ ...card, padding: isMobile ? '16px' : '22px 26px' }}
                   >
-                    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                      {/* Logo */}
-                      {app.employer_logo ? (
-                        <img src={app.employer_logo} alt={app.company} style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'contain', background: '#F8F7FF', flexShrink: 0 }} />
-                      ) : (
-                        <div style={{
-                          width: 44, height: 44, borderRadius: 10, flexShrink: 0,
-                          background: '#F5F3FF',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: '#7C3AED', fontWeight: 700, fontSize: 16,
-                        }}>
-                          {app.company.charAt(0)}
-                        </div>
-                      )}
-
-                      {/* Info */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h3 style={{ fontSize: 15, fontWeight: 600, color: '#1E1B4B', margin: 0 }}>
-                          {app.job_title}
-                        </h3>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Building2 size={12} /> {app.company}</span>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><MapPin size={12} /> {app.location}</span>
-                          {app.match_score != null && (
-                            <span style={{
-                              fontSize: 11, fontWeight: 600, padding: '1px 7px', borderRadius: 5,
-                              background: app.match_score >= 80 ? 'rgba(34,197,94,.1)' : app.match_score >= 60 ? 'rgba(245,158,11,.1)' : 'rgba(239,68,68,.1)',
-                              color: app.match_score >= 80 ? '#22c55e' : app.match_score >= 60 ? '#f59e0b' : '#ef4444',
-                            }}>
-                              {app.match_score}% Match
-                            </span>
-                          )}
+                    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 12 : 16, alignItems: isMobile ? 'stretch' : 'center' }}>
+                      {/* Logo + Info */}
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flex: 1, minWidth: 0 }}>
+                        {app.employer_logo ? (
+                          <img src={app.employer_logo} alt={app.company} style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'contain', background: '#F8F7FF', flexShrink: 0 }} />
+                        ) : (
+                          <div style={{
+                            width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+                            background: '#F5F3FF',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#7C3AED', fontWeight: 700, fontSize: 16,
+                          }}>
+                            {app.company.charAt(0)}
+                          </div>
+                        )}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <h3 style={{ fontSize: 15, fontWeight: 600, color: '#1E1B4B', margin: 0 }}>
+                            {app.job_title}
+                          </h3>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: '#6B7280', marginTop: 4, flexWrap: 'wrap' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><Building2 size={12} /> {app.company}</span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}><MapPin size={12} /> {app.location}</span>
+                            {app.match_score != null && (
+                              <span style={{
+                                fontSize: 11, fontWeight: 600, padding: '1px 7px', borderRadius: 5,
+                                background: app.match_score >= 80 ? 'rgba(34,197,94,.1)' : app.match_score >= 60 ? 'rgba(245,158,11,.1)' : 'rgba(239,68,68,.1)',
+                                color: app.match_score >= 80 ? '#22c55e' : app.match_score >= 60 ? '#f59e0b' : '#ef4444',
+                              }}>
+                                {app.match_score}% Match
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Status selector */}
-                      <select
-                        value={app.status}
-                        onChange={(e) => handleStatusChange(app.id, e.target.value)}
-                        style={{
-                          padding: '7px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                          border: `1.5px solid ${meta.color}40`,
-                          background: `${meta.color}10`, color: meta.color,
-                          cursor: 'pointer', outline: 'none',
-                        }}
-                      >
-                        {STATUS_OPTIONS.map((s) => (
-                          <option key={s.value} value={s.value}>{s.label}</option>
-                        ))}
-                      </select>
-
+                      {/* Controls row */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <select
+                          value={app.status}
+                          onChange={(e) => handleStatusChange(app.id, e.target.value)}
+                          style={{
+                            padding: '7px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                            border: `1.5px solid ${meta.color}40`,
+                            background: `${meta.color}10`, color: meta.color,
+                            cursor: 'pointer', outline: 'none',
+                          }}
+                        >
+                          {STATUS_OPTIONS.map((s) => (
+                            <option key={s.value} value={s.value}>{s.label}</option>
+                          ))}
+                        </select>
                         <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap' }}>
-                        {new Date(app.applied_at).toLocaleDateString()}
-                      </span>
-
-                      {/* Actions */}
-                      <a
-                        href={app.apply_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          width: 34, height: 34, borderRadius: 8,
-                          border: '1px solid #E9E5F5',
-                          color: '#6B7280', flexShrink: 0,
-                        }}
-                        title="Open job posting"
-                      >
-                        <ExternalLink size={14} />
-                      </a>
-
-                      <button
-                        onClick={() => handleDelete(app.id)}
-                        disabled={deleting === app.id}
-                        style={{
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          width: 34, height: 34, borderRadius: 8,
-                          border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.06)',
-                          color: '#ef4444', cursor: 'pointer', flexShrink: 0,
-                        }}
-                        title="Delete application"
-                      >
-                        {deleting === app.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                      </button>
+                          {new Date(app.applied_at).toLocaleDateString()}
+                        </span>
+                        <a
+                          href={app.apply_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            width: 34, height: 34, borderRadius: 8,
+                            border: '1px solid #E9E5F5',
+                            color: '#6B7280', flexShrink: 0,
+                          }}
+                          title="Open job posting"
+                        >
+                          <ExternalLink size={14} />
+                        </a>
+                        <button
+                          onClick={() => handleDelete(app.id)}
+                          disabled={deleting === app.id}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            width: 34, height: 34, borderRadius: 8,
+                            border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.06)',
+                            color: '#ef4444', cursor: 'pointer', flexShrink: 0,
+                          }}
+                          title="Delete application"
+                        >
+                          {deleting === app.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 );

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { interviewAPI } from '../services/api';
 import type { InterviewSession } from '../types';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 
 /* ---------- inline style helpers ---------------------------------- */
 const s = {
@@ -181,6 +182,9 @@ const resourceIcon = (type: string) => {
 
 export default function RoadmapPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
+  const winW = useWindowWidth();
+  const isMobile = winW < 640;
+
   const [roadmap, setRoadmap] = useState<LearningRoadmap | null>(null);
   const [session, setSession] = useState<InterviewSession | null>(null);
   const [loading, setLoading] = useState(true);
@@ -284,7 +288,7 @@ export default function RoadmapPage() {
   };
 
   return (
-    <div style={{ padding: '28px 28px 64px', maxWidth: 860, margin: '0 auto' }}>
+    <div style={{ padding: isMobile ? '16px 16px 40px' : '28px 28px 64px', maxWidth: 860, margin: '0 auto' }}>
 
       {/* ── Back + header ── */}
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>

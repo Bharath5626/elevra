@@ -10,6 +10,7 @@ import {
   Eye, Mic2, Brain, Play, ArrowRight, Loader2, BookOpen, ChevronLeft,
   MessageSquare, Sparkles,
 } from 'lucide-react';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 
 const ANALYSIS_STEPS = [
   { icon: MessageSquare, label: 'Transcribing answers' },
@@ -238,7 +239,8 @@ export default function InterviewReportPage() {
   const current = answers[selectedAnswer];
   const avgOf   = (fn: (a: InterviewAnswer) => number) =>
     Math.round(answers.reduce((s, a) => s + (fn(a) ?? 0), 0) / answers.length);
-
+  const winW = useWindowWidth();
+  const isMobile = winW < 640;
   /* ─── shared inline style helpers ────────────────────── */
   const card: React.CSSProperties = {
     background: '#fff',
@@ -248,7 +250,7 @@ export default function InterviewReportPage() {
   };
 
   return (
-    <div style={{ padding: '24px 28px 48px' }}>
+    <div style={{ padding: isMobile ? '16px 16px 40px' : '24px 28px 48px' }}>
 
         {/* ── Back + page header ───────────────────────────── */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 32 }}>
@@ -340,7 +342,7 @@ export default function InterviewReportPage() {
           style={{ ...card, padding: '36px 36px 28px', marginBottom: 24 }}
         >
           {/* Ring + bars row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 40, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '180px 1fr', gap: isMobile ? 24 : 40, alignItems: 'start' }}>
             {/* Score ring */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <ScoreCard score={session.overall_score ?? 0} label="Overall Score" size="lg" />

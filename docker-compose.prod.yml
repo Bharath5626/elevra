@@ -1,0 +1,37 @@
+# Production overrides. Run with:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Assumes:
+#   1. Your .env file has all production secrets set (see .env.example)
+#   2. Let's Encrypt certs already exist at /etc/letsencrypt/live/elevraa.me/ on the host
+#      (run: sudo certbot certonly --standalone -d elevraa.me -d www.elevraa.me)
+#   3. You have set FRONTEND_URL=https://elevraa.me in your .env
+version: "3.9"
+
+services:
+  backend:
+    # No changes needed — env_file picks up production .env automatically
+    restart: always
+
+  frontend:
+    build:
+      args:
+        # Override the dev default — points browser at the real HTTPS origin
+        VITE_API_URL: https://elevraa.me/api
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # HTTPS nginx config replaces the default compose one
+      - ./frontend/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      # Mount Let's Encrypt certs from the host (read-only)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Certbot webroot for renewals (also used by certbot --webroot)
+      - /var/www/certbot:/var/www/certbot:ro
+    restart: always
+
+  db:
+    restart: always
+    # Bind to localhost only so the port is never exposed publicly
+    # (remove the ports key entirely if it exists in the base file)

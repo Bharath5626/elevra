@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { roadmapAPI, interviewAPI } from '../services/api';
 import type { LearningRoadmap, InterviewSession } from '../types';
 import { BookOpen, ArrowRight, Calendar, Loader2, Briefcase } from 'lucide-react';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -24,6 +25,8 @@ export default function RoadmapHistoryPage() {
   const [sessionMap, setSessionMap] = useState<Record<string, InterviewSession>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const winW = useWindowWidth();
+  const isMobile = winW < 640;
 
   useEffect(() => {
     Promise.all([roadmapAPI.getAll(), interviewAPI.getSessions()])
@@ -47,7 +50,7 @@ export default function RoadmapHistoryPage() {
   }
 
   return (
-    <div style={{ padding: '24px 28px 48px', maxWidth: 760, margin: '0 auto' }}>
+    <div style={{ padding: isMobile ? '16px 16px 40px' : '24px 28px 48px', maxWidth: 760, margin: '0 auto' }}>
 
         {/* Error */}
         {error && (

@@ -5,6 +5,7 @@ import { interviewAPI } from '../services/api';
 import type { InterviewSession } from '../types';
 import { History, Mic, ChevronRight, TrendingUp, TrendingDown, Calendar, Loader2, Sparkles, ArrowRight, Filter, Award, CheckCircle, Trash2, AlertTriangle } from 'lucide-react';
 import StatCard from '../components/StatCard';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 
 export default function HistoryPage() {
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
@@ -22,6 +23,9 @@ export default function HistoryPage() {
   }, []);
 
   const filtered = sessions.filter((s) => filter === 'all' || s.status === filter);
+
+  const winW = useWindowWidth();
+  const isMobile = winW < 640;
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return '#22c55e';
@@ -74,7 +78,7 @@ export default function HistoryPage() {
   const completed = sessions.filter((s) => s.status === 'completed').length;
 
   return (
-    <div style={{ padding: '24px 28px 48px' }}>
+    <div style={{ padding: isMobile ? '16px 16px 40px' : '24px 28px 48px' }}>
 
       {/* ── Delete Confirmation Modal ── */}
       {deleteTarget && (

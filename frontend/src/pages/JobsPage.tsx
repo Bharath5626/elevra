@@ -9,6 +9,7 @@ import {
 import CoverLetterModal from '../components/CoverLetterModal';
 import { jobsAPI, resumeAPI, profileAPI } from '../services/api';
 import type { JobListing, ResumeAnalysis, MatchScoreResult, ApplyKit } from '../types';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 
 export default function JobsPage() {
   /* search state */
@@ -162,21 +163,23 @@ export default function JobsPage() {
     });
   }, [jobs, selectedResume]);
 
-  /* ── style helpers ────────────────────────────────── */
+  /* ── style helpers ────────────────────────────────── */  const winW = useWindowWidth();
+  const isMobile = winW < 640;
   const card: React.CSSProperties = {
     background: '#fff', borderRadius: 14,
     border: '1px solid #E9E5F5',
     boxShadow: '0 1px 3px rgba(124,58,237,.04), 0 4px 16px rgba(124,58,237,.03)',
   };
   const inputStyle: React.CSSProperties = {
-    flex: 1, minWidth: 0, padding: '12px 16px 12px 42px',
+    width: '100%', minWidth: 0, padding: '12px 16px 12px 42px',
     borderRadius: 12, fontSize: 14, border: '1.5px solid #E9E5F5',
     background: '#fff', color: '#1E1B4B',
     outline: 'none', transition: 'border-color .15s',
+    boxSizing: 'border-box',
   };
 
   return (
-    <div style={{ padding: '24px 28px 48px' }}>
+    <div style={{ padding: isMobile ? '16px 16px 40px' : '24px 28px 48px' }}>
 
         {/* ── Header ────────────────────────────────── */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
@@ -204,15 +207,15 @@ export default function JobsPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.06 }}
-          style={{ ...card, padding: '24px 28px', marginBottom: 24 }}
+          style={{ ...card, padding: isMobile ? '16px' : '24px 28px', marginBottom: 24 }}
         >
           <form
             onSubmit={(e) => { e.preventDefault(); handleSearch(1); }}
-            style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}
+            style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', flexWrap: isMobile ? undefined : 'wrap', gap: 12, alignItems: isMobile ? 'stretch' : 'center' }}
           >
             {/* Query input */}
-            <div style={{ flex: '2 1 240px', position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
+            <div style={{ flex: isMobile ? undefined : '2 1 240px', width: isMobile ? '100%' : undefined, position: 'relative' }}>
+              <Search size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none', zIndex: 1 }} />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -222,8 +225,8 @@ export default function JobsPage() {
             </div>
 
             {/* Location input */}
-            <div style={{ flex: '1 1 180px', position: 'relative' }}>
-              <MapPin size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none' }} />
+            <div style={{ flex: isMobile ? undefined : '1 1 180px', width: isMobile ? '100%' : undefined, position: 'relative' }}>
+              <MapPin size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', pointerEvents: 'none', zIndex: 1 }} />
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
@@ -232,47 +235,48 @@ export default function JobsPage() {
               />
             </div>
 
-            {/* Remote toggle */}
-            <label style={{
-              display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
-              padding: '10px 16px', borderRadius: 12,
-              border: `1.5px solid ${remoteOnly ? '#7C3AED' : '#E9E5F5'}`,
-              background: remoteOnly ? '#F5F3FF' : '#fff',
-              color: remoteOnly ? '#7C3AED' : '#6B7280',
-              fontSize: 13, fontWeight: 500, transition: 'all .15s', flexShrink: 0,
-            }}>
-              <Wifi size={14} />
-              <input
-                type="checkbox"
-                checked={remoteOnly}
-                onChange={(e) => setRemoteOnly(e.target.checked)}
-                style={{ display: 'none' }}
-              />
-              Remote
-            </label>
+            {/* Remote toggle + Search button — share a row on mobile */}
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <label style={{
+                display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+                padding: '10px 16px', borderRadius: 12, flexShrink: 0,
+                border: `1.5px solid ${remoteOnly ? '#7C3AED' : '#E9E5F5'}`,
+                background: remoteOnly ? '#F5F3FF' : '#fff',
+                color: remoteOnly ? '#7C3AED' : '#6B7280',
+                fontSize: 13, fontWeight: 500, transition: 'all .15s',
+              }}>
+                <Wifi size={14} />
+                <input
+                  type="checkbox"
+                  checked={remoteOnly}
+                  onChange={(e) => setRemoteOnly(e.target.checked)}
+                  style={{ display: 'none' }}
+                />
+                Remote
+              </label>
 
-            {/* Search button */}
-            <button
-              type="submit"
-              disabled={loading || !query.trim()}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '12px 28px', borderRadius: 12, fontSize: 14, fontWeight: 600,
-                border: 'none', cursor: loading || !query.trim() ? 'not-allowed' : 'pointer',
-                color: '#fff',
-              background: '#7C3AED',
-                opacity: loading || !query.trim() ? 0.6 : 1,
-                transition: 'opacity .15s', flexShrink: 0,
-              }}
-            >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-              Search
-            </button>
+              <button
+                type="submit"
+                disabled={loading || !query.trim()}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  padding: '12px 20px', borderRadius: 12, fontSize: 14, fontWeight: 600,
+                  border: 'none', cursor: loading || !query.trim() ? 'not-allowed' : 'pointer',
+                  color: '#fff', flex: isMobile ? 1 : undefined, flexShrink: 0,
+                  background: '#7C3AED',
+                  opacity: loading || !query.trim() ? 0.6 : 1,
+                  transition: 'opacity .15s',
+                }}
+              >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                Search
+              </button>
+            </div>
           </form>
 
           {/* Resume selector */}
           {resumes.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--color-surface-200)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--color-surface-200)', flexWrap: 'wrap' }}>
               <SlidersHorizontal size={14} style={{ color: '#9CA3AF', flexShrink: 0 }} />
               <span style={{ fontSize: 12, color: '#6B7280', fontWeight: 500, flexShrink: 0 }}>Match against:</span>
               <select
@@ -281,7 +285,7 @@ export default function JobsPage() {
                 style={{
                   padding: '6px 12px', borderRadius: 8, fontSize: 12,
                   border: '1px solid #E9E5F5', background: '#fff',
-                  color: '#1E1B4B', outline: 'none', maxWidth: 300,
+                  color: '#1E1B4B', outline: 'none', flex: 1, minWidth: 0,
                 }}
               >
                 {resumes.map((r) => (
@@ -314,26 +318,27 @@ export default function JobsPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.04 }}
-                  style={{ ...card, padding: '24px 28px' }}
+                  style={{ ...card, padding: isMobile ? '16px' : '24px 28px' }}
                 >
-                  <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                    {/* Logo */}
-                    {job.employer_logo ? (
-                      <img
-                        src={job.employer_logo}
-                        alt={job.company}
-                        style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'contain', background: '#F8F7FF', flexShrink: 0 }}
-                      />
-                    ) : (
-                      <div style={{
-                        width: 48, height: 48, borderRadius: 12, flexShrink: 0,
-                        background: '#F5F3FF',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#7C3AED', fontWeight: 700, fontSize: 18,
-                      }}>
-                        {job.company.charAt(0)}
-                      </div>
-                    )}
+                  <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 16, alignItems: 'flex-start' }}>
+                    {/* Logo + Info */}
+                    <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flex: 1, minWidth: 0 }}>
+                      {job.employer_logo ? (
+                        <img
+                          src={job.employer_logo}
+                          alt={job.company}
+                          style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'contain', background: '#F8F7FF', flexShrink: 0 }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: 48, height: 48, borderRadius: 12, flexShrink: 0,
+                          background: '#F5F3FF',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: '#7C3AED', fontWeight: 700, fontSize: 18,
+                        }}>
+                          {job.company.charAt(0)}
+                        </div>
+                      )}
 
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -409,55 +414,108 @@ export default function JobsPage() {
                       )}
                     </div>
 
-                    {/* Actions column */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0, alignItems: 'flex-end' }}>
-                      <button
-                        type="button"
-                        onClick={() => handleOneClickApply(job)}
-                        disabled={!selectedResume}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 6,
-                          padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                          border: 'none', cursor: selectedResume ? 'pointer' : 'not-allowed',
-                          color: '#fff',
-                          background: '#7C3AED',
-                          opacity: selectedResume ? 1 : 0.5,
-                          transition: 'opacity .15s', whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <Zap size={14} /> One-Click Apply
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setApplyJob(job)}
-                        disabled={!selectedResume}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 6,
-                          padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600,
-                          border: '1.5px solid #E9E5F5',
-                          cursor: selectedResume ? 'pointer' : 'not-allowed',
-                          color: '#374151', background: '#fff',
-                          opacity: selectedResume ? 1 : 0.5,
-                          transition: 'opacity .15s', whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <Zap size={14} /> Quick Apply
-                      </button>
-                      <a
-                        href={job.apply_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 6,
-                          padding: '8px 16px', borderRadius: 10, fontSize: 12, fontWeight: 500,
-                          border: '1.5px solid #E9E5F5',
-                          color: '#374151', textDecoration: 'none',
-                          transition: 'border-color .15s', whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <ExternalLink size={12} /> Direct Link
-                      </a>
-                    </div>
+                    </div>{/* end Logo+Info wrapper */}
+
+                    {/* Actions */}
+                    {isMobile ? (
+                      /* Mobile: primary full-width, then secondary row */
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleOneClickApply(job)}
+                          disabled={!selectedResume}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            padding: '11px 14px', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                            border: 'none', cursor: selectedResume ? 'pointer' : 'not-allowed',
+                            color: '#fff', width: '100%',
+                            background: '#7C3AED',
+                            opacity: selectedResume ? 1 : 0.5,
+                          }}
+                        >
+                          <Zap size={14} /> One-Click Apply
+                        </button>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button
+                            type="button"
+                            onClick={() => setApplyJob(job)}
+                            disabled={!selectedResume}
+                            style={{
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                              padding: '9px 14px', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                              border: '1.5px solid #E9E5F5', flex: 1,
+                              cursor: selectedResume ? 'pointer' : 'not-allowed',
+                              color: '#374151', background: '#fff',
+                              opacity: selectedResume ? 1 : 0.5,
+                            }}
+                          >
+                            <Zap size={14} /> Quick Apply
+                          </button>
+                          <a
+                            href={job.apply_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                              padding: '9px 14px', borderRadius: 10, fontSize: 12, fontWeight: 500,
+                              border: '1.5px solid #E9E5F5', flex: 1,
+                              color: '#374151', textDecoration: 'none',
+                            }}
+                          >
+                            <ExternalLink size={12} /> Direct Link
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Desktop: vertical column on the right */
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0, alignItems: 'stretch' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleOneClickApply(job)}
+                          disabled={!selectedResume}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                            border: 'none', cursor: selectedResume ? 'pointer' : 'not-allowed',
+                            color: '#fff', background: '#7C3AED',
+                            opacity: selectedResume ? 1 : 0.5,
+                            transition: 'opacity .15s', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <Zap size={14} /> One-Click Apply
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setApplyJob(job)}
+                          disabled={!selectedResume}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            padding: '10px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600,
+                            border: '1.5px solid #E9E5F5',
+                            cursor: selectedResume ? 'pointer' : 'not-allowed',
+                            color: '#374151', background: '#fff',
+                            opacity: selectedResume ? 1 : 0.5,
+                            transition: 'opacity .15s', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <Zap size={14} /> Quick Apply
+                        </button>
+                        <a
+                          href={job.apply_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            padding: '8px 16px', borderRadius: 10, fontSize: 12, fontWeight: 500,
+                            border: '1.5px solid #E9E5F5',
+                            color: '#374151', textDecoration: 'none',
+                            transition: 'border-color .15s', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <ExternalLink size={12} /> Direct Link
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               );

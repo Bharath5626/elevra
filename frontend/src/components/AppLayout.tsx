@@ -143,7 +143,7 @@ function AppLayoutInner() {
               }}>
                 {(user?.full_name || user?.email || 'U')[0].toUpperCase()}
               </div>
-              <span style={{
+              <span className="topbar-username" style={{
                 fontSize: 13, fontWeight: 600, color: '#1E1B4B',
                 maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>

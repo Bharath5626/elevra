@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 import {
   FileSearch, Video, Play, Target, BookOpen, Shield,
   ArrowRight, Sparkles,
@@ -127,6 +128,10 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 export default function LandingPage() {
+  const winW = useWindowWidth();
+  const isMobile = winW < 768;
+  const isSmall  = winW < 480;
+
   return (
     <div style={{ background: BG, minHeight: '100vh', color: TEXT, overflowX: 'hidden', paddingTop: 70 }}>
 
@@ -139,7 +144,7 @@ export default function LandingPage() {
         }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100, background: `linear-gradient(to bottom, transparent, ${BG})`, pointerEvents: 'none' }} />
 
-        <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: 96, paddingBottom: 96 }}>
+        <div className="container landing-hero-content" style={{ position: 'relative', zIndex: 10, paddingTop: isMobile ? 48 : 96, paddingBottom: isMobile ? 48 : 96 }}>
 
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} style={{ marginBottom: 32 }}>
           </motion.div>
@@ -171,13 +176,15 @@ export default function LandingPage() {
             <motion.div
               initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.26, duration: 0.6 }}
+              className="landing-cta-row"
               style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}
             >
               <Link
                 to="/login?mode=register"
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 9,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 9,
                   padding: '13px 28px',
+                  width: isMobile ? '100%' : undefined,
                   background: P, color: '#fff',
                   fontSize: 14, fontWeight: 700, textDecoration: 'none',
                   border: `2px solid ${P}`, letterSpacing: '0.01em',
@@ -191,8 +198,9 @@ export default function LandingPage() {
               <a
                 href="#how-it-works"
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 9,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 9,
                   padding: '13px 28px',
+                  width: isMobile ? '100%' : undefined,
                   border: `2px solid ${BORDER}`, background: 'transparent',
                   color: TEXT, fontSize: 14, fontWeight: 600, textDecoration: 'none',
                   transition: 'border-color 0.2s, background 0.2s',
@@ -209,16 +217,19 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.38, duration: 0.65 }}
+            className="landing-stats-bar"
             style={{
-              display: 'flex', flexWrap: 'wrap',
+              display: 'grid',
+              gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
               border: `1px solid ${BORDER}`, borderTop: `3px solid ${P}`,
-              marginTop: 72, background: BG,
+              marginTop: isMobile ? 40 : 72, background: BG,
             }}
           >
             {stats.map((s, i) => (
               <div key={s.label} style={{
-                flex: '1 1 160px', padding: '24px 28px',
-                borderRight: i < stats.length - 1 ? `1px solid ${BORDER}` : 'none',
+                padding: isMobile ? '16px 20px' : '24px 28px',
+                borderRight: !isSmall && i < stats.length - 1 ? `1px solid ${BORDER}` : 'none',
+                borderBottom: isSmall && i < stats.length - 1 ? `1px solid ${BORDER}` : 'none',
               }}>
                 <div style={{ fontSize: 'clamp(1.4rem, 2.5vw, 2rem)', fontWeight: 800, color: TEXT, letterSpacing: '-0.025em', fontFamily: 'Poppins, sans-serif' }}>
                   {s.value}
@@ -233,7 +244,7 @@ export default function LandingPage() {
       </section>
 
       {/* FEATURES */}
-      <section id="features" style={{ padding: '100px 0', background: BG_ALT, borderTop: `1px solid ${BORDER}` }}>
+      <section id="features" style={{ padding: isMobile ? '60px 0' : '100px 0', background: BG_ALT, borderTop: `1px solid ${BORDER}` }}>
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} variants={fadeUp} custom={0} style={{ maxWidth: 540, marginBottom: 64 }}>
             <Label>Platform</Label>
@@ -279,7 +290,7 @@ export default function LandingPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how-it-works" style={{ padding: '100px 0', background: BG, borderTop: `1px solid ${BORDER}` }}>
+      <section id="how-it-works" style={{ padding: isMobile ? '60px 0' : '100px 0', background: BG, borderTop: `1px solid ${BORDER}` }}>
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} style={{ maxWidth: 500, marginBottom: 64 }}>
             <Label>Process</Label>
@@ -319,7 +330,7 @@ export default function LandingPage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section style={{ padding: '100px 0', background: BG_ALT, borderTop: `1px solid ${BORDER}` }}>
+      <section style={{ padding: isMobile ? '60px 0' : '100px 0', background: BG_ALT, borderTop: `1px solid ${BORDER}` }}>
         <div className="container">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} style={{ maxWidth: 480, marginBottom: 64 }}>
             <Label>Beta Feedback</Label>
@@ -371,7 +382,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section style={{ background: NAVY, borderTop: `4px solid ${P}`, padding: '100px 0' }}>
+      <section style={{ background: NAVY, borderTop: `4px solid ${P}`, padding: isMobile ? '60px 0' : '100px 0' }}>
         <div className="container">
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }}

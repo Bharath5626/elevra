@@ -4,6 +4,7 @@ import { Upload, FileText, Loader2, AlertCircle, CheckCircle, ChevronDown, Chevr
 import ProgressBar from '../components/ProgressBar';
 import { resumeAPI } from '../services/api';
 import type { ResumeAnalysis } from '../types';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 
 const P = '#7C3AED';
 const P_BG = '#F5F3FF';
@@ -55,6 +56,9 @@ function renderBold(text: string) {
 }
 
 export default function ResumePage() {
+  const winW = useWindowWidth();
+  const isMobile = winW < 640;
+
   const [file, setFile] = useState<File | null>(null);
   const [jd, setJd] = useState('');
   const [loading, setLoading] = useState(false);
@@ -126,7 +130,7 @@ export default function ResumePage() {
   };
 
   return (
-    <div style={{ padding: '24px 28px 48px' }}>
+    <div style={{ padding: isMobile ? '16px 16px 40px' : '24px 28px 48px' }}>
 
       {/* ── Full-screen analyzing overlay ── */}
       <AnimatePresence>
@@ -190,7 +194,7 @@ export default function ResumePage() {
       </AnimatePresence>
 
       {/* ── Page header row ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+      <div className="inner-page-header" style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', marginBottom: 24, gap: isMobile ? 12 : 0 }}>
         <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>
           Upload your resume to receive an ATS compatibility score, skill gap analysis, and targeted bullet point improvements.
         </p>
@@ -237,7 +241,7 @@ export default function ResumePage() {
               transition={{ type: 'spring', stiffness: 320, damping: 30 }}
               style={{
                 position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 101,
-                width: 420, background: '#fff',
+                width: isMobile ? '100vw' : 420, background: '#fff',
                 boxShadow: '-4px 0 32px rgba(124,58,237,.08)',
                 display: 'flex', flexDirection: 'column',
               }}

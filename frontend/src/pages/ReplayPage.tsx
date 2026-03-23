@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 import { motion } from 'framer-motion';
 import ReplayPlayer from '../components/ReplayPlayer';
 import { interviewAPI } from '../services/api';
@@ -13,6 +14,8 @@ export default function ReplayPage() {
   const [answers, setAnswers]       = useState<InterviewAnswer[]>([]);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [loading, setLoading]       = useState(true);
+  const winW = useWindowWidth();
+  const isMobile = winW < 768;
 
   useEffect(() => {
     if (!sessionId) return;
@@ -59,7 +62,7 @@ export default function ReplayPage() {
 
   /* -- Main ---------------------------------------------- */
   return (
-    <div style={{ padding: '24px 28px 48px' }}>
+    <div style={{ padding: isMobile ? '16px 16px 40px' : '24px 28px 48px' }}>
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
@@ -69,7 +72,7 @@ export default function ReplayPage() {
           >
             <ChevronLeft size={14} /> Back to Report
           </Link>
-          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 28, fontWeight: 700, color: '#1E1B4B', margin: '0 0 8px' }}>
+          <h1 style={{ fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? 22 : 28, fontWeight: 700, color: '#1E1B4B', margin: '0 0 8px' }}>
             Interview{' '}
             <span style={{ color: '#7C3AED' }}>
               Replay

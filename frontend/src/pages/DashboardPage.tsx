@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 import {
   FileSearch, Video, Play, BookOpen, Clock,
   TrendingUp, ArrowRight, Briefcase, Award, Target,
@@ -92,6 +93,9 @@ const getStatCards = (cri: CRIScore) => [
 /* ─────────────────────────────────────────────── */
 export default function DashboardPage() {
   const { user } = useAuth();
+  const winW = useWindowWidth();
+  const isMobile = winW < 768;
+  const isSmall  = winW < 480;
   const [cri, setCri]           = useState<CRIScore>(mockCRI);
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
   const [hoveredAction, setHoveredAction]   = useState<string | null>(null);
@@ -128,7 +132,7 @@ export default function DashboardPage() {
   const statCards = getStatCards(cri);
 
   return (
-    <div style={{ padding: '32px 32px 64px', maxWidth: 1320, margin: '0 auto', background: BG_PAGE, minHeight: '100vh' }}>
+    <div style={{ padding: isMobile ? '20px 16px 48px' : '32px 32px 64px', maxWidth: 1320, margin: '0 auto', background: BG_PAGE, minHeight: '100vh' }}>
 
       {/* ══ Hero banner ══════════════════════════════════════ */}
       <motion.div
@@ -137,7 +141,7 @@ export default function DashboardPage() {
         style={{
           position: 'relative',
           marginBottom: 36,
-          padding: '36px 40px',
+          padding: isMobile ? '24px 20px' : '36px 40px',
           background: HERO_BG,
           border: 'none',
           borderRadius: 16,
@@ -149,7 +153,7 @@ export default function DashboardPage() {
         <div style={{ position: 'absolute', width: 260, height: 260, borderRadius: '50%', background: 'rgba(139,92,246,.15)', filter: 'blur(80px)', top: -60, right: -40, pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', background: 'rgba(99,102,241,.1)', filter: 'blur(60px)', bottom: -50, left: 60, pointerEvents: 'none' }} />
 
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
+        <div style={{ position: 'relative', display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', flexWrap: 'wrap', gap: isMobile ? 16 : 20 }}>
           <div>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
@@ -161,7 +165,7 @@ export default function DashboardPage() {
               <Sparkles size={11} />
               Career Intelligence
             </div>
-            <h2 style={{ fontFamily: 'Poppins, sans-serif', fontSize: 28, fontWeight: 800, color: '#fff', margin: '0 0 8px', lineHeight: 1.2, letterSpacing: '-0.5px' }}>
+            <h2 style={{ fontFamily: 'Poppins, sans-serif', fontSize: isMobile ? 20 : 28, fontWeight: 800, color: '#fff', margin: '0 0 8px', lineHeight: 1.2, letterSpacing: '-0.5px' }}>
               Welcome back,{' '}
               <span style={{ background: 'linear-gradient(135deg, #C4B5FD, #818CF8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.full_name || 'User'}</span>
             </h2>
@@ -263,14 +267,14 @@ export default function DashboardPage() {
       </div>
 
       {/* ══ Main grid ══════════════════════════════════════ */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 24 }}>
+      <div className="dash-main-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: isMobile ? 16 : 24 }}>
 
         {/* ── CRI Breakdown — col span 4 ── */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.28 }}
-          style={{ gridColumn: 'span 4' }}
+          style={{ gridColumn: isMobile ? 'span 12' : 'span 4' }}
         >
           <div style={{
             background: BG,
@@ -360,7 +364,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* ── Right two columns ── */}
-        <div style={{ gridColumn: 'span 8', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ gridColumn: isMobile ? 'span 12' : 'span 8', display: 'flex', flexDirection: 'column', gap: isMobile ? 16 : 24 }}>
 
           {/* Quick Actions */}
           <motion.div
@@ -387,7 +391,7 @@ export default function DashboardPage() {
                 <Zap size={16} style={{ color: '#F59E0B' }} />
               </div>
 
-              <div style={{ padding: '24px 24px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14 }}>
+              <div className="dash-quick-actions" style={{ padding: isMobile ? '16px' : '24px 24px', display: 'grid', gridTemplateColumns: isSmall ? 'repeat(2, 1fr)' : isMobile ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)', gap: isMobile ? 10 : 14 }}>
                 {quickActions.map((a) => (
                   <Link
                     key={a.label}

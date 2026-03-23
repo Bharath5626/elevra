@@ -7,6 +7,7 @@ import ProgressBar from '../components/ProgressBar';
 import { interviewAPI, analysisAPI } from '../services/api';
 import type { InterviewSession, InterviewQuestion } from '../types';
 import { useInterviewGuard } from '../context/InterviewGuardContext';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 import {
   ChevronRight, ChevronLeft, Loader2, CheckCircle,
   Clock, HelpCircle, Briefcase, Lightbulb,
@@ -44,6 +45,8 @@ export default function InterviewSessionPage() {
   const [codeLanguages, setCodeLanguages]       = useState<Record<number, string>>({});
   const [showLeaveModal, setShowLeaveModal]     = useState(false);
   const guard = useInterviewGuard();
+  const winW = useWindowWidth();
+  const isMobile = winW < 768;
 
   useEffect(() => {
     if (!sessionId) return;
@@ -163,7 +166,7 @@ export default function InterviewSessionPage() {
           <div style={{
             background: '#1E1B4B',
             borderRadius: 16,
-            padding: '36px 36px 32px',
+            padding: isMobile ? '24px 20px 20px' : '36px 36px 32px',
             boxShadow: '0 8px 32px rgba(30,27,75,.18)',
           }}>
             {/* Icon + heading */}
@@ -245,7 +248,10 @@ export default function InterviewSessionPage() {
               border: `1px solid ${P_BD}`,
               borderRadius: 12,
               padding: '20px 24px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+              display: 'flex',
+              alignItems: isMobile ? 'stretch' : 'center',
+              flexDirection: isMobile ? 'column' : 'row',
+              justifyContent: 'space-between', gap: 16,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -286,7 +292,7 @@ export default function InterviewSessionPage() {
   const isCodingActive = currentQuestion?.type === 'coding' && !submitted.has(currentQ);
 
   return (
-    <div style={{ padding: '14px 28px 32px', maxWidth: 1480, margin: '0 auto' }}>
+    <div style={{ padding: isMobile ? '14px 16px 32px' : '14px 28px 32px', maxWidth: 1480, margin: '0 auto' }}>
 
       {/* ── Leave Interview Confirmation Modal ──────────────────── */}
       {showLeaveModal && (
@@ -517,7 +523,7 @@ export default function InterviewSessionPage() {
                     </div>
                   </div>
                 ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '3fr 2.5fr', gap: 16, alignItems: 'stretch' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '3fr 2.5fr', gap: 16, alignItems: 'stretch' }}>
 
                   {/* Code editor */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6, height: '100%' }}>
@@ -560,7 +566,7 @@ export default function InterviewSessionPage() {
                  ════════════════════════════════════════════════════ */
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1.4fr',
+                gridTemplateColumns: isMobile ? '1fr' : '1fr 1.4fr',
                 gap: 20,
                 alignItems: 'start',
               }}>
@@ -696,7 +702,7 @@ export default function InterviewSessionPage() {
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {Array.from({ length: totalQ }, (_, i) => (
+          {!isMobile && Array.from({ length: totalQ }, (_, i) => (
             <div
               key={i}
               style={{

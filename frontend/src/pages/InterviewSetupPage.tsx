@@ -7,6 +7,7 @@ import {
   Mic, Briefcase, BarChart2, ArrowRight, Sparkles,
   AlertCircle, Loader2, FileText, Upload, ChevronDown, Search, X,
 } from 'lucide-react';
+import { useWindowWidth } from '../hooks/useWindowWidth';
 
 /* ── comprehensive job roles list ── */
 const JOB_ROLES = [
@@ -179,6 +180,9 @@ const MUTED  = '#6B7280';
 
 export default function InterviewSetupPage() {
   const navigate    = useNavigate();
+  const winW = useWindowWidth();
+  const isMobile = winW < 640;
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef     = useRef<HTMLInputElement>(null);
   const dropdownRef  = useRef<HTMLDivElement>(null);
@@ -341,7 +345,7 @@ export default function InterviewSetupPage() {
           </div>
 
           {/* Tips grid */}
-          <div style={{ padding: '24px 32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div style={{ padding: isMobile ? '16px' : '24px 32px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14 }}>
             {TIPS.map((tip) => (
               <div key={tip.title} style={{ background: '#F8F7FF', borderRadius: 12, border: '1px solid #E9E5F5', padding: '16px 18px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
@@ -354,7 +358,7 @@ export default function InterviewSetupPage() {
           </div>
 
           {/* Footer */}
-          <div style={{ padding: '0 32px 28px', display: 'flex', gap: 12 }}>
+          <div style={{ padding: isMobile ? '0 16px 20px' : '0 32px 28px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 12 }}>
             <button
               onClick={() => setShowTips(false)}
               style={{ flex: 1, padding: '12px 0', borderRadius: 14, border: '1px solid #E9E5F5', background: '#fff', fontSize: 14, fontWeight: 600, color: MUTED, cursor: 'pointer' }}
@@ -371,7 +375,7 @@ export default function InterviewSetupPage() {
         </motion.div>
       </div>
     )}
-    <div style={{ padding: '10px 28px 24px' }}>
+    <div style={{ padding: isMobile ? '10px 16px 24px' : '10px 28px 24px' }}>
 
       {/* ── Header ── */}
       <motion.div {...fadeUp(0)} style={{ marginBottom: 12 }}>
@@ -384,7 +388,7 @@ export default function InterviewSetupPage() {
       </motion.div>
 
       {/* ── 2-column grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, alignItems: 'start' }}>
 
         {/* ── LEFT: Resume + Job Role stacked ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

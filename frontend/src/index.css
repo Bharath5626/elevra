@@ -203,6 +203,145 @@ a { text-decoration: none; color: inherit; }
   padding: 0 32px;
 }
 
+/* ─── Mobile container padding ─────────── */
+@media (max-width: 767px) {
+  .container {
+    padding: 0 16px;
+  }
+}
+
+/* ─── Topbar mobile adjustments ─────────── */
+@media (max-width: 480px) {
+  .app-topbar {
+    padding: 0 12px;
+    gap: 10px;
+  }
+  .topbar-username {
+    display: none !important;
+  }
+}
+
+/* ─── Page content padding on mobile ────── */
+@media (max-width: 639px) {
+  .page-pad {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* ─── Dashboard grid collapse ─────────── */
+@media (max-width: 767px) {
+  .dash-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .dash-col-4 {
+    grid-column: span 1 !important;
+  }
+  .dash-col-8 {
+    grid-column: span 1 !important;
+  }
+  .dash-quick-actions {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  .dash-hero-banner {
+    padding: 24px 20px !important;
+  }
+  .dash-hero-banner h2 {
+    font-size: 20px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .dash-quick-actions {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ─── Landing hero mobile ─────────────── */
+@media (max-width: 767px) {
+  .landing-hero-content {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+  }
+  .landing-cta-row {
+    flex-direction: column !important;
+  }
+  .landing-cta-row a,
+  .landing-cta-row button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .landing-stats-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-stats-bar {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ─── Resume / Jobs / History / Roadmap page padding ─── */
+@media (max-width: 639px) {
+  .inner-page {
+    padding: 16px 16px 40px !important;
+  }
+  .inner-page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+}
+
+/* ─── Jobs search bar stack ───────────── */
+@media (max-width: 639px) {
+  .jobs-search-row {
+    flex-direction: column !important;
+  }
+  .jobs-search-row > * {
+    width: 100% !important;
+  }
+}
+
+/* ─── Report page tabs ───────────────── */
+@media (max-width: 639px) {
+  .report-tabs {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .report-tab-btn {
+    flex: 1 1 calc(50% - 6px) !important;
+    justify-content: center !important;
+  }
+}
+
+/* ─── Setup page difficulty grid ─────── */
+@media (max-width: 639px) {
+  .setup-difficulty-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ─── Roadmap header flex ─────────────── */
+@media (max-width: 639px) {
+  .roadmap-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+}
+
+/* ─── Generic responsive helpers ─────── */
+@media (max-width: 639px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .stack-on-mobile {
+    flex-direction: column !important;
+  }
+}
+
 /* ─── Gradient Text ───────────────────── */
 .gradient-text {
   background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-accent-400) 100%);
