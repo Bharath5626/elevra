@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
-_JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
+_JSEARCH_URL = "https://jsearch.p.rapidapi.com/search-v2"
 
 
 # ── GET /jobs/search ──────────────────────────────────────────────────────────
