@@ -48,7 +48,7 @@ async def search_jobs(
         "date_posted": "all",
     }
     if remote_only:
-       params["work_from_home"] = "true" 
+        params["work_from_home"] = "true"
 
     headers = {
         "X-RapidAPI-Key": api_key,
@@ -62,24 +62,26 @@ async def search_jobs(
         logger.warning("JSearch API error %s: %s", resp.status_code, resp.text[:300])
         raise HTTPException(status_code=502, detail="Job search API returned an error")
 
-  raw = resp.json()
+    raw = resp.json()
 
-data_wrapper = raw.get("data", {})
+    # /search-v2 returns: { "data": { "jobs": [...], "cursor": "..." } }
+    # v1 returned:        { "data": [ ...job dicts... ] }
+    data_wrapper = raw.get("data", {})
+    if isinstance(data_wrapper, list):
+        jobs = data_wrapper
+    else:
+        jobs = data_wrapper.get("jobs", [])
 
-if isinstance(data_wrapper, list):
-    jobs = data_wrapper
-else:
-    jobs = data_wrapper.get("jobs", [])
-
-if not isinstance(jobs, list):
-    logger.warning("Unexpected JSearch response shape: %s", str(raw)[:200])
-    jobs = []
+    if not isinstance(jobs, list):
+        logger.warning("Unexpected JSearch response shape: %s", str(raw)[:200])
+        jobs = []
 
     results: list[JobListingOut] = []
-  for job in jobs:
+    for job in jobs:
         if not isinstance(job, dict):
             logger.warning("Skipping non-dict job entry: %r", job)
             continue
+
         salary_min = job.get("job_min_salary")
         salary_max = job.get("job_max_salary")
         salary_range = None
@@ -104,7 +106,6 @@ if not isinstance(jobs, list):
         ))
 
     return results
-
 
 # ── POST /jobs/match-score ────────────────────────────────────────────────────
 @router.post("/match-score", response_model=MatchScoreOut)
