@@ -6,7 +6,7 @@ Auto-detects which provider to use based on the key prefix:
   AIza...      → Google Gemini
 
 Gemini quota fallback chain:
-  gemini-2.5-flash  →  gemini-2.0-flash  →  gemini-1.5-flash  →  gemini-1.5-flash-8b
+ gemini-3.5-flash → gemini-2.5-flash  →  gemini-2.0-flash  →  gemini-1.5-flash  →  gemini-1.5-flash-8b
 """
 import re
 import json
@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Models tried in order when a 429 is hit.  All are free-tier eligible.
 _GEMINI_FALLBACK_CHAIN: List[str] = [
+    "gemini-3.5-flash",
     "gemini-2.5-flash",
     "gemini-2.0-flash",
     "gemini-1.5-flash",
@@ -42,7 +43,7 @@ def _detect_provider(key: str) -> str:
         return "gemini"
     raise ValueError(
         f"Unrecognised API key format. "
-        "Anthropic keys start with 'sk-ant-', Gemini keys start with 'AIza'."
+        "Anthropic keys start with 'sk-ant-', Gemini keys start with 'AQ or AI'."
     )
 
 
