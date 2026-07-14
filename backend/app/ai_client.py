@@ -38,7 +38,7 @@ def _detect_provider(key: str) -> str:
         )
     if key.startswith("sk-ant-"):
         return "anthropic"
-    if key.startswith("AIza"):
+    if key.startswith("A"):
         return "gemini"
     raise ValueError(
         f"Unrecognised API key format. "
