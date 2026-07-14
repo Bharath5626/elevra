@@ -62,10 +62,24 @@ async def search_jobs(
         logger.warning("JSearch API error %s: %s", resp.status_code, resp.text[:300])
         raise HTTPException(status_code=502, detail="Job search API returned an error")
 
-    data = resp.json().get("data", [])
+  raw = resp.json()
+
+data_wrapper = raw.get("data", {})
+
+if isinstance(data_wrapper, list):
+    jobs = data_wrapper
+else:
+    jobs = data_wrapper.get("jobs", [])
+
+if not isinstance(jobs, list):
+    logger.warning("Unexpected JSearch response shape: %s", str(raw)[:200])
+    jobs = []
 
     results: list[JobListingOut] = []
-    for job in data:
+  for job in jobs:
+        if not isinstance(job, dict):
+            logger.warning("Skipping non-dict job entry: %r", job)
+            continue
         salary_min = job.get("job_min_salary")
         salary_max = job.get("job_max_salary")
         salary_range = None
