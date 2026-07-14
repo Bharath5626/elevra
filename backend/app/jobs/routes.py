@@ -22,7 +22,7 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 logger.info("=== BUILD TEST ===")
 logger.info("Using endpoint: https://jsearch.p.rapidapi.com/search")
 
-_JSEARCH_URL = "https://jsearch.p.rapidapi.com/search-v2"  
+_JSEARCH_URL = "https://jsearch.p.rapidapi.com/search-v2"
 
 
 # ── GET /jobs/search ──────────────────────────────────────────────────────────
@@ -62,22 +62,39 @@ async def search_jobs(
         logger.warning("JSearch API error %s: %s", resp.status_code, resp.text[:300])
         raise HTTPException(status_code=502, detail="Job search API returned an error")
 
-    raw = resp.json()
+    # FIX 1: Guard against non-dict top-level response
+    try:
+        raw = resp.json()
+    except Exception as exc:
+        logger.error("Failed to parse JSearch JSON response: %s", exc)
+        return []
+
+    if not isinstance(raw, dict):
+        logger.warning("Unexpected top-level JSearch response type %s: %r", type(raw), str(raw)[:200])
+        return []
+
+    # Log response shape once for debugging
+    logger.info("JSearch raw keys: %s", list(raw.keys()))
 
     # /search-v2 returns: { "data": { "jobs": [...], "cursor": "..." } }
     # v1 returned:        { "data": [ ...job dicts... ] }
     data_wrapper = raw.get("data", {})
+
     if isinstance(data_wrapper, list):
         jobs = data_wrapper
-    else:
+    elif isinstance(data_wrapper, dict):
         jobs = data_wrapper.get("jobs", [])
+    else:
+        logger.warning("Unexpected JSearch data_wrapper type %s", type(data_wrapper))
+        jobs = []
 
     if not isinstance(jobs, list):
-        logger.warning("Unexpected JSearch response shape: %s", str(raw)[:200])
+        logger.warning("Unexpected JSearch jobs shape: %s", str(raw)[:200])
         jobs = []
 
     results: list[JobListingOut] = []
     for job in jobs:
+        # FIX 2: Skip any non-dict entries (strings, None, etc.)
         if not isinstance(job, dict):
             logger.warning("Skipping non-dict job entry: %r", job)
             continue
@@ -106,6 +123,7 @@ async def search_jobs(
         ))
 
     return results
+
 
 # ── POST /jobs/match-score ────────────────────────────────────────────────────
 @router.post("/match-score", response_model=MatchScoreOut)
