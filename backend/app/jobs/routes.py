@@ -22,7 +22,7 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 logger.info("=== BUILD TEST ===")
 logger.info("Using endpoint: https://jsearch.p.rapidapi.com/search")
 
-_JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
+_JSEARCH_URL = "https://jsearch.p.rapidapi.com/search-v2"  
 
 
 # ── GET /jobs/search ──────────────────────────────────────────────────────────
@@ -45,11 +45,10 @@ async def search_jobs(
     params = {
         "query": search_query,
         "page": str(page),
-        "num_pages": "1",
         "date_posted": "all",
     }
     if remote_only:
-        params["remote_jobs_only"] = "true"
+       params["work_from_home"] = "true" 
 
     headers = {
         "X-RapidAPI-Key": api_key,
