@@ -19,6 +19,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
+logger.info("=== BUILD TEST ===")
+logger.info("Using endpoint: https://jsearch.p.rapidapi.com/search")
+
 _JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
 
 
