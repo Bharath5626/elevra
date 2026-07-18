@@ -36,9 +36,9 @@ Most job seekers — especially freshers — get almost no real feedback until t
 
 **[Try it live →](https://elevraa.me)**
 
-| Resume Analysis | Mock Interview | Career Readiness Index |
+| Resume Analysis | Mock Interview | Job Search |
 |---|---|---|
-| _screenshot here_ | _screenshot here_ | _screenshot here_ |
+| ![resumeanalysis](screenshots/resumeanalysis.png) | ![mockinterview](screenshots/mockinterview.png) | ![jobsearch](screenshots/jobsearch.png) |
 
 ---
 
